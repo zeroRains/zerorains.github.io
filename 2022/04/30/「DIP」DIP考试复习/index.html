@@ -1,0 +1,855 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「DIP」DIP考试复习 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="数字图像处理复习 (ps: 为什么全都是重点啊！) 第二章：图像数字化 难点：  图像文件格式：不要求对图像文件存储格式有深入了解，要了解他们存储的方式是什么样的说得出大概就行 图像质量评价  主观评价：肉眼观察，不同的人对图像进行打分 可观评价：均方差，标准差，信噪比，结构相似度     1、采样间隔和量化等级，或采样与量化方式、参数的选择对图像质量有何影响?  采样间隔越密集图像质量越好，图像">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「DIP」DIP考试复习">
+<meta property="og:url" content="http://blog.zerorains.top/2022/04/30/%E3%80%8CDIP%E3%80%8DDIP%E8%80%83%E8%AF%95%E5%A4%8D%E4%B9%A0/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="数字图像处理复习 (ps: 为什么全都是重点啊！) 第二章：图像数字化 难点：  图像文件格式：不要求对图像文件存储格式有深入了解，要了解他们存储的方式是什么样的说得出大概就行 图像质量评价  主观评价：肉眼观察，不同的人对图像进行打分 可观评价：均方差，标准差，信噪比，结构相似度     1、采样间隔和量化等级，或采样与量化方式、参数的选择对图像质量有何影响?  采样间隔越密集图像质量越好，图像">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/12.png">
+<meta property="article:published_time" content="2022-04-30T06:33:31.000Z">
+<meta property="article:modified_time" content="2022-06-30T08:18:09.032Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="数字图像处理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/12.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「DIP」DIP考试复习",
+  "url": "http://blog.zerorains.top/2022/04/30/%E3%80%8CDIP%E3%80%8DDIP%E8%80%83%E8%AF%95%E5%A4%8D%E4%B9%A0/",
+  "image": "http://blog.zerorains.top/img/12.png",
+  "datePublished": "2022-04-30T06:33:31.000Z",
+  "dateModified": "2022-06-30T08:18:09.032Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2022/04/30/%E3%80%8CDIP%E3%80%8DDIP%E8%80%83%E8%AF%95%E5%A4%8D%E4%B9%A0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「DIP」DIP考试复习',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/12.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「DIP」DIP考试复习</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「DIP」DIP考试复习</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-30T06:33:31.000Z" title="发表于 2022-04-30 14:33:31">2022-04-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-06-30T08:18:09.032Z" title="更新于 2022-06-30 16:18:09">2022-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%BE%E7%A8%8B%E5%AD%A6%E4%B9%A0/">课程学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="数字图像处理复习">数字图像处理复习</h1>
+<p>(ps: 为什么全都是重点啊！)</p>
+<h2 id="第二章：图像数字化">第二章：图像数字化</h2>
+<p>难点：</p>
+<ol>
+<li>图像文件格式：不要求对图像文件存储格式有深入了解，要了解他们存储的方式是什么样的说得出大概就行</li>
+<li>图像质量评价
+<ol>
+<li>主观评价：肉眼观察，不同的人对图像进行打分</li>
+<li>可观评价：均方差，标准差，信噪比，结构相似度</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>1、采样间隔和量化等级，或采样与量化方式、参数的选择对图像质量有何影响?</p>
+</blockquote>
+<p>采样间隔越密集图像质量越好，图像就会越接近与物理图像</p>
+<p>量化等级越多，越接近我们实际的物理图像，灰度级越细致，反之则会损失掉较多的灰度信息，太少还会出现伪轮廓的情况</p>
+<blockquote>
+<p>2、像素之间的关系</p>
+</blockquote>
+<p>邻接：两个像素点有接触，比如4邻域，对角邻域，8邻域的中心像素与其他任意像素的关系</p>
+<p><img src="https://blog.zerorains.top/img/image-20220430144313290.png" alt="image-20220430144313290"></p>
+<p>邻接性，是在指定的<strong>灰度集合</strong>（可以包含多个灰度值）中，图像的像素邻域内的像素都为灰度集合的像素</p>
+<p><img src="https://blog.zerorains.top/img/image-20220430150703969.png" alt="image-20220430150703969"></p>
+<p>连通性：如果两个像素按照某种邻接关系存在一条连通的路径时，他们就是连通的。</p>
+<p>区域：由连通的像素点所组成的点的集合称为一个区域</p>
+<p>区域中的某一个像素如果存在某一个邻域不属于这一区域，则称他是该区域的边界点</p>
+<p>边界：一个区域的全部边界点的集合组成该区域的边界</p>
+<p><img src="https://blog.zerorains.top/img/image-20220430152053416.png" alt="image-20220430152053416"></p>
+<p><strong>边界和边缘的区别</strong>：边界如上所示，边缘是指图像中灰度存在差异的地方，通常指相邻像素之间的灰度值差异大于某一个阈值。</p>
+<p>(ps:内部4个1像素中，左上角的那个也算边界点。漏掉了_(:з」∠)_)</p>
+<blockquote>
+<p>3、数字图像中距离的度量有哪几种﹖给出对应的公式及计算方法</p>
+</blockquote>
+<p>有两个像素点p,q，他们的坐标分别为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x_1,y_1),(x_2,y_2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> ，则</p>
+<p>欧氏距离</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>D</mi><mi>e</mi></msub><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><msqrt><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>−</mo><msub><mi>y</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">D_e(p,q) =\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">e</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.24em;vertical-align:-0.2561em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9839em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-2.9439em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2561em;"><span></span></span></span></span></span></span></span></span></span></p>
+<p>城市距离</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>D</mi><mn>4</mn></msub><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">∣</mi><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi><mo>+</mo><mi mathvariant="normal">∣</mi><msub><mi>y</mi><mn>1</mn></msub><mo>−</mo><msub><mi>y</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">D_4(p,q) = |x_1-x_2|+|y_1-y_2|
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span></span></span></span></span></p>
+<p>棋盘距离</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>D</mi><mn>8</mn></msub><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mi>m</mi><mi>a</mi><mi>x</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi><mo separator="true">,</mo><mi mathvariant="normal">∣</mi><msub><mi>y</mi><mn>1</mn></msub><mo>−</mo><msub><mi>y</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">D_8(p,q) = max(|x_1-x_2|,|y_1-y_2|)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ma</span><span class="mord mathnormal">x</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mclose">)</span></span></span></span></span></p>
+<p><img src="https://blog.zerorains.top/img/image-20220430152848344.png" alt="image-20220430152848344"></p>
+<blockquote>
+<p>4、常用的图像存储的文件格式:BMP、GIF、JPEG、TIFF、PNG，各有什么优缺点?</p>
+</blockquote>
+<ol>
+<li>BMP：位图存储格式，采用位映射的方式存储，图像信息较丰富，但是占用磁盘空间大</li>
+<li>GIF：图像互换格式，允许设置背景的透明属性，使用无损压缩，一个GIF可以存储多幅彩色图像，可以形成简单的动画。</li>
+<li>JPEG：有损压缩格式，可以压缩到很小的存储空间并保持较好的图像质量。</li>
+<li>TIFF：支持多种色位和多种彩色模式，支持多钟压缩方式。</li>
+<li>PNG：可移植网络图形格式，位图文件存储格式，采用无损数据压缩算法，压缩比高，生成文件容量小。</li>
+</ol>
+<blockquote>
+<p>5、图像打印的半调输出技术有哪两种﹖要输出256级灰度效果，需要多大的技术模板?</p>
+</blockquote>
+<ol>
+<li>幅度调制技术和频率调制技术</li>
+<li>5个灰度用2×2，10个灰度用3×3，256个灰度用16×16</li>
+</ol>
+<blockquote>
+<p>6、图像质量评价方法如何分类﹖图像质量评价的客观方法主要有哪几种?各有什么特点?</p>
+</blockquote>
+<p>主观评价和可观评价</p>
+<p>客观方法：</p>
+<ol>
+<li>均方误差：误差值越大，说明图像对应像素值整体差异大，图像质量差，反之均方误差小，说明图像质量好。均方误差为0，则被评价图像与参考图像完全一致</li>
+<li>信噪比与峰值信噪比：不同图像，在均方误差相同的情况下，由于像素值不同，信噪比也很有可能不一样。</li>
+<li>结构相似度：考虑了两幅图像的亮度，对比度和结构等罂粟对相似性的影响。</li>
+</ol>
+<h2 id="第三章：数字图像处理的数学基础-重点">第三章：数字图像处理的数学基础（重点）</h2>
+<blockquote>
+<p>1、什么是线性系统和移不变系统﹖具有哪些重要性质</p>
+</blockquote>
+<ol>
+<li>线性系统是对于任意两个输入x1,x2有两个输出f(x1),f(x2)，若其满足<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mo>⋅</mo><mi>x</mi><mn>1</mn><mo>+</mo><mi>b</mi><mo>⋅</mo><mi>x</mi><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mi>a</mi><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mi>b</mi><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(x1)+f(x2)=f(a\cdot x1+b\cdot x2)=af(x1)+bf(x2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">x</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">2</span><span class="mclose">)</span></span></span></span>则说明这是一个线性系统满足叠加原理（可加性，齐次性）</li>
+<li>输出信号的函数形式不变,仅仅是输出信号的自变量平移了同样的长度T,则称该系统具有移不变性;或称为移不变系统。若线性系统满足移不变特性,则称为线性移不变系统。</li>
+</ol>
+<blockquote>
+<p>2、调谐信号和传递函数的数学表达是什么?各有什么作用?频率、增益(幅值)、相位的物理意义是什么?</p>
+</blockquote>
+<p><strong>调谐信号</strong>实际上是用一个指数函数来表达我们这个线性当中很多的信号，因为指数也可以分解为正弦波，通过欧拉公式联系起来。作用：<strong>用调谐信号作为一种假设的输入</strong><br>
+这个输入通过一个系统得到一个输出，当这个信号如果是一个单位阶要函数的时候，这个输出就是<strong>传递函数</strong></p>
+<p>频率：表示信号变化的周期</p>
+<p>赋值：表示对信号的影响程度</p>
+<p>相位：表示信号的偏移</p>
+<blockquote>
+<p>3、卷积运算具有哪些重要性质﹖卷积运算和图像滤波有怎样的关系?</p>
+</blockquote>
+<p><img src="https://blog.zerorains.top/img/image-20220430161102246.png" alt="image-20220430161102246"></p>
+<p>滤波的目的是实现图像变换，其本质就是使用不同的卷积核对图像进行卷积运算。</p>
+<blockquote>
+<p>4、图像的相关性如何描述﹖相关与卷积的关系?</p>
+</blockquote>
+<p>相关性可以是指两幅图像的相关性，两者可以相等，如果不完全相等，可以用一个大于0小于1的数表示两者的差距。一个图像中两个不同物体不同之间的相关性，还有一幅图像中两个不同区域的相关性，其可以构成一种联合概率函数矩阵。</p>
+<p>序列相关函数和卷积和的关系为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mrow><mi>f</mi><mi>h</mi></mrow></msub><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mo>×</mo><mi>h</mi><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">r_{fh}(m)=f(-m)\times h(m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mord mathnormal mtight">h</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">−</span><span class="mord mathnormal">m</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>，对于自相关函数择优<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>f</mi></msub><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mo>∗</mo><mi>f</mi><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">r_f(m)=f(-m)*f(m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">−</span><span class="mord mathnormal">m</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>。</p>
+<blockquote>
+<p>5、二维线性系统和位置不变系统的数学表达，有哪些重要性质?</p>
+</blockquote>
+<p>其本质就是将一个二维的系统，转化为在x和y上分别进行一维系统的计算，即两次一维运算。具有移不变性，若其还满足线性特征，则称为二维位置不变线性系统。</p>
+<blockquote>
+<p>6、图像处理常用的矩阵运算有哪些?(复习线性代数)</p>
+</blockquote>
+<p>加减乘除，转置，逆，行列式，内积</p>
+<blockquote>
+<p>7、什么是梯度﹖二维梯度算子如何表达﹖离散梯度的简化算子有哪些?</p>
+</blockquote>
+<p>高频信号和低频信号的边缘就是一种梯度，使用微分运算找到梯度。</p>
+<blockquote>
+<p>8、什么是图像的灰度直方图﹖直方图具有哪些性质?</p>
+</blockquote>
+<p>直方图代表了每一个灰度的取值占总像素的概率和数量的多少，是一种概率密度分布。</p>
+<p>性质：</p>
+<p>(1）直方图是一幅图像中各像素灰度值出现次数或频数的统计结果,它只反映该图像中不同灰度值出现的频率,而不能反映某一灰度值像素所在的位置信息,即直方图仅包含了该图像中某一灰度值的像素出现的概率,而丢失了其所在位置的信息。<br>
+(2）任一幅图像,都能唯一地确定一个与之对应的直方图。但不同的图像,可能有相同的直方图。也就是说,图像与直方图之间是一种多对一的映射关系。<br>
+(3）由于直方图是对具有相同灰度值的像素统计计数得到的,若某一幅图像由若干子图像区域构成,那么各子区域直方图之和就等于原图像的直方图。</p>
+<blockquote>
+<p>9、数字图像的直方图的概念﹖图像的统计特征有哪些?图</p>
+</blockquote>
+<p>像的信息量、灰度平均值、中值、值域、方差(均方差、标准差)等</p>
+<p>标准差是一组薮据平均值分散程度的一种度量。一个较大的标准差，代表大部分数值和其平均值之间差异较大;一个较小的标准差，代表这些数值较接近平均值。<br>
+例如，A、B两组各有6位学生参加同一次语文测验，A组的分数为95、85、75、65、55、45，B组的分数为73、72、71、69、68、67。这两组的平均数都是70，但A组的标准差为17.07分，B组的标准差为2.37分(此数据时在R统计软件中运行获得），说明A组学生之间的差距要比B组学生之间的差距大得多。</p>
+<h2 id="第四章：数字图像处理的数学运算-重点">第四章：数字图像处理的数学运算(重点)</h2>
+<blockquote>
+<p>1、点运算的主要类型和特点是什么?有哪些应用?</p>
+</blockquote>
+<p>点运算可以改变图像数据所占据的灰度值范围。但不会改变图像内的空间位置关系。</p>
+<p>类型：</p>
+<ol>
+<li>线性点运算：可以调节图像的亮度，对比度，以及图像求补。</li>
+<li>非线性点运算：通过压低在中间灰度级出的对比度，将较亮和较暗部分的对比度加强。</li>
+</ol>
+<p>应用：</p>
+<ol>
+<li>对比度增强</li>
+<li>光度学标定</li>
+<li>显示标定</li>
+<li>轮廓线</li>
+<li>裁剪</li>
+</ol>
+<blockquote>
+<p>2、图像的代数运算有几种类型﹖有哪些典型应用?</p>
+</blockquote>
+<p>加：平均值降噪</p>
+<p>减：消除背景影响，差影法图像分离，求梯度幅度</p>
+<p>乘：通过图像掩码实现抠图效果</p>
+<p>除：比值图像处理</p>
+<blockquote>
+<p>3、图像的几何变换有位置变换（平移、镜像、旋转）和形状变换(（放大、地小、错切)，如何形成统一的数学表示﹖（会考计算题，图像的几何变换结果）</p>
+</blockquote>
+<p>通过齐次方程，把所有的变换统一用矩阵的形式来表达。</p>
+<blockquote>
+<p>4、如何理解齐次坐标﹖它有什么作用?</p>
+</blockquote>
+<p>变换矩阵一般是方阵，在进行加减乘除与原图像进行矩阵运算的时候，矩阵行与列要遵循一定的关系才能进行运算。齐次方程坐标就是要解决这个问题。</p>
+<blockquote>
+<p>5、为什么要进行灰度级插值?有哪几种灰度插值方法?</p>
+</blockquote>
+<p>在进行图像放大时，少的像素要变成多的像素会出现像素空洞的情况，还有进行旋转时，也会发生角度的偏移而出现空洞。插值就是填补这些空洞的一个有效方法。</p>
+<p>灰度插值：</p>
+<ol>
+<li>最近邻插值</li>
+<li>双线性插值</li>
+<li>三次内插值</li>
+</ol>
+<blockquote>
+<p>6、简述图像几何变换与图像变换的区别。</p>
+</blockquote>
+<p>图像的几何变换:改变图像的位置、大小或形状。</p>
+<p>图像变换：在不同空间对图像进行变化。</p>
+<h2 id="第五章：图像变换-重点">第五章：图像变换（重点）</h2>
+<blockquote>
+<p>1、什么是图像变换﹖图像变换的目的是什么?</p>
+</blockquote>
+<p>图像变换:指在不同空间对图像进行的变换。为了快速和有效地对图像i行处理。</p>
+<blockquote>
+<p>2、常用的图像变换有几种﹖不同的变换主要差异是什么?</p>
+</blockquote>
+<p>图像变换的方法和种类很多，其原理和效果是不同的。由<strong>变换核</strong>决定不同类型的图像变换。</p>
+<p>正弦型变换:傅里叶变换、余弦变换和正弦变换。方波型变换:哈达玛 (Hadamarn)变换、沃尔什(Walsh)变换、斜变换、小波变换。</p>
+<p>基于特征向量的变换:主要包括Hotelling变换、K一L变换和SVD变换。</p>
+<blockquote>
+<p>3、为什么说傅里叶变换是“数学棱镜”﹖典型函数的傅里叶变换的特点。</p>
+</blockquote>
+<ol>
+<li>傅里叶变换将信号分成不同频率成份：直流分量和交流分量。</li>
+<li>傅立叶变换在图像滤波中的应用：Fourier变换后的图像，中间部分为低频部分，越靠外边频率越高。因此，我们可以在Fourier变换图中，选择所需要的高频或是低频进行滤波。</li>
+<li>信号变化的快慢与频率域的频率有关：噪声、边缘、跳跃部分代表图像的高频分量;背景区域和慢变部分代表图像的低频分量。</li>
+<li>傅立叶变换在图像压缩中的应用：变换系数刚好表现的是各个频率点上的幅值，可以进行压缩编码。考虑到高频反映细节、低频反映景物概貌的特性，往往认为可将高频系数置为0，骗过人眼。</li>
+</ol>
+<blockquote>
+<p>4、二维离散（数字图像）的傅里叶变换具有哪些性质﹖图像压缩运用了什么性质?</p>
+</blockquote>
+<p>性质：线性特性，比例特性，平移性质，可分离性，周期性，共轭对称性，旋转不变形，微分性质，平均值性质，卷积定理，相关定理，Parseval定理</p>
+<p>图像压缩利用了共轭对称性，只保存一半的信息，然后通过这一半能够还原另一半的信息。还利用了离散余弦变化进行压缩。</p>
+<blockquote>
+<p>5、正弦信号的在频域中是由频谱和相角确定的一个点，从而有利于对信号进行分析与处理。</p>
+</blockquote>
+<p>频域中低频信号幅值(傅里叶频谱)大，对应的能量谱高，频点亮;信号频率越高，对应的幅值越小，能量谱越小，频点越暗。</p>
+<p><img src="https://blog.zerorains.top/img/image-20220430170024558.png" alt="image-20220430170024558"></p>
+<h2 id="第六章：图像增强-重点">第六章：图像增强（重点）</h2>
+<blockquote>
+<p>1、什么是图像增强﹖其目的和特点是什么?</p>
+</blockquote>
+<p>图像增强：通过某种技术手段有选择地突出对某一具体应用有价值的信息，即图像增强只通过突出某些信息以增强对这些信息的辨识能力，而其他信息则被压缩了。</p>
+<p>目的：根据应用需要突出图像中的某些“有用”信息，削弱或取出不需要的信息，以达到扩大图像中不同物体特征之间的差别，使处理后的图像对于特定应用而言，比原始图像更适合，或者使用图像的信息提取以及为其他图像分析技术奠定基础。</p>
+<blockquote>
+<p>2、图像增强技术有哪些类型?</p>
+</blockquote>
+<p><img src="https://blog.zerorains.top/img/image-20220430171445239.png" alt="image-20220430171445239"></p>
+<blockquote>
+<p>3、什么是直方图均衡化﹖其处理过程包括哪些步骤﹖（这两个后面用题目说吧）</p>
+</blockquote>
+<blockquote>
+<p>4、什么是直方图规定化技术﹖其处理包含哪些步骤﹖</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>原始</th>
+<th>直方图</th>
+<th>规定</th>
+<th>直方图</th>
+<th>对<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>r</mi></msub><mo stretchy="false">(</mo><msub><mi>r</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_r(r_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>累加</th>
+<th>对<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>z</mi></msub><mo stretchy="false">(</mo><msub><mi>Z</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_z(Z_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>累加</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">r_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>r</mi></msub><mo stretchy="false">(</mo><msub><mi>r</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_r(r_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Z</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">Z_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>z</mi></msub><mo stretchy="false">(</mo><msub><mi>z</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_z(z_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">R_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">V_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><msub><mi>r</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mo>→</mo><mi>P</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(r_k) \rightarrow P(z_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>0</mn></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">r_0=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td>
+<td>0.29</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>0</mn></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z_0=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td>
+<td>0</td>
+<td>0.29</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mfrac><mn>1</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_1=\frac 17</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.24</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>=</mo><mfrac><mn>1</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_1=\frac 17</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0</td>
+<td>0.53</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mfrac><mn>2</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_2=\frac 27</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.17</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>2</mn></msub><mo>=</mo><mfrac><mn>2</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_2=\frac 27</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0</td>
+<td>0.70</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>3</mn></msub><mo>=</mo><mfrac><mn>3</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_3=\frac 37</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.12</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>3</mn></msub><mo>=</mo><mfrac><mn>3</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_3=\frac 37</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0</td>
+<td>0.82</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>4</mn></msub><mo>=</mo><mfrac><mn>4</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_4=\frac 47</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.09</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>4</mn></msub><mo>=</mo><mfrac><mn>4</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_4=\frac 47</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.27</td>
+<td>0.91</td>
+<td>0.27</td>
+<td>0.29</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>5</mn></msub><mo>=</mo><mfrac><mn>5</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_5=\frac 57</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.06</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>5</mn></msub><mo>=</mo><mfrac><mn>5</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_5=\frac 57</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.43</td>
+<td>0.97</td>
+<td>0.70</td>
+<td>0.24+0.17=0.41</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>6</mn></msub><mo>=</mo><mfrac><mn>6</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">r_6=\frac 67</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.02</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>6</mn></msub><mo>=</mo><mfrac><mn>6</mn><mn>7</mn></mfrac></mrow><annotation encoding="application/x-tex">z_6=\frac 67</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>0.19</td>
+<td>0.99</td>
+<td>0.89</td>
+<td>0.12+0.09=0.21</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mn>7</mn></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r_7=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+<td>0.01</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mn>7</mn></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">z_7=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+<td>0.11</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>0.06+0.02+0.01=0.09</td>
+</tr>
+</tbody>
+</table>
+<p>结果就是对比<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">V_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>中与<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">R_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>最接近的值对应的灰度级的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>r</mi></msub><mo stretchy="false">(</mo><msub><mi>r</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_r(r_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>的加和，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>z</mi></msub><mo stretchy="false">(</mo><msub><mi>z</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_z(z_k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>中要求为0的像素点，在结果中也一定为0，这个可以避免一些<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">V_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>相同不知道怎么处理的情况。</p>
+<blockquote>
+<p>5、平滑滤波的作用是什么?什么是邻域平均滤波(均值滤波)﹖掌握其处理过程。 （均值滤波应该会有题目的）</p>
+</blockquote>
+<p>作用：对图像的高频分量进行削弱或消除，增强图像的低频分量，平滑滤波一般用于消除图像中的随机噪声，从而起到图像平滑的作用。</p>
+<blockquote>
+<p>6、中值滤波的原理是什么?掌握其处理过程。（应该有题目）</p>
+</blockquote>
+<p>原理：利用一个奇数点的移动窗口，将窗口中心点的值用窗口各点像素值的中位数代替。</p>
+<blockquote>
+<p>7、什么是图像锐化?其目的和原理是什么?</p>
+</blockquote>
+<p>图像锐化就是突出图像的边缘纹理信息，可以通过锐化滤波器实现，它可以消除或减弱图像的低频分量从而增强图像中物体的边缘轮廓信息，使得除边缘以外的像素点的灰度值趋向于零。</p>
+<blockquote>
+<p>8、图像锐化有哪些算法﹖罗伯特算子和拉普拉斯算子各有什么特点﹖、</p>
+</blockquote>
+<ol>
+<li>梯度法，拉普拉斯算子，定向滤波</li>
+<li>罗伯特算子是一种交叉差分的运算法则，拉普拉斯算子采用的是二阶偏导数</li>
+</ol>
+<blockquote>
+<p>9、平滑模板和锐化模板有什么特点和不同之处?</p>
+</blockquote>
+<p>平滑模板与锐化模板的不同之处在于，平滑模板各系数的符号均为正，因此平滑具有积分或求和的性质，而锐化模板各系数的符号则有正有负，而且模板系数的和正好为0，即锐化滤波算法具有微分或差分的性质。</p>
+<blockquote>
+<p>10、频率滤波的原理及主要步骤。什么是截止频率?</p>
+</blockquote>
+<p>阶数滤波，巴特沃斯滤波，指数滤波，梯形滤波（都是低通滤波 ）</p>
+<p>截止频率就是控制这些滤波中的哪一部分进行保留，哪一部分会被舍去。其中在截止频率内的频率将会被保留，反之则会被舍弃。</p>
+<blockquote>
+<p>11、低通、高通、带同、带阻滤波有什么作用﹖决定滤波效果的关键因素是化么?</p>
+</blockquote>
+<p>低通滤波：通过滤波器函数H减弱或抑制高频分量，保留低频分量，消除图像中的随机噪声，削弱边缘效应，起到平滑图像的作用。</p>
+<p>高通滤波：对图像的边缘信息进行增强，起到锐化图像的作用。</p>
+<p>带通滤波：允许一定频率范围内的信号通过而组织其他频率范围的信号通过</p>
+<p>带阻滤波：可以对一定频率范围内的信号进行完全衰减，而允许其他频率范围内的信号通过。</p>
+<p>关键因素：截止频率。</p>
+<blockquote>
+<p>12、图像匹配中直方图匹配、模板匹配、形状匹配的原理是什么?各有什么特点﹖</p>
+</blockquote>
+<ol>
+<li><strong>直方图匹配</strong>又称为直方图规定化，是指将一幅图像的直方图变成规定形状的直方图而进行的图像增强方法。 即将某幅影像或某一区域的直方图匹配到另一幅影像上。使两幅影像的色调保持一致。</li>
+<li><strong>模板匹配</strong>是一项在一幅图像中寻找与另一幅模板图像最匹配(相似)部分的技术。这里说的模板是我们已知的小图像，模板匹配就是在一副大图像中搜寻目标。模板就是我们已知的在图中要找的目标，且该目标同模板有相同的尺寸、方向和图像，通过一定的算法可以在图中找到目标，确定其坐标位置。</li>
+<li><strong>形状匹配</strong>就是在形状描述的基础上，依据一定的判定准则，计算两个形状的相似度或者非相似度。两个形状之间的匹配结果用一个数值表示，这一数值称为形状相似度。形状相似度越大，表示两个形状越相似。非相似度也称为形状距离。与相似度相反，形状距离越小，两个形状越相似。</li>
+</ol>
+<blockquote>
+<p>13、常用的彩色增强方法有哪几种﹖是如何实现的?</p>
+</blockquote>
+<ol>
+<li><strong>真彩色增强技术</strong>:真彩色处理中，被处理的图像一般通过全彩色传感器获取(彩色摄像机或彩色扫描仪等)，对像按RGB三通道进行处理，并合成为真彩色。</li>
+<li><strong>假彩色增强技术</strong>:假彩色处理是一种尽量逼近真实色彩的人工彩色处理技术。把真实的自然彩色图像或遥感多光谱图像处理成假彩色图像。</li>
+<li><strong>伪彩色增强技术</strong>:伪彩色是指分配彩色给某一灰度范围或某一灰度值，以增强图像辨识能力。例如把黑白图象处理成伪彩色图象。</li>
+</ol>
+<blockquote>
+<p>14、彩色图像有何特点?什么是真彩色图像和伪彩色图像?</p>
+</blockquote>
+<p>真彩色图像指能真实反应自然物体本来颜色的图像，有彩色摄像机摄制，并由彩色监视器复原的彩色图像都可以认为是真彩色。</p>
+<p>伪彩色是指分配彩色给某一灰度范围或某一灰度值，以增强图像辨识能力。</p>
+<h2 id="第七章：图像复原-重点">第七章：图像复原（重点）</h2>
+<blockquote>
+<p>1.图像退化的原因有哪些﹖图像复原的机理是什么?</p>
+</blockquote>
+<p><strong>原因</strong>:</p>
+<ol>
+<li>成像系统镜头聚焦不准产生的散焦模糊;</li>
+<li>相机与景物之间的相对运动模糊;</li>
+<li>成像系统存在的各种非线性因素以及系统本身的性能造成的成像模糊;</li>
+<li>射线辐射大气湍流等因素造成的几何畸变成像系统的像差、畸变、有限带宽等导致的变形;</li>
+<li>底片感光图像显示时会造成记录显示失真</li>
+<li>成像系统中存在的各种随机噪声。</li>
+</ol>
+<p><strong>机理是什么</strong>：</p>
+<p>典型的图像复原方法是根据图像退化的先验知识建立一个退化模型,以此模型为基础，采用滤波等手段进行处理，使得复原后的图像符合一定的准则，达到改善图像质量的目的。</p>
+<blockquote>
+<p>2.图像复原和图像增强有哪些主要区别?</p>
+</blockquote>
+<p><strong>图像增强</strong>是一种改进图像视觉效果的技术，是为了突出图像中感兴趣的特征，增强后的图像可能与原始图像存在一定的差异。</p>
+<p><strong>图像复原</strong>是一种对退化(或品质下降)的图像去除退化因素，进而复原或重建被退化图像的技术，是针对图像退化的原因做出补偿，使恢复后的图像尽可能接近原始图像。</p>
+<blockquote>
+<p>3.图像复原的关键任务是什么?</p>
+</blockquote>
+<p>建立退化模型</p>
+<blockquote>
+<p>4.什么是无约束复原﹖其基本原理是什么?存在什么问题?</p>
+</blockquote>
+<p>根据系统退化模型，噪声项可以表示为</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>n</mi><mo>=</mo><mi>g</mi><mo>−</mo><mi>H</mi><mo>⋅</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">n = g-H \cdot f
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span></span></p>
+<p>在噪声n不确定的情况下，希望对原始图像f的估计值<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{f}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1523em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>应该满足这样的条件，希望找到一个<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{f}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1523em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>，使得</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∥</mi><mi>n</mi><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo>=</mo><mi mathvariant="normal">∥</mi><mi>g</mi><mo>−</mo><mi>H</mi><mover accent="true"><mi>f</mi><mo>^</mo></mover><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo>=</mo><mo stretchy="false">(</mo><mi>g</mi><mo>−</mo><mi>H</mi><mover accent="true"><mi>f</mi><mo>^</mo></mover><msup><mo stretchy="false">)</mo><mi>T</mi></msup><mo stretchy="false">(</mo><mi>g</mi><mo>−</mo><mi>H</mi><mover accent="true"><mi>f</mi><mo>^</mo></mover><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\|n\|^{2}=\|g-H \hat{f}\|^{2}=(g-H \hat{f})^{T}(g-H \hat{f})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal">n</span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>为最小（噪声项的范数最小）。由定义可知</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∥</mi><mi>n</mi><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo>=</mo><msup><mi>n</mi><mi>T</mi></msup><mi>n</mi></mrow><annotation encoding="application/x-tex">\|n\|^{2}=n^{T} n
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal">n</span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8913em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span><span class="mord mathnormal">n</span></span></span></span></span></p>
+<p>求<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mi>n</mi><mi mathvariant="normal">∣</mi><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">||n||^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">∣∣</span><span class="mord mathnormal">n</span><span class="mord">∣</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>最小等效于求<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mi>g</mi><mo>−</mo><mi>H</mi><mover accent="true"><mi>f</mi><mo>^</mo></mover><mi mathvariant="normal">∣</mi><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">||g-H\hat{f}||^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣∣</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>最小，即<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>J</mi><mo stretchy="false">(</mo><mover accent="true"><mi>f</mi><mo>^</mo></mover><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mi>g</mi><mo>−</mo><mi>H</mi><mover accent="true"><mi>f</mi><mo>^</mo></mover><mi mathvariant="normal">∣</mi><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">J(\hat{f}) = ||g-H\hat{f}||^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣∣</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>的极小值问题。</p>
+<p><strong>这里的选择除了要求为最小外，不受任何其他条件的约束，因此称为无约束复原</strong>。</p>
+<p>由于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo>=</mo><mi>H</mi><mi>f</mi><mo>+</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">g = Hf+n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>可知，在不考虑图像噪声的情况下，要恢复元图像需要对矩阵H求逆，即：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><msup><mi>H</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>g</mi></mrow><annotation encoding="application/x-tex">f = H^{-1}g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span></p>
+<p>在实际中可能有逆矩阵<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">H^{-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>不存在的情况，但却确实存在着与<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span>十分近似的解。这称为恢复问题的奇异性</p>
+<blockquote>
+<p>5.什么是逆滤波复原﹖其病态条件是什么?如何避免?</p>
+</blockquote>
+<p>逆滤波复原：是通过变换到频域进行滤波复原的方法，属于频域图像复原方法。</p>
+<p><strong>条件</strong>：由于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">H(u,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span>在分母上，当u-v平面上有些点或区域<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">H(u,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span>很小或等于零，即出现了零点时，就会导致不稳定解。</p>
+<p><strong>避免方法</strong>：在<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">H(u,v)=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>的那些频谱点及其附近，人为地设置<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">H^{-1}(u,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span>的值，使得在这些频谱点附近<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>H</mi><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">N(u,v)/H(u,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span>不会对<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(u,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span>产生太大的影响。</p>
+<blockquote>
+<p>6.什么是有约束复原?什么情况下使用?</p>
+</blockquote>
+<p>在了解关于退化系统的传递函数的基础上，还知道了某些噪声的统计特性或噪声与图像的某些相关情况的情况下使用</p>
+<p><strong>约束复原</strong>：根据所了解的噪声的先验知识的不同，采用不同的约束调节，可得到不同的图像复原技术。</p>
+<blockquote>
+<p>7．维纳滤波的准则是什么?其有效性受哪些因素影响?</p>
+</blockquote>
+<p><strong>准则</strong>：将原始图像<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span>和对原始图像的估计<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{f}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1523em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>看作随机变量，按照<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span>和估计值<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{f}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1523em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>之间的均方误差达到最小的准则实现图像复原。</p>
+<p><strong>因素</strong>：</p>
+<p>(1）当图像复原的目的是供人观察时,均方误差(MSE)准则并不是一个特别好的优化准则。这是因为MSE准则不管其在图像中的位置对所有误差都赋以同样的权﹐而人眼则对暗处和高梯度区域的误差比其他区域的误差具有较大的容忍性。由于使均方误差最小化,维纳滤波器以一种并非最适合人眼的方式对图像进行了平滑。<br>
+(2）经典的维纳去卷积不能处理具有空间可变点扩散函数的情形﹐例如存在彗差﹑散差﹑表面像场弯曲以及含旋转的运动模糊等情况。<br>
+(3）这种技术不能处理非平稳信号和噪声的一般情形。许多图像都是高度非平稳的，有着被陡峭边缘分开的大块平坦区域。此外，一些重要的噪声源具有与局部灰度有关的特性。</p>
+<blockquote>
+<p>8． 中值滤波可以用于哪种原因的图像退化复原?二维中值滤波窗口有哪几种?各适用于什么场合?</p>
+</blockquote>
+<p>可以克服线性滤波如最小均方滤波，均值滤波给图像边缘带来的模糊，可以既取出噪声，又能保护图像的边缘，从而获得比较满意的图像复原效果。</p>
+<p>常用的有5种，方形，圆形，十字形</p>
+<p><img src="https://blog.zerorains.top/img/image-20220430224147593.png" alt="image-20220430224147593"></p>
+<p>对于有缓变的较长轮廓线物体的图像，采用方形或圆形为宜</p>
+<p>对于包含尖顶角物体的图像，事宜用十字形窗口。</p>
+<p>窗口大小则以不超过图像中最小有效物体的尺寸为宜。</p>
+<h2 id="第十章：图像分割与边缘检测-重点">第十章：图像分割与边缘检测(重点)</h2>
+<blockquote>
+<p>1、数字图像处理的三个层次</p>
+</blockquote>
+<p><img src="https://blog.zerorains.top/img/image-20220430224519535.png" alt="image-20220430224519535"></p>
+<blockquote>
+<p>什么是SHIFT特征</p>
+</blockquote>
+<p>具有尺度，旋转，平移，不变性的特征</p>
+<blockquote>
+<p>2、什么是图像分割﹖有哪些主要方法?</p>
+</blockquote>
+<p><strong>图像分割</strong>就是把图像分成若干个特定的、具有独特性质的区域并提出感兴趣目标的技术和过程。</p>
+<p><strong>主要方法</strong>：基于阈值的分割方法、基于区域的分割方法、基于边缘的分割方法、基于特定理论的分割方法等。</p>
+<blockquote>
+<p>3、灰度阈值分割的基本原理。如何找到双峰直方图的分割阈值。</p>
+</blockquote>
+<p><strong>原理</strong>：把图像灰度分成不同的等级,然后用设置灰度门限(阈值)的方法，确定有意义的区域或分割物体的边界。</p>
+<p>图像中的目标分布在较暗的灰度级上形成一个波峰，图像中的背景分布在较亮的灰度级上形成另一个波峰。以双峰之间的谷低处灰度值作为阈值T进行图像的阈值化处理，便可将目标和背景分割开来。</p>
+<blockquote>
+<p>4、区域分割方法主要有哪两种﹖实现过程步骤、各有什么特点?</p>
+</blockquote>
+<ol>
+<li>
+<p>区域生长法</p>
+<p>思想:将每个需要分割的区域找一个种子像素作为生长的起点，然后将种子像素周围领域中与种子像素有相同或相似的像素合并到种子像素所在的区域中。</p>
+</li>
+<li>
+<p>分裂合并法</p>
+<p>分裂合并法先从整幅图开始，先将图像分成任意大小且不重叠的区域，然后再合并或分裂这些区域以满足分割的要求。</p>
+</li>
+</ol>
+<blockquote>
+<p>5、什么是图像的边缘﹖常见的边缘信号有哪些?</p>
+</blockquote>
+<p>图像的边缘是指其周围像素灰度有阶跃变化或屋顶变化的像素的集合。</p>
+<p><strong>边缘信号</strong>：</p>
+<ol>
+<li>阶跃信号</li>
+<li>斜坡信号</li>
+<li>屋顶信号</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20220501143145925.png" alt="image-20220501143145925"></p>
+<blockquote>
+<p>6、基于梯度的边缘检测算子有哪些﹖各有什么特点?</p>
+</blockquote>
+<ol>
+<li>
+<p>罗伯特算子（Robert）利用局部差分方法寻找边缘，其梯度算子采用的是对角方向相邻两像素值之差。</p>
+<blockquote>
+<p>算子模板：</p>
+<p>[[1    0]      [[  0  1]</p>
+<p>[0  -1]]       [-1  0]]</p>
+</blockquote>
+</li>
+<li>
+<p>索贝尔算子（Sobel）具有一定的噪声抑制能力，在检测阶跃边缘是可以得到至少两个像素的边缘宽度。</p>
+<blockquote>
+<p>算子模板：</p>
+<p>[[-1 -2 -1]     [[-1 0 1]</p>
+<p>[0   0  0]       [-2 0 2]</p>
+<p>[1   2  1]]      [-1 0 1]]</p>
+</blockquote>
+</li>
+<li>
+<p>普瑞维特算子(Prewitt) 利用局部差分平均法寻找边缘的算子</p>
+<blockquote>
+<p>算子模板：</p>
+<p>[[-1 -1 -1]     [[1 0 -1]</p>
+<p>[0   0  0]       [1 0 -1]</p>
+<p>[1   1  1]]      [1 0 -1]]</p>
+</blockquote>
+</li>
+<li>
+<p>拉普拉斯算子(Laplancian) 二阶导数算子，噪声成分得到加强，对噪声更敏感</p>
+<blockquote>
+<p>算子模板：</p>
+<p>[[ 0   -1   0]     [[-1 -1 -1]</p>
+<p>[-1   4  -1]       [-1  8 -1]</p>
+<p>[0   -1   0]]      [-1 -1 -1]]</p>
+</blockquote>
+</li>
+<li>
+<p>凯西算子(Kirsch)：8组算子(对应8个方向)，取最大值（确定方向）</p>
+<blockquote>
+<p>算子模板：</p>
+<p><img src="https://blog.zerorains.top/img/image-20220501144802750.png" alt="image-20220501144802750"></p>
+</blockquote>
+</li>
+<li>
+<p>Marr算子(LOG算子)，抗噪声能力强，各向同性，图像模糊化</p>
+</li>
+<li>
+<p>Canny算子，2D高斯模板平滑滤波(平滑图像，去噪)，求梯度（幅度与方向），非极大抑制（每个像素与其梯度方向相邻像素（两个）比较，如其灰度非极大值，则该点置0），双阈值判别（根据灰度直方图计算两个阈值）</p>
+</li>
+</ol>
+<p><strong>各边缘算子的特点</strong></p>
+<p><img src="https://blog.zerorains.top/img/image-20220501145122310.png" alt="image-20220501145122310"></p>
+<blockquote>
+<p>7、常用的二阶梯度算子有哪些﹖有何特点﹖</p>
+</blockquote>
+<p>Laplancian，Marr，Canny，特点如上图</p>
+<blockquote>
+<p>8、进行边缘检测前，应该对图像进行什么处理?</p>
+</blockquote>
+<p>需要进行图像平滑，去除噪声</p>
+<blockquote>
+<p>9、什么是图像匹配﹖主要有哪些方法?</p>
+</blockquote>
+<p><strong>图像匹配</strong>，就是指将不同时间、不同成像条件下对同一物体或场景获取的两幅或多幅图像在空间上对准，或根据已知模式到另一幅图像中寻找相应的模式。</p>
+<p>方法：</p>
+<ol>
+<li>模板匹配</li>
+<li>直方图匹配</li>
+<li>形状匹配</li>
+</ol>
+<blockquote>
+<p>10、模板匹配的原理是什么?有何局限?</p>
+</blockquote>
+<p><strong>模板匹配</strong>是指用一个较小的图像即模板，与源图像进行比较，以确定在源图像中是否存在与该模板相同或相似的区域,若该区域存在，还可确定其位置并提取该区域。</p>
+<p><strong>模板匹配的主要局限性</strong>在于它只能进行平行移动，如原图像中要匹配的目标发生旋转或大小变化，该算法无效。如原图像中要匹配的目标只有部分可见，该算法也无法完成匹配。</p>
+<blockquote>
+<p>11、直方图匹配和形状匹配的原理是什么?</p>
+</blockquote>
+<p>要利用图像的颜色特征描述图像，可借助图像特征的统计直方图。利用直方图进行图像的匹配，这便是<strong>直方图匹配</strong>。</p>
+<p><strong>形状匹配</strong>：目标的形状常常可以用目标的轮廓来表示，而轮廓是由一系列边界点所组成的。一般认为，在较大尺度下常常能较可靠地消除误检并检测到真正的边界点，但在大尺度下对边界的定位不易准确。相反，在较小尺度下对真正边界点的定位常比较准确，但在小尺度下误检的比例会增加。所以，可考虑先在较大尺度下检测出真正的边界点，再在较小尺度下对真正边界点进行较精确的定位。</p>
+<h2 id="第十一章：图像特征与理解">第十一章：图像特征与理解</h2>
+<blockquote>
+<p>1、图像特征是指什么﹖具有什么作用?</p>
+</blockquote>
+<p>图像特征是区分一个图像内部或区域的最基本属性和特点。</p>
+<p>可以用于图像识别，分类和理解。</p>
+<blockquote>
+<p>2、SIFT特征具有什么特点﹖其实际应用价值是什么?</p>
+</blockquote>
+<p>对旋转、尺度缩放、亮度变化保持不变性，对视角变化、仿射变换、噪声也保持一定程度的稳定性。</p>
+<p>可以帮助不同视角的图像，实现物体对齐</p>
+<p>可以用于</p>
+<blockquote>
+<p>2、SIFT特征具有什么特点﹖其实际应用价值是什么?</p>
+</blockquote>
+<p><strong>特点</strong>：对旋转，尺度缩放，亮度变化保持不变性，对视角变换，仿射变化，噪声也保持一定程度的稳定性</p>
+<p>可以实现不同视角的图像物体实现对齐</p>
+<blockquote>
+<p>3、提取图像特征之前,需要对图像进行什么处理?</p>
+</blockquote>
+<p>图像去噪，图像增强，图像恢复</p>
+<blockquote>
+<p>4、数字图像中如何计算区域的周长?</p>
+</blockquote>
+<ol>
+<li>
+<p>若把图像中的像素视为<strong>单位面积的小方块</strong>，那么区域和背景之间的间隙(隙码)数量就是区域的周长（如下图红色部分）</p>
+<p><img src="https://blog.zerorains.top/img/image-20220501152417888.png" alt="image-20220501152417888"></p>
+</li>
+<li>
+<p>若把图像中的像素视为点，水平垂直边为1，斜边为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span></span></span></span>，这个叫做他的链码(如下图)</p>
+<p><img src="https://blog.zerorains.top/img/image-20220501153322918.png" alt="image-20220501153322918"></p>
+</li>
+<li>
+<p>用边界所占面积表示</p>
+<p><img src="https://blog.zerorains.top/img/image-20220501153711342.png" alt="image-20220501153711342"></p>
+</li>
+</ol>
+<blockquote>
+<p>5、数字图像处理中，计算区域的面积有哪些方法?</p>
+</blockquote>
+<ol>
+<li>像素计数法，物体边界内像素点的总和</li>
+<li>边界行程码计算法</li>
+<li>边界坐标计算法</li>
+</ol>
+<blockquote>
+<p>6、什么是物体的形状特征﹖常见的有哪些﹖</p>
+</blockquote>
+<p>矩形度，宽长比，圆形度，球状度，不变矩，偏心率。</p>
+<blockquote>
+<p>7、为什么说不变矩是具有平移、旋转、尺度不变性的特征?不变矩的阶数是如何确定的?</p>
+</blockquote>
+<p>相对于主轴计算采用面积归一化的中心矩，在物体放大，平移，旋转时保持不变。利用归一化的中心矩，可以获得不变矩的多种组合，这些组合对于平移，旋转，尺度等变换都具有不变性。将x，y的指数进行相加，就可以得到图像矩的阶数。</p>
+<blockquote>
+<p>8、拓扑描述具有什么特点﹖欧拉数如何计算﹖</p>
+</blockquote>
+<p>图形的拓扑性质具有稳定性，即只要图形没有发生破坏性变化，其拓扑性质就不会因为物理变化而改变。</p>
+<p>连接部分表示连通区域，孔洞数表示连接区域中的空白圈</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>欧拉数</mtext><mo>=</mo><mtext>区域内的连接部分</mtext><mo>−</mo><mtext>区域中的孔洞数</mtext></mrow><annotation encoding="application/x-tex">欧拉数 = 区域内的连接部分 - 区域中的孔洞数</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">欧拉数</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">区域内的连接部分</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">区域中的孔洞数</span></span></span></span></p>
+<h2 id="例题1">例题1</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501160040738.png" alt="image-20220501160040738"></p>
+<p>其中，对a的话，就是小于127的像素全部变为0，大于等于127的像素全部变为255</p>
+<p>对b的话，是一个分段函数，<code>0~100</code>的像素为50，<code>100~180</code>的像素x按照函数</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>x</mi><mo>−</mo><mn>100</mn></mrow><mrow><mn>180</mn><mo>−</mo><mn>100</mn></mrow></mfrac><mo>×</mo><mo stretchy="false">(</mo><mn>255</mn><mo>−</mo><mn>50</mn><mo stretchy="false">)</mo><mo>+</mo><mn>50</mn><mo>=</mo><mfrac><mrow><mi>x</mi><mo>−</mo><mn>100</mn></mrow><mn>16</mn></mfrac><mo>×</mo><mn>41</mn><mo>+</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">g(x) = \frac{x-100}{180-100}\times(255-50)+50 = \frac{x-100}{16}\times 41+50
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0908em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">180</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">100</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">100</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">255</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">50</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">16</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">100</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">41</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">50</span></span></span></span></span></p>
+<p>计算，对于<code>180~255</code>的像素为255</p>
+<h2 id="例题2">例题2</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501160528066.png" alt="image-20220501160528066"></p>
+<p>高通：有正有负，低通：只有正</p>
+<p>边缘检测，中间为0，0在行表示水平检测，在列表示竖直检测，在对角线表示45度角检测</p>
+<p>中间向四周称高斯分布且为低通，则表示图像平滑，去噪</p>
+<p>没有0，但是是高通就是锐化</p>
+<h2 id="例题3">例题3</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501161450669.png" alt="image-20220501161450669"></p>
+<p><img src="https://blog.zerorains.top/img/image-20220501162636393.png" alt="image-20220501162636393"></p>
+<h2 id="例题4">例题4</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501162714562.png" alt="image-20220501162714562"></p>
+<h2 id="例题5">例题5</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501162855247.png" alt="image-20220501162855247"></p>
+<p><img src="https://blog.zerorains.top/img/image-20220501162918281.png" alt="image-20220501162918281"></p>
+<p>最邻近就是，计算两点之间距离，距离最小的那个就是像素值</p>
+<h2 id="例题6">例题6</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501163727755.png" alt="image-20220501163727755"></p>
+<p><strong>变亮向上，变暗向下</strong></p>
+<h2 id="例题7">例题7</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501164135932.png" alt="image-20220501164135932"></p>
+<h2 id="例题8">例题8</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501164333451.png" alt="image-20220501164333451"></p>
+<h2 id="例题9">例题9</h2>
+<p><img src="https://blog.zerorains.top/img/image-20220501164502182.png" alt="image-20220501164502182"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2022/04/30/%E3%80%8CDIP%E3%80%8DDIP%E8%80%83%E8%AF%95%E5%A4%8D%E4%B9%A0/">http://blog.zerorains.top/2022/04/30/%E3%80%8CDIP%E3%80%8DDIP%E8%80%83%E8%AF%95%E5%A4%8D%E4%B9%A0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%97%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/">数字图像处理</a></div><div class="post-share"><div class="social-share" data-image="/img/12.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2022/04/14/%E3%80%8CPAT%E7%94%B2%E7%BA%A7%E3%80%8DPAT%E7%BB%83%E4%B9%A0%E9%A2%98/" title="「PAT甲级」PAT练习题"><img class="cover" src="/img/9.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「PAT甲级」PAT练习题</div></div><div class="info-2"><div class="info-item-1">PAT练习题，共（13/167）题(持续更新中)  声明：此博客中提及到的所有题目均出自PTA平台的提供的PAT甲级练习题，不存在任何盗版行为  A+B Format 本题就是将计算结果按照英文的输出习惯(三位一逗号)进行输出，思路很简单就是直接将计算结果转成字符串，扭转，3位加一个逗号即可 12345678910111213141516171819202122#include &lt;bits/stdc++.h&gt;using namespace std;int a, b;string res;int main()&#123;	// freopen(&quot;1.txt&quot;, &quot;r&quot;, stdin);	cin &gt;&gt; a &gt;&gt; b;	res = to_string(a + b);	reverse(res.begin(), res.end());	int t = 3;	while (res.size() &gt; t)	&#123;		if (&#x27;0&#x27; &lt;= res[t] &amp;&amp;...</div></div></div></a><a class="pagination-related" href="/2022/05/03/%E3%80%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8DLearning-Temporal-Correlated-and-Channel-Decorrelated-Siamese-Networks-for-Visual-Tracking/" title="「论文阅读」Learning Temporal-Correlated and Channel-Decorrelated Siamese Networks for Visual Tracking"><img class="cover" src="/img/2.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「论文阅读」Learning Temporal-Correlated and Channel-Decorrelated Siamese Networks for Visual Tracking</div></div><div class="info-2"><div class="info-item-1">Learning Temporal-Correlated and Channel-Decorrelated Siamese Networks for Visual Tracking  论文名称：Learning Temporal-Correlated and Channel-Decorrelated Siamese Networks for Visual Tracking  作者：Mao Xi; Wengang Zhou; Ning Wang; Houqiang Li 期刊：IEEE Transactions on Multimedia 时间：2021-6-08  原文摘要  Recently, Siamese network based trackers have attracted growing popularity in visual tracking, which tackle the tracking by template matching between the initial template and successive search regions....</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E5%AD%97%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86%E5%A4%8D%E4%B9%A0"><span class="toc-number">1.</span> <span class="toc-text">数字图像处理复习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E6%95%B0%E5%AD%97%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">第二章：图像数字化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9A%E6%95%B0%E5%AD%97%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80-%E9%87%8D%E7%82%B9"><span class="toc-number">1.2.</span> <span class="toc-text">第三章：数字图像处理的数学基础（重点）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9A%E6%95%B0%E5%AD%97%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86%E7%9A%84%E6%95%B0%E5%AD%A6%E8%BF%90%E7%AE%97-%E9%87%8D%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">第四章：数字图像处理的数学运算(重点)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E5%8F%98%E6%8D%A2-%E9%87%8D%E7%82%B9"><span class="toc-number">1.4.</span> <span class="toc-text">第五章：图像变换（重点）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E5%A2%9E%E5%BC%BA-%E9%87%8D%E7%82%B9"><span class="toc-number">1.5.</span> <span class="toc-text">第六章：图像增强（重点）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E5%A4%8D%E5%8E%9F-%E9%87%8D%E7%82%B9"><span class="toc-number">1.6.</span> <span class="toc-text">第七章：图像复原（重点）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E4%B8%8E%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B-%E9%87%8D%E7%82%B9"><span class="toc-number">1.7.</span> <span class="toc-text">第十章：图像分割与边缘检测(重点)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%9B%BE%E5%83%8F%E7%89%B9%E5%BE%81%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="toc-number">1.8.</span> <span class="toc-text">第十一章：图像特征与理解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%981"><span class="toc-number">1.9.</span> <span class="toc-text">例题1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%982"><span class="toc-number">1.10.</span> <span class="toc-text">例题2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%983"><span class="toc-number">1.11.</span> <span class="toc-text">例题3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%984"><span class="toc-number">1.12.</span> <span class="toc-text">例题4</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%985"><span class="toc-number">1.13.</span> <span class="toc-text">例题5</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%986"><span class="toc-number">1.14.</span> <span class="toc-text">例题6</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%987"><span class="toc-number">1.15.</span> <span class="toc-text">例题7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%988"><span class="toc-number">1.16.</span> <span class="toc-text">例题8</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%989"><span class="toc-number">1.17.</span> <span class="toc-text">例题9</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

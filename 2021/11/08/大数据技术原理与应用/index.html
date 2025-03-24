@@ -1,0 +1,505 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>大数据技术原理与应用 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Big Data(大数据应用技术) 第一章：大数据概述(看好例题即可) 1. 大数据的概念 例:简述大数据的4V特征?并分别简要解释每个特征的意义? 答案：  数据量大(Volume)——各行各业每时每刻都在生产数据，生产速度非常块，产生的数量非常大。 数据类型繁多(Variety)——每个领域都会产生不同的数据类型，因此数据类型非常多。 处理速度快(Velocity)——数据生成速度很快，因此对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大数据技术原理与应用">
+<meta property="og:url" content="http://blog.zerorains.top/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="Big Data(大数据应用技术) 第一章：大数据概述(看好例题即可) 1. 大数据的概念 例:简述大数据的4V特征?并分别简要解释每个特征的意义? 答案：  数据量大(Volume)——各行各业每时每刻都在生产数据，生产速度非常块，产生的数量非常大。 数据类型繁多(Variety)——每个领域都会产生不同的数据类型，因此数据类型非常多。 处理速度快(Velocity)——数据生成速度很快，因此对">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/2.png">
+<meta property="article:published_time" content="2021-11-08T13:41:29.000Z">
+<meta property="article:modified_time" content="2022-06-30T08:17:58.052Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="大数据">
+<meta property="article:tag" content="教学课程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/2.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "大数据技术原理与应用",
+  "url": "http://blog.zerorains.top/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/",
+  "image": "http://blog.zerorains.top/img/2.png",
+  "datePublished": "2021-11-08T13:41:29.000Z",
+  "dateModified": "2022-06-30T08:17:58.052Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '大数据技术原理与应用',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/2.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">大数据技术原理与应用</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">大数据技术原理与应用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-11-08T13:41:29.000Z" title="发表于 2021-11-08 21:41:29">2021-11-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-06-30T08:17:58.052Z" title="更新于 2022-06-30 16:17:58">2022-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="big-data-大数据应用技术">Big Data(大数据应用技术)</h1>
+<h1 id="第一章：大数据概述-看好例题即可">第一章：大数据概述(看好例题即可)</h1>
+<h2 id="1-大数据的概念">1. 大数据的概念</h2>
+<p><strong>例:简述大数据的4V特征?并分别简要解释每个特征的意义?</strong></p>
+<p>答案：</p>
+<ol>
+<li>数据量大(Volume)——各行各业每时每刻都在生产数据，生产速度非常块，产生的数量非常大。</li>
+<li>数据类型繁多(Variety)——每个领域都会产生不同的数据类型，因此数据类型非常多。</li>
+<li>处理速度快(Velocity)——数据生成速度很快，因此对这些数据的处理也要非常快。</li>
+<li>价值密度低(Value)——我们的视频监控可能要录制很长时间，并且存储量特别大，但是有价值的部分可能只有几分钟。</li>
+</ol>
+<h2 id="2-大数据的应用实例">2. 大数据的应用实例</h2>
+<p>智能推荐系统，信贷评估系统，无人驾驶汽车，优化物流网络，智慧交通，智能安防</p>
+<h2 id="3-大数据的关键技术">3. 大数据的关键技术</h2>
+<p><strong>从数据分析全流程角度，大数据技术包含哪些内容？每个内容请至少列出至少2个该内容包含的功能？</strong></p>
+<ol>
+<li>数据采集与预测——清洗，转化，集成</li>
+<li>数据存储和管理——利用分布式文件系统，数据仓库等，实现海量数据的存储和管理</li>
+<li>数据处理与分析——分布式并行编程，机器学习和数据挖掘</li>
+<li>数据安全和隐私保护——保护数据安全和个人隐私</li>
+</ol>
+<h2 id="4-大数据的计算模式">4. 大数据的计算模式</h2>
+<p><strong>例：大数据有哪些计算模式？每个计算模式下请列举至少2个代表产品？</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108214809Untitled.png" alt="Untitled"></p>
+<h2 id="5-大数据与云计算-物联网的关系">5. 大数据与云计算，物联网的关系</h2>
+<p><strong>例：请简要说明大数据与云计算、物联网的联系与区别？</strong></p>
+<p><strong>区别</strong>：</p>
+<ol>
+<li>大数据侧重海量数据的存储，处理与分析</li>
+<li>云计算整合优化各种IT资源，通过网络的方式廉价地提供给用户</li>
+<li>物联网的目的是实现&quot;物物互联&quot;</li>
+</ol>
+<p><strong>联系</strong>：</p>
+<ol>
+<li>云计算为大数据提供分布式存储和管理系统，大数据通过分布式并行处理框架MapReduce为云计算提供数据分析能力。</li>
+<li>物联网传感器产生的数据是大数据的来源之一，云计算和大数据为物理网实现了数据的存储，分析和处理</li>
+</ol>
+<h2 id="2-大数据处理架构hadoop">2.大数据处理架构Hadoop</h2>
+<h2 id="1-hdfs的生态环境">1. HDFS的生态环境</h2>
+<p><img src="https://blog.zerorains.top/img/20211108215046image-20211108215044927.png" alt="image-20211108215044927"></p>
+<p><img src="https://blog.zerorains.top/img/20211108215058image-20211108215057663.png" alt="image-20211108215057663"></p>
+<h2 id="2-hdfs的安装与使用">2. HDFS的安装与使用</h2>
+<p><strong>在Linux下若以伪分布式的方式安装Hadoop，若Hadoop启动成功，则输入JPS后应至少包含哪些java进程？</strong></p>
+<p>答案：</p>
+<ol>
+<li>NameNode</li>
+<li>DataNode</li>
+<li>SeondaryNameNode</li>
+</ol>
+<p><strong>超重点：单击安装和伪分布式安装的区别</strong></p>
+<p>单机安装：只在一台机子上运行，存储采用本地文件系统，没有采用分布式文件系统HDFS</p>
+<p>伪分布式：hadoop存储采用HDFS，但是HDFS的名称节点和数据节点都位于同一台机器上</p>
+<p><strong>超重点：HDFS块的概念及意义</strong></p>
+<p>概念：默认一个块的大小是64MB，在HDFS中的文件会被拆分成多个块，每个块作为独立的单元进行存储</p>
+<p>意义：支持大规模文件存储，简化系统设计，适合数据备份</p>
+<p><strong>超重点：名称节点的构成与合作关系</strong></p>
+<p>构成：FsImage<strong>维护文件系统树及元数据</strong>，EditLog记录所用的<strong>创建，删除，重命名</strong>操作，第二名称节点正常状态下定时同步FsImage，故障情况下用于恢复</p>
+<p>合作关系：开始进入时读取FsImage中的内容，然后操作过程记录在EditLog中，再次打开FsImage时会重新执行EditLog中的内容一次。第二名称节点，定期使用网络请求的方式将EditLog和FsImage下载到本地，在本地对FsImage中的内容执行EditLog的操作，然后将新的FsImage上传回名称节点替换掉原本的FsIamge，EditLog也用新的文件代替。</p>
+<p><strong>读HDFS操作的指令：</strong></p>
+<p>假设HDFS中名称节点NameNode下FsImage中保存的文件目录结构以及EditLog中的内容如下图所示，回答如下问题：</p>
+<p><img src="https://blog.zerorains.top/img/20211108215146image-20211108215145219.png" alt="image-20211108215145219"></p>
+<p>1）若16:00时系统重启，且重启后至名称节点正常工作期间无任何操作，请给出此时的FSImage和EditLog的内容？</p>
+<p>2）若此HDFS系统配置有第二名称节点，且第二节点每整点执行“检查点”操作，若系统在15:08分时名称节点出现故障，请给出解决措施，并给出最终恢复的名称节点中FSImage和EditLog的内容？</p>
+<p><strong>解题</strong>：</p>
+<p>1）按顺序执行上面的内容</p>
+<ol>
+<li>创建other文件夹</li>
+<li>将myData.txt文件放进/input文件夹中</li>
+<li>删除/input中的data.txt文件</li>
+<li>在/input文件夹中创建一个tmp.txt文件</li>
+</ol>
+<p>EditLog中没有任何的内容，FSImage的内容如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/20211108215211image-20211108215209595.png" alt="image-20211108215209595"></p>
+<p>2）在执行到15.08分时，出现故障，此时EditLog文件中记录了最开始的三条操作，恢复结果应该如下图所示(只执行前三条操作)，FSImage为空。</p>
+<p><img src="https://blog.zerorains.top/img/20211108215225image-20211108215223661.png" alt="image-20211108215223661"></p>
+<p>解决措施：第二名称节点先复制名称节点的FSImage文件和EditLog文件，再将两个文件通过网络请求的方式下载到本地，然后第二名称节点在本地执行EditLog中记录的操作，并修改复制的FSImage文件。在执行玩EditLog中的操作后，上传新的FSImage文件替换名称节点中FSImage文件，名称节点中的EditLog文件也用空文件替换。</p>
+<h2 id="3-超重点：hdfs的存储原理">3. 超重点：HDFS的存储原理</h2>
+<p><strong>假设文件分成了2个块A和B，那A和B的上传是按序的，先A后B对吧，但是因为有复制的过程，假设复制因子=3，则先上传A，A要复制3份啊，这3份的复制过程是并行的；A都复制完了之后，B再开始，3份B的复制过程开始</strong></p>
+<ul>
+<li>如果是在集群内发起写请求，则把第一个副本放置在发起写操作的数据结点上，实现就近写入数据。如果是来自集群外部的写操作请求，则从集群内部挑选一台磁盘不太满，CPU不太忙的数据结点，作为第一个副本的存放地。</li>
+<li>第二个副本会被放置在与第一个副本不同的机架的数据结点上</li>
+<li>第三个副本会被放置在与第一个副本想头给你的机架的其他结点上</li>
+<li>如果还有更多的副本，则继续从集群中，随机选择数据结点进行存放</li>
+</ul>
+<p><img src="https://blog.zerorains.top/img/20211108215240image-20211108215239047.png" alt="image-20211108215239047"></p>
+<p><img src="https://blog.zerorains.top/img/20211108214810Untitled.jpeg" alt="Untitled"></p>
+<h3 id="4-数据读取">4. 数据读取</h3>
+<p>客户端可以通过API获取自己的ID和机架的ID，客户端请求数据到机架请求数据就需要ID，客户端请求的内容会获得目标数据及其副本的位置，当搜索到第一个位置ID与客户端ID相同时，有限读取这个副本</p>
+<h3 id="5-超重点：数据复制">5. 超重点：数据复制</h3>
+<p>客户端将文件写入HDFS时，现在本地将文件分成若干块，然后向HDFS集群发起请求，然后名称节点返回一个数据节点存放位置和其他副本的存放位置列表，每传送好4KB就向副本传输。</p>
+<p>总之就是说，<strong>一旦原本的文件存放完成，副本也存放完成了</strong></p>
+<h2 id="4-hdfs存储机制">4. HDFS存储机制</h2>
+<p><strong>简述HDFS的写入过程和读入过程，假设复制因子为3？</strong></p>
+<ol>
+<li>读入时
+<ol>
+<li>客户端向<strong>名称节点</strong>请求上传文件，<strong>名称节点检查目标文件是否已经存在，父目录是否存在</strong></li>
+<li>名称节点返回是否可以上传</li>
+<li>客户端请求<strong>第一个块</strong>上传到那几个数据节点服务器上</li>
+<li>名称节点<strong>返回3个数据节点</strong>，分别为D1,D2,D3</li>
+<li>客户端请求D1上传数据，D1收到请求会继续调用D2，然后D2调用D3，将这个<strong>通信管道建立完成</strong></li>
+<li>D1,D2,D3<strong>逐级响应</strong>客户端</li>
+<li>客户端开始往D1上传第一个块(先从磁盘读取数据放到第一个本地内存缓存)，以包为单位，D1收到一个包就会传给D2，D2传给D3，D1每传一个包会放入一个应答队列等待应答</li>
+<li>当一个块传输完成之后，客户端再次<strong>请求名称节点上传第二个块</strong>的服务器(重复3-7)</li>
+</ol>
+</li>
+<li>写入时
+<ol>
+<li>客户端向名称节点请求下载文件，名称节点<strong>通过查询元数据</strong>，找到文件所在的<strong>数据节点地址</strong></li>
+<li><strong>挑选一台数据节点</strong>(就近原则，然后随机)<strong>服务器</strong>，请求读取数据。</li>
+<li>数据节点开始<strong>传输数据给客户端</strong>(从磁盘里面读取数据放入流，以包为单位来做校验)</li>
+<li>客户端以包为单位接收，现在<strong>本地缓存</strong>，然后<strong>写入目标文件</strong></li>
+</ol>
+</li>
+</ol>
+<h2 id="5-超重点：数据错误的恢复-p56">5. 超重点：数据错误的恢复(P56)</h2>
+<ol>
+<li><strong>名称节点出错：</strong>
+<ol>
+<li>首先到远程挂载的网络文件系统中获取备份的元数据信息，放到第二名称节点上进行恢复，并把第二名称节点作为名称节点来使用</li>
+</ol>
+</li>
+<li><strong>数据节点出数据出错：</strong>
+<ol>
+<li>数据节点定期向名称节点发送信号，，当数据节点故障时，名称节点收不到这个信号，就标记数据节点为不可读状态，名称节点不会向其发送IO请求</li>
+<li>如果这导致数据块的副本数量小于冗余因子，就会启动数据冗余复制，为它生成新的副本</li>
+</ol>
+</li>
+<li><strong>数据出错：</strong>
+<ol>
+<li>客户端会采用MD5和SHA-1对数据块进行校验</li>
+<li>当客户读取文件的时候，会先读取该信息文件，然后利用该信息文件对每个读取的数据块进行校验</li>
+<li>如果出错，客户端就会请求到另外一个数据节点读取该文件块，并且向名称节点报告这个文件块有错误，名称节点会定期检查并重新复制这个块。</li>
+</ol>
+</li>
+</ol>
+<h2 id="6-超重点：数据库的数据模型-概念视图-物理视图">6. 超重点：数据库的数据模型，概念视图，物理视图</h2>
+<p><strong>数据模型：就是我常见的样子，左边是行键，然后列族堆下来，每个列族下面有对应的列限定符，然后就是对应的数据了</strong></p>
+<p><strong>概念视图：行键在左边，然后是时间戳，对应时间，然后就是每一个列族了，然后每个时间戳对应的记录就是这个时间戳的时候记录的修改，记录方式为</strong></p>
+<p>列族名称：列限定符=数值，列限定符=数值。。。</p>
+<p><strong>物理视图：每个列族拆成一个表，每个表中，行键在最左边，然后对应时间戳，然后列族，列族的表示方式为：列族：列限定符=数值</strong></p>
+<p>列式存储(DSM)：DSM以关系数据库中的属性或列作为单位进行存储，关系中多个元组的同一属性值(或同一列值)会被存储在一起，而一个元组中不同属性值通常会被分别存放于不同的磁盘页中。</p>
+<p>例：给定如下的数据，请按要求完成如下问题：<br>
+1）请将该数据转化为HBase数据模型<br>
+2）分别画出该数据模型的概念视图和物理视图</p>
+<p><img src="https://blog.zerorains.top/img/20211108215255image-20211108215254585.png" alt="image-20211108215254585"></p>
+<h2 id="7-超重点：region定位的三层映射结构">7. 超重点：Region定位的三层映射结构</h2>
+<p><img src="https://blog.zerorains.top/img/20211108215414image-20211108215413051.png" alt="image-20211108215413051"></p>
+<p>用户数据表中初始化时一个数据表对应一个Region，随着Region的增大会不断进行分裂，这些Region被分发到不同的Region服务器上。</p>
+<p>Region标识符和Region服务器标识符组成一个条目被记录在&quot;.META.&quot;表(元数据表)中(元数据就是Region和Region服务器之间的对应关系)</p>
+<p>当&quot;.META.“表也会分裂成多个Region，这时候就要将这些Region映射到”-ROOT-&quot;表中</p>
+<p>&quot;-ROOT-&quot;表不会再继续分裂了，“-ROOT-”表的位置被记录在ZooKeeper文件中。</p>
+<h2 id="8-超重点：region服务器的工作原理">8.超重点：Region服务器的工作原理</h2>
+<ol>
+<li><strong>用户读写数据的过程</strong>
+<ol>
+<li>写入：分配Region服务器去执行操作，首先将用户数据写入MemStore和HLog中，当操作写入Hlog后，commit()调用才会将其返回到客户端中</li>
+<li>读取：Region服务器首先访问MemStore缓存，如果数据不在缓存中，才会到磁盘上的StoreFile中去寻找</li>
+</ol>
+</li>
+<li><strong>缓存的刷新</strong>
+<ol>
+<li>Region服务器会周期性地将MemStore缓存里的内容写入磁盘的StoreFile文件中，清空缓存，并在HLog文件中进行标记，用来表示内容已经写入了StoreFile中</li>
+<li>在启动时，每个Region服务器会检查自己的Hlog文件，确认最近一次执行缓存刷新操作之后是否发生新的写入操作。</li>
+</ol>
+</li>
+<li><strong>StoreFile合并</strong>
+<ol>
+<li>MemStore缓存刷新都会在磁盘上生成一个新的StoreFile文件，当StoreFile的文件数量达到一个阈值时，就会将StoreFile合并成一个大文件</li>
+</ol>
+</li>
+</ol>
+<h2 id="9-超重点：store的工作原理">9. 超重点：Store的工作原理</h2>
+<p>当用户写入数据时，系统首先把数据放入MemStore缓存中，当MemStore缓存满时，就会刷新到磁盘中的一个StoreFile文件中。</p>
+<p>当达到实现设定的数量时，就会出发文件合并操作，多个StoreFile文件会被合并成一个大的StoreFile文件。</p>
+<p>当单个StoreFile文件大小超过一定阈值时，就会出发文件分裂操作</p>
+<p>同时，当前的一个父Region会被分裂成两个Region，父Region会下线，新分裂的两个子Region会被Master主服务器分配到相应的Region服务器上</p>
+<h2 id="10-超重点：-hlog的工作原理">10.超重点： HLog的工作原理</h2>
+<p>HBase系统为每个Region服务器配置了一个HLog文件，用户更新数据必须首先被记入日志才能吸入MemStore缓存，并且知道MemStore缓存对应的日志已经写入磁盘之后，该缓存内容才会被刷新写入磁盘。</p>
+<p>Zookeeper服务器会实时监视Region服务器的状态，当某个Region服务器发生故障时，ZooKeeper服务器会通知Master主服务器。Master主服务器首先会处理该故障Region服务器上面遗留的HLog文件，会把每条日志记录所述的Region对象对HLog数据进行拆分，分别放到相应的Region对象的目录下，然后将失效的Region重新分配到可用的Region服务器中。Region服务器获取到失效的Region后，执行Region中的日志操作，然后写入到自己的HLog和缓存之中，并立即对缓存进行刷新。</p>
+<p><strong>例子：</strong></p>
+<p>假设一个HBase集群中有1个Master服务器（表示为MS）以及<strong>5台Region服务器</strong>，分别标识为<strong>RS1，RS2，RS3，RS4和RS5</strong>，HBase中设置Region的默认大小为128MB。假设目前HBase中存储了一个大小为<strong>1GB的数据表</strong>，该数据表被分成了<strong>10个Region</strong>，分别标识为**R1，R2，…，R10，**且集群中各Region服务器负载均衡，即RS1中存放了R1和R2；RS2中存放了R3和R4；以此类推。假设META表被分割成2份（M1和M2）分别保存在RS2和RS5中，M1表存放了R1-R5的信息，M2表存放了R6-R10的信息，ROOT表保存在RS1中。请回答如下问题。</p>
+<ol>
+<li>请根据如上的描述，分别写出ROOT表以及各个META表中完整的映射关系，画出HBase相应的三层映射结构。</li>
+<li>假设某个操作员按照上级的要求在如下表规定的时间<strong>对HBase进行相应的操作</strong>，且<strong>HBase在12:00正式启动完毕</strong>，假设表中的操作<strong>全部映射到RS2</strong>，<br>
+（1）请<strong>列出14:00时（假设OP7已完成）RS2上Hlog的内容</strong>。<br>
+（2）若14：00时RS2发生故障，缓存的刷新频率为1小时1次（每个整点的01分开始刷新），若Master已经获知了RS2的故障信息并准备将R3和R4分别分配给RS1和RS3，请描述整个分配过程，包括HLog，缓存的内容变化，R3和R4需要执行哪些操作以及各个服务器如何协作？</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/20211108215430image-20211108215429361.png" alt="image-20211108215429361"></p>
+<p>解答：</p>
+<p><img src="https://blog.zerorains.top/img/20211108215439image-20211108215437356.png" alt="Untitled"></p>
+<h2 id="11-nosql数据库-例题即可"><strong>11. NoSQL数据库(例题即可)</strong></h2>
+<p><strong>例：简述NoSQL数据库的四大类型以及各类型的至少2个代表数据库？</strong></p>
+<ol>
+<li>键值数据库：Redis，Riak</li>
+<li>列族数据库：Hbase，BigTable</li>
+<li>文档数据库：MongoDB，SisoDB</li>
+<li>图数据库：InfoGrid，GraphDB</li>
+</ol>
+<p><strong>CAP理论：一致性(Consistency)、可用性(Availability)、分区容忍性(Tolerance of Network Partition)</strong></p>
+<p><strong>例：如图所示，假设M1和M2为两个分布式环境下的节点，M1和M2为数据V副本的存放节点，进程P1向M1写入新值val1，进程P2读取M2的值。当新值更新失败时，该分布式系统的操作如上图，请从CAP理论的角度解释图中的流程，并给出该系统基于CAP理论的设计原则？</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108215453image-20211108215451575.png" alt="image-20211108215451575"></p>
+<p>该分布式系统采用AP设计原则，</p>
+<p>当网络发生故障时M1中的消息无法发送到M2，这是进程P2在节点M2读取的副本V2的值仍然是旧值val0，产生了不一致问题，不满足一致性理论©</p>
+<p>P1和P2都能迅速到达V1和V2获取自己想要的数据，满足可用性理论(A)</p>
+<p>即使V1节点发生故障，V2节点仍然能发挥作用，满足了分区容忍性理论§</p>
+<p><strong>什么是最终一致性？根据更新数据后各进程访问到数据的时间和方式的不同可以分为哪几类？</strong></p>
+<p><strong>最终一致性：允许后续的访问操作可以暂时读不到更新后的数据，但是经过一段时间之后，用户必须读到更新后的数据。</strong></p>
+<p><strong>类别：</strong></p>
+<ol>
+<li>因果一致性</li>
+<li>”读已之所写“一致性</li>
+<li>会话一致性</li>
+<li>单调读一致性</li>
+<li>单调写一致性</li>
+</ol>
+<h2 id="12-超重点：mapreduce代数运算">12.超重点：MapReduce代数运算</h2>
+<p><strong>shuffle的过程，如果值只有一个元素就直接写，如果有多个元素，尖角号括起来，不要被下面的写法误导了</strong></p>
+<p><strong>纠正一点：下面的shuffle过程只针对一个map内，我下面写的shuffle包含了多个map，这个地方错了，不过shuffle的思想没有错</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108215505image-20211108215504331.png" alt="image-20211108215504331"></p>
+<p><img src="https://blog.zerorains.top/img/20211108215912image-20211108215911188.png" alt="image-20211108215911188"></p>
+<p><img src="https://blog.zerorains.top/img/20211108215627image-20211108215626269.png" alt="image-20211108215626269"></p>
+<p><img src="https://blog.zerorains.top/img/20211108215641image-20211108215639797.png" alt="image-20211108215639797"></p>
+<p><img src="https://blog.zerorains.top/img/20211108215653image-20211108215652438.png" alt="image-20211108215652438"></p>
+<h2 id="13-超重点：mapreduce的top-k-极值问题">13. 超重点：MapReduce的Top-k 极值问题</h2>
+<p><strong>某大型超市想要对最近 10 天的销售数据进行分析，每一天的数据均保存在一个文件中。现要求对这 10 天的销售数据用大数据相关技术进行分析，指定一个参数 k，请设计一个大数据算法返回销量最低的前 k（top-k）个商品，并打印出它们各自的总销量。请设计相应的算法，给出你用到的大数据相关的技术，编写相应代码并进行演示。</strong></p>
+<p><strong>输入</strong>：</p>
+<p>10 天的数据文件，文件名为 data_i.txt 表示第 i 天的销售数据。每个文件中 1 行有 2 个值，第 1 个值为商品名称，第 2 个值为用户一次购买的数量。因只用于测试，每个文件仅有10000 行左右的数据。（测试数据见附件！）</p>
+<p>k：需要返回的销量最高的商品的个数；</p>
+<p><strong>输出</strong>：</p>
+<p>前 k 个销量最高的商品名称以及商品的总销量。</p>
+<p><strong>示例：</strong></p>
+<p>假设只有 2 天的数据且两天的数据如下图所示，</p>
+<p><img src="https://blog.zerorains.top/img/20211108220003image-20211108220000984.png" alt="image-20211108220000984"></p>
+<p>若设置 k=2，则应输出（按字母序排列！）：</p>
+<p>Apple: 14<br>
+Beef: 14</p>
+<p>若 k=1，应输出 Apple:14<br>
+若 k=3，应输出：</p>
+<p>Apple: 14</p>
+<p>Beef: 14</p>
+<p>Peanut: 8</p>
+<p>解题思路 1：首先，将该问题变成一个经典的 wordcount 问题，word 即为商品名称，对应的 count 可以直接从原始文件中取，这样 <strong>Map 任务即输出&lt;商品，数量&gt;的集合</strong>，假设一<strong>个文件对应一个 Map 任务，则 Reduce 端不需要任何处理，直接将最终的&lt;数量，商品&gt;写入HDFS 即可</strong>，之所以是&lt;数量，商品&gt;的集合，<strong>是因为 Shuffle 过程中会对 key 进行排序，若key 为数量，则我们不需要写任何排序代码</strong>，将<strong>第一次 MapReduce 生成的文件直接进行MapReduce 任务</strong>，Map 直接读即可，<strong>Reduce 端直接迭代并倒序输出即可</strong>，不需要任何多余的代码。该方法代码量非常少（可能自己写的代码只要十几行），实现也非常容易。<br>
+解题思路 2：该思路<strong>只需要一次 MapReduce 过程，Map 过程类似于 wordcount 过程</strong>，在Reduce 任务中，<strong>可以获得所有商品的销售总量的哈希表，基于这个哈希表</strong>，我们可以设计非常多高效的方法进行 Top-k 极值的选择，<strong>最简单的方法就是先排序，再取前 k 个，代码量也很少，且容易实现，但时间复杂度为 O(n2)</strong>。当然，这里面还有很多很多巧妙的解决方式，不 需 要 全 排 序 既 可 以 拿 到 结 果 ， 详 细 请 戳 ：<a target="_blank" rel="noopener" href="https://blog.csdn.net/wufaliang003/article/details/82940218%EF%BC%8C%E6%9C%80%E5%BF%AB%E5%8F%AF%E8%BE%BE%E5%88%B0">https://blog.csdn.net/wufaliang003/article/details/82940218，最快可达到</a> O(logn)，请同学们根据自己的兴趣进行发挥。</p>
+<p><img src="https://blog.zerorains.top/img/20211108215740image-20211108215738938.png" alt="image-20211108215738938"></p>
+<h2 id="14-超重点：mapreduce的购物篮数据的关联分析">14. 超重点：MapReduce的购物篮数据的关联分析</h2>
+<p>某大型商场预计在下个周进行一次大型的促销活动，促销的主要手段为捆绑销售，即将某些商品进行捆绑销售并以一定的折扣卖出。然而，捆绑并不是随机的，商场希望捆绑的商品都是关联的，即若在平时用户买了商品 A，则他有大概率会买商品 B 的话，将 A 和 B 进行捆绑就有很大概率比单卖的话销量更高，即A 和 B 是关联商品。现要求设计一个大数据算法，利用大数据相关的技术，获取尽可能多的关联商品集合，以帮助该商场获得尽可能多的利润。然而，偶尔的关联性并不能很好地说明物品间的联系，因此，给定该商场最近 10 天的所有销售记录（用户的购买记录）t，若存在一个商品集合 s = {A，B，C} ∈t，s 若能频繁地出现在销售记录中，则 s 就可能是一个关联的商品集合。为了量化该频繁性，给定一个参数 d，d 为正整数，若|s|不小于 d，则 s 就是一个关联集合，请设计算法求出所有的关联集合，给出用到的大数据的相关技术，编写相应代码并演示</p>
+<p></p>
+<p><strong>输入</strong>：</p>
+<p>10 天的销售数据文件 data.txt，文件中每一行代表一个用户的购买记录，如“apple, milk, beef”表示用户一次性买了苹果、牛奶和牛肉。因只用于测试，该文件仅有 10000 行左右的数据。（测试数据见附件！）</p>
+<p>d：需要满足的<strong>最小频繁度</strong>；</p>
+<p><strong>输出</strong>：</p>
+<p>返回所有的关联集合以及它们各自的频繁度，且集合内商品的数量不小于 2。</p>
+<p><strong>示例：</strong></p>
+<p>假设文件 data.txt 的内容如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/20211108220037image-20211108220035920.png" alt="image-20211108220035920"></p>
+<p>若设置 d=2，则应输出：</p>
+<p>{Bread, Diaper, Beer}, 2<br>
+{Bread, Diaper}, 2<br>
+{Bread, Beer}, 2<br>
+{Diaper, Beer}, 3</p>
+<p><strong>思路提示：</strong></p>
+<p>本题为求解所有的关联集合，用白话来说，<strong>给定某个集合 S，若 S 出现在数据集中的次数达到了 d 以上，则 S 就可以输出了，因此，本题转化为求 S 的个数的问题</strong>，基于 MapReduce的特性，我们 <strong>Map 的输出一定得是&lt;集合，在当前数据集中存在的个数&gt;这样的一个键值对</strong>，然而，数据集给的是一条一条的记录，一个记录里可能包含了很多的集合，因此，本题的难点在于如何把这些集合都拆解出来，而<strong>拆解集合其实就是一个求子</strong>集的过程，每读到一条购物记录，则<strong>将其所有子集拆出来</strong>（只含 1 项的去掉），然后转化为&lt;子集，1&gt;的形式，这样又变成了 1 个 wordcount 问题，Reduce 过程几乎不用做任何处理。所以，<strong>当数据集被读入时，每读到一个购物记录，则生成该购物记录的所有子集</strong>，剔除<strong>其中只含有 1 个商品的子集，并将每个子集计数为 1</strong>，并输出。Reduce 端不需要做任何处理，只要判断<strong>某个集合的计数是否不小于 d，若不小于 d 则输出即可</strong>，本题完结。</p>
+<p><img src="https://blog.zerorains.top/img/20211108220047image-20211108220046725.png" alt="image-20211108220046725"></p>
+<p><img src="https://blog.zerorains.top/img/20211108220106image-20211108220105605.png" alt="Untitled"></p>
+<p><img src="https://blog.zerorains.top/img/20211108220118image-20211108220116826.png" alt="image-20211108220116826"></p>
+<h2 id="15-超重点：窄依赖和宽依赖以及stage划分">15. 超重点：窄依赖和宽依赖以及stage划分</h2>
+<p>窄依赖：一个节点出发只能指向一个节点</p>
+<p>宽依赖：一个节点出发可以指向多个节点</p>
+<p>stage划分，如果碰到宽依赖，就划分为一个stage，如果没有碰到就继续往后走</p>
+<p><strong>例：给定如下图所示的RDD依赖关系DAG，请指明其中哪些RDD的依赖关系为窄依赖，哪些为宽依赖？并根据此DAG图划分stage，给出你划分的stage？</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108220419image-20211108220418739.png" alt="image-20211108220418739"></p>
+<p>宽依赖：A-&gt;B，F-&gt;G</p>
+<p>窄依赖：C-&gt;D，C-&gt;F，B-&gt;G，E-&gt;F</p>
+<p>划分为三个Stage：</p>
+<ol>
+<li>A</li>
+<li>C,D,E,F</li>
+<li>A,B,C,D,E,F,</li>
+</ol>
+<h2 id="16-超重点：rdd的概念-血缘关系-以及-惰性调用">16. 超重点：RDD的概念，“血缘关系”以及“惰性调用”</h2>
+<p><strong>概念</strong>：</p>
+<p>一个RDD就是一个<strong>分布式对象集合</strong>，本质上是一个**只读的分区记录集合，**每个RDD可以分成多个数据集片段，可以保存在集群中的不同节点上，在不同的节点上进行并行计算。</p>
+<p>RDD提供了一种高度受限的共享内存模型，即RDD是只读的记录分区的集合，不能直接修改，只能基于稳定的物理存储中的数据集创建RDD，或者通过在其他RDD上执行确定的转换操作（如map、join和group by）而创建得到新的RDD。</p>
+<p><strong>惰性调用</strong>：在RDD执行过程中，<strong>真正的计算发生在RDD的&quot;行动&quot;操作</strong>，对于&quot;行动&quot;之前的所有&quot;转换&quot;操作，Spark<strong>只是记录</strong>下“转换”操作应用的一些基础数据集以及RDD的生成轨迹，即相互之间的依赖关系，而不会出发真正的计算。</p>
+<p><strong>说白了就是之前都是在生成新的RDD，只有在最后行动的时候才进行计算</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108220150image-20211108220148781.png" alt="image-20211108220148781"></p>
+<p><strong>血缘关系</strong>：本质上是DAG拓扑排序的结果。在输入之后，会在<strong>逻辑上</strong>生成各种RDD，最后在行动的时候，才将RDD之间的生成和依赖关系进行使用，计算最终结果的过程就是血缘关系起作用的过程。</p>
+<p>优点：惰性调用、管道化、避免同步等待、不需要保存中间结果、每次操作变得简单</p>
+<h2 id="17-超重点rdd的各个操作的辨析">17.<strong>超重点</strong>RDD的各个操作的辨析</h2>
+<p>下面都是转化操作</p>
+<p>map,filter→两个集合一对一</p>
+<p>union→三个集合，两个集合一对一指向第三个集合的不同节点</p>
+<p>join→三个集合，两个集合一对一，指向第三个集合的任意节点</p>
+<p>groupByKey→两个集合多对多</p>
+<p>join→三个集合，两个集合多对多，指向第三个集合的任意节点</p>
+<p><img src="https://blog.zerorains.top/img/20211108220207image-20211108220206692.png" alt="image-20211108220206692"></p>
+<h2 id="18-超重点：rdd的容错方式">18.超重点：RDD的容错方式</h2>
+<p>RDD数据只读不改，如果需要修改数据必须从父RDD转化到子RDD，由此在不同的RDD之间建立了血缘关系。</p>
+<p>RDD是具有容错机制的特殊集合，不需要通过数据荣誉的方式实现容错，而只需要通过RDD父子依赖关系重新计算丢失的分区来实现容错，无须回滚整个系统。</p>
+<h2 id="19-超重点：rdd的wordcount代码">19.超重点：RDD的wordcount代码</h2>
+<p>5行代码实现他</p>
+<p>conf用于配置Spark的上下文</p>
+<p>sc实例化SparkContext</p>
+<p>textFile实例化文件内容</p>
+<p>flatMap每个输入可以映射多个输出结果，这里映射为每一行按照空格分割后的结果</p>
+<p>map映射每一个单词对应出现一次，</p>
+<p>reduceByKey定义每个键值对的值之间进行的操作</p>
+<p>collect()收集reduce的结果</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">&quot;word count&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line"><span class="keyword">val</span> textFile = sc.textFile(path)</span><br><span class="line"><span class="keyword">val</span> wordCounts = textFile.flatMap(line=&gt;line.splite(<span class="string">&quot; &quot;</span>)).map(word=&gt;(word,<span class="number">1</span>)).reduceByKey(a,b)=&gt;a+b)</span><br><span class="line">wordCounts.collect()</span><br></pre></td></tr></table></figure>
+<h2 id="20-超重点：store的wordcount代码">20. 超重点：Store的wordcount代码</h2>
+<p><strong>例：给定如下所示的Storm相关代码，请说明该拓扑的作用？该拓扑中定义了两个Bolt，试述两个Bolt各自完成的功能，以及中间结果如何在两个Bolt之间传输？</strong></p>
+<p><img src="https://blog.zerorains.top/img/20211108220521image-20211108220520314.png" alt="image-20211108220520314"></p>
+<p>该Topology实现了<strong>单词统计的功能</strong>。在Topology中包含了<strong>两个Bolt处理器</strong>，同时每个Bolt<strong>使用了Grouping()系列方法定义了Tuple的发送方式</strong>。</p>
+<p>通过这两个Blot的定义，第一个<strong>Bolt用于单词的分割</strong>，该Blot中的任务<strong>随机接收Spout发送的句子</strong>，并从接受的句子中<strong>提取出单词</strong></p>
+<p>第二个Bolt<strong>接受第一个Bolt发送的Tuple进行处理</strong>(Bolt是通过定于Tuple的名称来接收相应的数据，第一个Bolt声明其输出Steam的名称为‘split’，而第二个Bolt申明其订阅的Steam为’split’，因此第二个Bolt可以接受到第一个Bolt发送的Tuple)</p>
+<p>即统计分割后的单词出现的次数。通过fieldsGroupings()方法，在’word’上具有相同字段值的所有Tuple(即单词相同的Tuple)将发送到同一个任务中进行统计，从而保证了统计的准确性</p>
+<p>上面代码的拓扑图：</p>
+<p><img src="https://blog.zerorains.top/img/20211108220229image-20211108220228108.png" alt="image-20211108220228108"></p>
+<h2 id="21-超重点：-storm中各个分组策略的辨析">21.超重点： Storm中各个分组策略的辨析</h2>
+<ol>
+<li>ShuffleGrouping：随机分组，<strong>随机分发Stream中的Tuple</strong>，保证<strong>每个Bolt的Task接受Tuple的数量一致</strong>。</li>
+<li>FieldsGrouping：按照<strong>字段分组</strong>，保证<strong>相同字段</strong>的Tuple分配到同一个Task中</li>
+<li>AllGrouping：广播发送，<strong>每个Task都会收到所有的Tuple</strong>。</li>
+<li>GlobalGrouping：全局分组，<strong>所有的Tuple都发送到同一个Task中</strong></li>
+<li>NonGrouping：不分组，和ShuffleGrouping类似，<strong>当前Task的执行会和他的被订阅者在同一个线程中执行</strong></li>
+<li>DirectGrouping：直接分组，直接<strong>指定由某个Task来执行Tuple的处理</strong></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/">http://blog.zerorains.top/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a><a class="post-meta__tags" href="/tags/%E6%95%99%E5%AD%A6%E8%AF%BE%E7%A8%8B/">教学课程</a></div><div class="post-share"><div class="social-share" data-image="/img/2.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2021/10/30/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E4%BA%A7%E4%B8%9A%E8%90%BD%E5%9C%B0%E7%9A%84%E9%9A%BE%E7%82%B9%E4%B8%8E%E5%BA%94%E5%AF%B9/" title="计算机视觉产业落地的难点与应对"><img class="cover" src="/img/32.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">计算机视觉产业落地的难点与应对</div></div><div class="info-2"><div class="info-item-1">计算机视觉产业落地的难点与应对  出自：百度大脑——(计算机视觉产业落地难点与应对)https://www.bilibili.com/video/BV1eB4y1T772?spm_id_from=333.999.0.0  学术研究和产业应用的区别     学术研究 产业应用     任务 1. 定义明确2. 聚焦某一任务3. 单一明确的评估标准 1. 开放问题2. 系统整体设计3. 多维度，复杂评估   数据 1. 公开数据集2. 固定不变3. 数据量大 1. 自定义数据集(也可以采用公开)2. 不断迭代3. 数据量小   算力 无硬性限制(不受到设备限制) 1. 限制硬件端部署2. 服务器部署吞吐量要求3....</div></div></div></a><a class="pagination-related" href="/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/" title="计算机网络总复习"><img class="cover" src="/img/9.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">计算机网络总复习</div></div><div class="info-2"><div class="info-item-1">计算机网络自救指南 基本缩写词语 ISP、OSl、TCP/IP、C/S、B/S、LAN、WLAN、VLAN、STP、UTP、ADSL、FDM、WDM、TDM、HDLC、PPP、CRC、MAC、CSMA/CD、MACA、LLC、CSMA/CA、AS、IGP、EGP、CIDR、NAT、ICMP、ARP、RARP、DHCP、OSPF、BGP、TSAP、NSAP、TCP、UDP、RPC、RTP、DNS、SNMP、FTP、SMTP、HTTP、POP3、Email、www、IMAP、HTML、URL、MIME、XML 第一章 绪论 分类标准：传输技术和网络尺度 两种传输技术 传输技术{点到点链路——单播(点到点传输只有一个发送方和一个接收方)广播式链路——在一个广播网络上，通信信道被网络上的所有机器所共享，任何一台机器发出额数据包能被所有其他任何机器收到广播式链路{广播——将一个数据包发送给所有目标机器，只要在地址字段中使用一个特殊的编码组播——将一个数据包发送个一组机器  ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#big-data-%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%BA%94%E7%94%A8%E6%8A%80%E6%9C%AF"><span class="toc-number">1.</span> <span class="toc-text">Big Data(大数据应用技术)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%A6%82%E8%BF%B0-%E7%9C%8B%E5%A5%BD%E4%BE%8B%E9%A2%98%E5%8D%B3%E5%8F%AF"><span class="toc-number">2.</span> <span class="toc-text">第一章：大数据概述(看好例题即可)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">2.1.</span> <span class="toc-text">1. 大数据的概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%9A%84%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B"><span class="toc-number">2.2.</span> <span class="toc-text">2. 大数据的应用实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%9A%84%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF"><span class="toc-number">2.3.</span> <span class="toc-text">3. 大数据的关键技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%9A%84%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.4.</span> <span class="toc-text">4. 大数据的计算模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%A4%A7%E6%95%B0%E6%8D%AE%E4%B8%8E%E4%BA%91%E8%AE%A1%E7%AE%97-%E7%89%A9%E8%81%94%E7%BD%91%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">2.5.</span> <span class="toc-text">5. 大数据与云计算，物联网的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%9E%B6%E6%9E%84hadoop"><span class="toc-number">2.6.</span> <span class="toc-text">2.大数据处理架构Hadoop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-hdfs%E7%9A%84%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83"><span class="toc-number">2.7.</span> <span class="toc-text">1. HDFS的生态环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-hdfs%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8"><span class="toc-number">2.8.</span> <span class="toc-text">2. HDFS的安装与使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Ahdfs%E7%9A%84%E5%AD%98%E5%82%A8%E5%8E%9F%E7%90%86"><span class="toc-number">2.9.</span> <span class="toc-text">3. 超重点：HDFS的存储原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96"><span class="toc-number">2.9.1.</span> <span class="toc-text">4. 数据读取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6"><span class="toc-number">2.9.2.</span> <span class="toc-text">5. 超重点：数据复制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-hdfs%E5%AD%98%E5%82%A8%E6%9C%BA%E5%88%B6"><span class="toc-number">2.10.</span> <span class="toc-text">4. HDFS存储机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A%E6%95%B0%E6%8D%AE%E9%94%99%E8%AF%AF%E7%9A%84%E6%81%A2%E5%A4%8D-p56"><span class="toc-number">2.11.</span> <span class="toc-text">5. 超重点：数据错误的恢复(P56)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B-%E6%A6%82%E5%BF%B5%E8%A7%86%E5%9B%BE-%E7%89%A9%E7%90%86%E8%A7%86%E5%9B%BE"><span class="toc-number">2.12.</span> <span class="toc-text">6. 超重点：数据库的数据模型，概念视图，物理视图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Aregion%E5%AE%9A%E4%BD%8D%E7%9A%84%E4%B8%89%E5%B1%82%E6%98%A0%E5%B0%84%E7%BB%93%E6%9E%84"><span class="toc-number">2.13.</span> <span class="toc-text">7. 超重点：Region定位的三层映射结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Aregion%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.14.</span> <span class="toc-text">8.超重点：Region服务器的工作原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Astore%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.15.</span> <span class="toc-text">9. 超重点：Store的工作原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A-hlog%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.16.</span> <span class="toc-text">10.超重点： HLog的工作原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-nosql%E6%95%B0%E6%8D%AE%E5%BA%93-%E4%BE%8B%E9%A2%98%E5%8D%B3%E5%8F%AF"><span class="toc-number">2.17.</span> <span class="toc-text">11. NoSQL数据库(例题即可)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Amapreduce%E4%BB%A3%E6%95%B0%E8%BF%90%E7%AE%97"><span class="toc-number">2.18.</span> <span class="toc-text">12.超重点：MapReduce代数运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Amapreduce%E7%9A%84top-k-%E6%9E%81%E5%80%BC%E9%97%AE%E9%A2%98"><span class="toc-number">2.19.</span> <span class="toc-text">13. 超重点：MapReduce的Top-k 极值问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Amapreduce%E7%9A%84%E8%B4%AD%E7%89%A9%E7%AF%AE%E6%95%B0%E6%8D%AE%E7%9A%84%E5%85%B3%E8%81%94%E5%88%86%E6%9E%90"><span class="toc-number">2.20.</span> <span class="toc-text">14. 超重点：MapReduce的购物篮数据的关联分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A%E7%AA%84%E4%BE%9D%E8%B5%96%E5%92%8C%E5%AE%BD%E4%BE%9D%E8%B5%96%E4%BB%A5%E5%8F%8Astage%E5%88%92%E5%88%86"><span class="toc-number">2.21.</span> <span class="toc-text">15. 超重点：窄依赖和宽依赖以及stage划分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Ardd%E7%9A%84%E6%A6%82%E5%BF%B5-%E8%A1%80%E7%BC%98%E5%85%B3%E7%B3%BB-%E4%BB%A5%E5%8F%8A-%E6%83%B0%E6%80%A7%E8%B0%83%E7%94%A8"><span class="toc-number">2.22.</span> <span class="toc-text">16. 超重点：RDD的概念，“血缘关系”以及“惰性调用”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-%E8%B6%85%E9%87%8D%E7%82%B9rdd%E7%9A%84%E5%90%84%E4%B8%AA%E6%93%8D%E4%BD%9C%E7%9A%84%E8%BE%A8%E6%9E%90"><span class="toc-number">2.23.</span> <span class="toc-text">17.超重点RDD的各个操作的辨析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#18-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Ardd%E7%9A%84%E5%AE%B9%E9%94%99%E6%96%B9%E5%BC%8F"><span class="toc-number">2.24.</span> <span class="toc-text">18.超重点：RDD的容错方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Ardd%E7%9A%84wordcount%E4%BB%A3%E7%A0%81"><span class="toc-number">2.25.</span> <span class="toc-text">19.超重点：RDD的wordcount代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#20-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9Astore%E7%9A%84wordcount%E4%BB%A3%E7%A0%81"><span class="toc-number">2.26.</span> <span class="toc-text">20. 超重点：Store的wordcount代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#21-%E8%B6%85%E9%87%8D%E7%82%B9%EF%BC%9A-storm%E4%B8%AD%E5%90%84%E4%B8%AA%E5%88%86%E7%BB%84%E7%AD%96%E7%95%A5%E7%9A%84%E8%BE%A8%E6%9E%90"><span class="toc-number">2.27.</span> <span class="toc-text">21.超重点： Storm中各个分组策略的辨析</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>数据库理论(六)——数据库恢复 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="数据库理论(六)——数据库恢复 在数据库的数据操作过程中，通常会经过两个部分，一个是经过数据文件，对数据进行读写，还有一个部分会进入日志文件对数据库的操作行为进行记录 数据库操作的组织模式 事物(Transaction)  一个数据库操作序列 一个不可分割的工作单元 恢复和并发控制的基本单元  事物定义的sql语句 12345678910111213-- 显式定义begin transaction">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库理论(六)——数据库恢复">
+<meta property="og:url" content="http://blog.zerorains.top/2021/05/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="数据库理论(六)——数据库恢复 在数据库的数据操作过程中，通常会经过两个部分，一个是经过数据文件，对数据进行读写，还有一个部分会进入日志文件对数据库的操作行为进行记录 数据库操作的组织模式 事物(Transaction)  一个数据库操作序列 一个不可分割的工作单元 恢复和并发控制的基本单元  事物定义的sql语句 12345678910111213-- 显式定义begin transaction">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/33.jpg">
+<meta property="article:published_time" content="2021-05-25T06:31:50.000Z">
+<meta property="article:modified_time" content="2022-06-30T08:17:58.052Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="数据库理论">
+<meta property="article:tag" content="数据库恢复">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/33.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "数据库理论(六)——数据库恢复",
+  "url": "http://blog.zerorains.top/2021/05/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/",
+  "image": "http://blog.zerorains.top/img/33.jpg",
+  "datePublished": "2021-05-25T06:31:50.000Z",
+  "dateModified": "2022-06-30T08:17:58.052Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2021/05/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '数据库理论(六)——数据库恢复',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/33.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">数据库理论(六)——数据库恢复</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">数据库理论(六)——数据库恢复</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-05-25T06:31:50.000Z" title="发表于 2021-05-25 14:31:50">2021-05-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-06-30T08:17:58.052Z" title="更新于 2022-06-30 16:17:58">2022-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="数据库理论-六-数据库恢复">数据库理论(六)——数据库恢复</h1>
+<p>在数据库的数据操作过程中，通常会经过两个部分，一个是经过数据文件，对数据进行读写，还有一个部分会进入日志文件对数据库的操作行为进行记录</p>
+<h2 id="数据库操作的组织模式">数据库操作的组织模式</h2>
+<p><strong>事物(Transaction)</strong></p>
+<ol>
+<li>一个数据库操作序列</li>
+<li>一个不可分割的工作单元</li>
+<li>恢复和并发控制的基本单元</li>
+</ol>
+<p><strong>事物定义的sql语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 显式定义</span></span><br><span class="line"><span class="keyword">begin</span> transaction</span><br><span class="line"><span class="keyword">sql</span>语句<span class="number">1</span></span><br><span class="line"><span class="keyword">sql</span>语句<span class="number">2</span></span><br><span class="line"><span class="keyword">commit</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">begin</span> transaction</span><br><span class="line"><span class="keyword">sql</span>语句<span class="number">1</span></span><br><span class="line"><span class="keyword">sql</span>语句<span class="number">2</span></span><br><span class="line"><span class="keyword">rollback</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 隐式定义</span></span><br><span class="line">当用户没有显示地定义事物时，DBMS将自动划分事物</span><br></pre></td></tr></table></figure>
+<h2 id="数据库故障">数据库故障</h2>
+<h3 id="事物内部的故障">事物内部的故障</h3>
+<p>比如：运算溢出，发生死锁，违反某些完整性限制</p>
+<p>发生事物故障时，事物中的操作一部分已经发生，一部分还没有开始，因此需要对发生的操作进行撤销(UNDO)</p>
+<h3 id="系统故障">系统故障</h3>
+<p>造成系统停止运转的任何事件：</p>
+<pre><code>1. 系统要重新启动
+2. 所有正在运行的事物都非正常终止
+3. 没有破坏数据库
+4. 内存中数据库缓冲区的信息全部丢失
+</code></pre>
+<p>典型的系统故障：</p>
+<pre><code>1. 特定类型的硬件错误（CPU故障）
+2. 操作系统故障
+3. DBMS代码错误
+4. 系统断电
+</code></pre>
+<p>系统故障可能导致的现象</p>
+<ol>
+<li>事物未执行完成
+<ol>
+<li>恢复策略：强行撤销(UNDO)所有未完成事物</li>
+</ol>
+</li>
+<li>事物已执行完成（提交），但缓冲区中的数据尚未完全写回到磁盘上
+<ol>
+<li>恢复策略：重做(REDO)所有已提交的事物。</li>
+</ol>
+</li>
+</ol>
+<h3 id="介质故障">介质故障</h3>
+<p>硬故障，指外存故障</p>
+<ol>
+<li>磁盘损坏</li>
+<li>磁盘碰撞</li>
+<li>操作系统的某种潜在错误</li>
+<li>瞬时强磁场干扰</li>
+</ol>
+<p>介质故障的恢复策略：装入数据库发生介质故障前某个时刻的数据副本，重做自此时开始的所有成功事物，将这些事物已提交的结果重新写入数据库</p>
+<h2 id="数据库恢复技术">数据库恢复技术</h2>
+<p>**数据库恢复：**把数据库从错误状态恢复到某一已知的正确状态（亦称为一致状态或完整状态）</p>
+<p><strong>恢复机制涉及的关键问题：</strong></p>
+<pre><code>1. 如何建立冗余数据
+2. 如何利用这些冗余数据实施数据库恢复
+</code></pre>
+<p><strong>建立冗余数据的基本技术</strong></p>
+<ol>
+<li>数据转储（数据备份）
+<ol>
+<li>数据转存是指DBA将整个数据库复制到磁带或另一个磁盘上，保存起来的过程，备用的数据成为后备副本或后援副本</li>
+</ol>
+</li>
+<li>登录日志文件
+<ol>
+<li>日志文件：记录事物对数据库进行更新的操作（包括操作类型，操作时间，操作用户，操作结束等）的文件。</li>
+<li>begin transaction表示各个事物的开始标记</li>
+<li>commit和rollback表示各个事物的结束标记</li>
+</ol>
+</li>
+</ol>
+<p><strong>在事物的执行过程中，必须先写日志文件，然后再写入数据库中</strong></p>
+<p><strong>事物故障</strong>：事物在运行至终止点被终止</p>
+<p><strong>恢复方法</strong>：数据库恢复子系统利用日志文件撤销(undo)此事物已对数据库进行的修改</p>
+<h3 id="系统故障恢复">系统故障恢复</h3>
+<ol>
+<li>未完成事物对数据库的更新已经写入数据库</li>
+<li>已提交事物对数据库的更新还留在缓冲区没来得及写入数据库</li>
+</ol>
+<p><strong>恢复方法</strong>：</p>
+<pre><code>1. undo故障发生时未完成的事物
+2. redo已完成的事物
+</code></pre>
+<p>系统故障的恢复由系统在冲洗启动时自动完成，无需用户干预</p>
+<p><strong>讲了这么多举个例子吧</strong></p>
+<p><img src="https://blog.zerorains.top/img/20210525154419image-20210525154417634.png" alt="image-20210525154417634"></p>
+<p>事物T1在检查点之前就完成了，不在考虑范围内</p>
+<p>T2在检查点开始前就执行了，并且在发生故障之前就commit了，所以需要redo</p>
+<p>T3在检查点之前执行，在发生故障前还没有commit，要进行撤销(undo)</p>
+<p>T4在检查点之后故障之前执，并且在发生故障之前commit，所以要进行重做（redo）</p>
+<p>T5在检查点之后故障之前执行，故障发生后还没有commit所以要进行<strong>撤销(undo)</strong></p>
+<p><strong>简单总结一下吧，反正在检查点之后，故障之前commit都要是</strong></p>
+<p>上面的图太直接了，我们来看个复杂一点的：</p>
+<p><img src="https://blog.zerorains.top/img/20210525160202image-20210525160159874.png" alt="image-20210525160159874"></p>
+<p>假设，我们的故障发生在T6（日志文件片断2的右下角）结束后，那么我们应该怎么对数据库进行恢复呢？</p>
+<p>首先我们要找到故障发生前最近的检查点,从中间的文件中可以看出，最近的检查点应该在T5开始前(C4检查点，日志文件片断2的右下角)，通过这个检查点将上图转化成我们认识的图像：</p>
+<p><img src="https://blog.zerorains.top/img/20210526092851image-20210526092849438.png" alt="image-20210526092849438"></p>
+<p>从图像中可以看出在检查点C4之前，T1,T2,T3已经完成了commit，这个我们就不用管了；</p>
+<p>然后在C4前，开始了T3,T5,T6；</p>
+<p>在C4后故障前只有，T5完成了commit；</p>
+<p>因此真正需要redo的只有T5，而T4,T6都要undo</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2021/05/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/">http://blog.zerorains.top/2021/05/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA/">数据库理论</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D/">数据库恢复</a></div><div class="post-share"><div class="social-share" data-image="/img/33.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2021/05/24/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E4%BA%94-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" title="数据库理论(五)——数据库设计"><img class="cover" src="/img/20.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">数据库理论(五)——数据库设计</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2021/05/26/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" title="数据库理论(七)——并发控制"><img class="cover" src="/img/1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">数据库理论(七)——并发控制</div></div><div class="info-2"><div class="info-item-1">数据库理论(七)——并发控制 并发控制的任务： 1. 对并发操作进行正确调度 2. 保证事物的隔离性 3. 保证数据库的一致性  并发操作可能带来的数据不一致性：  丢失修改 不可重复读 读“脏”数据  辅助符号：  R(X)：读数据x W(X)：写数据x  并发控制的基本理念  封锁(Locking) 时间戳(Timestamp) 乐观控制法  商用的DBMS通常采用封锁发方法 封锁 封锁指事物T在对某个数据对象(表，记录)操作之前，先向系统发出请求，对其加锁； 加锁后，事物T就对该数据对象有了一定的控制，在事物T1释放它的锁之前，其他事物不能更新此数据对象。 事物对数据对象加锁的类型决定了事物对数据对象的控制  排他锁(Exclusive Locks，简记为X锁，写锁)  事物T在更新数据对象之前，必须先获得数据对象的排他锁 若事物T对数据对象A加上X锁，则只允许T读取和修改A，其他任何事物都不能在对A加任何类型的锁   共享锁(Share...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2021/05/24/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E4%BA%94-%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" title="数据库理论(五)——数据库设计"><img class="cover" src="/img/20.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-24</div><div class="info-item-2">数据库理论(五)——数据库设计</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2021/05/20/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA%E2%80%94%E2%80%94%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8ESQL%E8%AF%AD%E5%8F%A5/" title="数据库理论(一)——基本概念与关系代数"><img class="cover" src="/img/15.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-20</div><div class="info-item-2">数据库理论(一)——基本概念与关系代数</div></div><div class="info-2"><div class="info-item-1">数据库理论(一)——基本概念与关系代数 基本概念 数据库(Database)：长期存储在计算机内的，有组织的，可共享的数据集合 数据库管理系统(DBMS  databases management system)：能够有效建立和维护大量数据的强大工具 数据库管理员(DBA) 用户(User) 型：某一类数据的结构和属性的说明 值：型的一个具体赋值 模式(schema):数据库中全体数据的逻辑结构和特征描述 实例：模式的一个具体的值 数据模型的三个层面 概念层面 逻辑层面 物理层面 (逻辑)数据模型 = 数据结构 + 数据操作集合 + 数据完整性约束 关系数据模型 = 关系数据结构 + 关系数据操作集合 + 关系数据完整性约束 数据库的三级结构模式： 模式(Schema)：数据操作 内模式(Internal Schema)：数据存储方式 外模式(External...</div></div></div></a><a class="pagination-related" href="/2021/05/26/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" title="数据库理论(七)——并发控制"><img class="cover" src="/img/1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-26</div><div class="info-item-2">数据库理论(七)——并发控制</div></div><div class="info-2"><div class="info-item-1">数据库理论(七)——并发控制 并发控制的任务： 1. 对并发操作进行正确调度 2. 保证事物的隔离性 3. 保证数据库的一致性  并发操作可能带来的数据不一致性：  丢失修改 不可重复读 读“脏”数据  辅助符号：  R(X)：读数据x W(X)：写数据x  并发控制的基本理念  封锁(Locking) 时间戳(Timestamp) 乐观控制法  商用的DBMS通常采用封锁发方法 封锁 封锁指事物T在对某个数据对象(表，记录)操作之前，先向系统发出请求，对其加锁； 加锁后，事物T就对该数据对象有了一定的控制，在事物T1释放它的锁之前，其他事物不能更新此数据对象。 事物对数据对象加锁的类型决定了事物对数据对象的控制  排他锁(Exclusive Locks，简记为X锁，写锁)  事物T在更新数据对象之前，必须先获得数据对象的排他锁 若事物T对数据对象A加上X锁，则只允许T读取和修改A，其他任何事物都不能在对A加任何类型的锁   共享锁(Share...</div></div></div></a><a class="pagination-related" href="/2021/05/21/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95%E4%B8%8E%E8%A7%86%E5%9B%BE/" title="数据库理论(二)——索引与视图"><img class="cover" src="/img/11.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-21</div><div class="info-item-2">数据库理论(二)——索引与视图</div></div><div class="info-2"><div class="info-item-1">数据库理论(二)——索引与视图 数据库对象 表(tables)：关系在数据库中的表现形式 视图(Views)：虚表，从一个或者多个table中导出的，数据库中存放视图的结构而不存放视图对应的数据，可以基于存在的视图定义新的视图。 索引(index)：一种特殊的存储结构，伴随基本表存在，是基本表中若干属性(组)的有序结构；用于加快数据库的查询速度。 1个关系数据库实例-&gt;多个数据库 1个数据库-&gt;多个模式 1个模式-&gt;多个表，视图，索引等数据库对象 创建和删除数据库 1234-- 创建数据库CREATE DATABASE 数据库的名称;-- 删除数据库DROP DATABASE 数据库的名称; 模式的创建与删除 1234-- 创建模式，作者是用户CREATE SCHEMA 模式名称 AUTHORIZATION 用户名;-- 删除模式 cascade级联删除——删除该模式下的所有数据库对象，restrict限制删除——只有模式为空的时候才能删除drop schema 模式名称...</div></div></div></a><a class="pagination-related" href="/2021/05/05/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA%E2%80%94%E2%80%94%E6%A8%A1%E5%BC%8F%E5%88%86%E8%A7%A3/" title="数据库理论(四)——数据库规范化与模式分解"><img class="cover" src="/img/32.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-05</div><div class="info-item-2">数据库理论(四)——数据库规范化与模式分解</div></div><div class="info-2"><div class="info-item-1">数据库理论(四)——数据库规范化与模式分解 部分函数依赖 函数依赖的确定  1对1的关系时，有两个函数依赖 1对多时，有一个函数依赖 多对多时，没有函数依赖  函数依赖类型 右边不为左边的子集{非平凡函数依赖（A−&gt;B），yes平凡函数依赖(AB−&gt;B)，no左边有子集能决定右边{部分函数依赖,yes完全函数依赖,no右边不为左边的子集 \begin{cases} 非平凡函数依赖（A-&gt;B），yes...</div></div></div></a><a class="pagination-related" href="/2021/05/22/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E4%BC%98%E5%8C%96%E6%9F%A5%E8%AF%A2/" title="数据库理论（三）——完整性约束及触发器"><img class="cover" src="/img/8.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-22</div><div class="info-item-2">数据库理论（三）——完整性约束及触发器</div></div><div class="info-2"><div class="info-item-1">数据库理论（三）——完整性约束，触发器和数据库安全 关系模型的实体完整性 码 实体完整性的定义：primary key(主码) 约束： 1. 列级约束，在定义好属性后进行约束，只对单个属性，**约束方式**：主键，外键，唯一，检查，默认，非空 2. 表级约束，对多个属性进行约束，通常在定义好属性之后编写，**联合主码**通常使用的是表级约束，**约束方式**：主键，外键，唯一，检查  对应sql语句 1234567891011121314151617create table 表名(    -- 非空	属性1 类型1 not null,    -- 唯一    属性2 类型2 unique,    -- 默认    属性3 类型3 default 默认值,    -- 检查    属性4 类型4 check (只有属性4满足L条件时才能正常创建)    -- 联合组件    primary key(属性1，属性2),    -- 外码    foreign key(属性1) references 另一个表(属性1),    --...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%90%86%E8%AE%BA-%E5%85%AD-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D"><span class="toc-number">1.</span> <span class="toc-text">数据库理论(六)——数据库恢复</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C%E7%9A%84%E7%BB%84%E7%BB%87%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.1.</span> <span class="toc-text">数据库操作的组织模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%95%85%E9%9A%9C"><span class="toc-number">1.2.</span> <span class="toc-text">数据库故障</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E7%89%A9%E5%86%85%E9%83%A8%E7%9A%84%E6%95%85%E9%9A%9C"><span class="toc-number">1.2.1.</span> <span class="toc-text">事物内部的故障</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%95%85%E9%9A%9C"><span class="toc-number">1.2.2.</span> <span class="toc-text">系统故障</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E8%B4%A8%E6%95%85%E9%9A%9C"><span class="toc-number">1.2.3.</span> <span class="toc-text">介质故障</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%81%A2%E5%A4%8D%E6%8A%80%E6%9C%AF"><span class="toc-number">1.3.</span> <span class="toc-text">数据库恢复技术</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%95%85%E9%9A%9C%E6%81%A2%E5%A4%8D"><span class="toc-number">1.3.1.</span> <span class="toc-text">系统故障恢复</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

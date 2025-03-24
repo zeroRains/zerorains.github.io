@@ -1,0 +1,446 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「书籍阅读」数据密集型应用系统设计 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="可靠、可拓展与可维护的应用系统 应用系统的组成模块：  数据库：存储数据 高速缓存：缓存复杂或操作代价昂贵的结果 索引：用户可以按关键字搜索并支持各种过滤 流式处理：持续发送消息至另一进程(异步) 批处理：定期处理大量的累积数据  数据软件系统重视的三个问题：  可靠性(Reliability)：硬件、软件故障、人为失误等，系统仍然可以正常运转。 可拓展性(Scalability)：数据量和复杂度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「书籍阅读」数据密集型应用系统设计">
+<meta property="og:url" content="http://blog.zerorains.top/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="可靠、可拓展与可维护的应用系统 应用系统的组成模块：  数据库：存储数据 高速缓存：缓存复杂或操作代价昂贵的结果 索引：用户可以按关键字搜索并支持各种过滤 流式处理：持续发送消息至另一进程(异步) 批处理：定期处理大量的累积数据  数据软件系统重视的三个问题：  可靠性(Reliability)：硬件、软件故障、人为失误等，系统仍然可以正常运转。 可拓展性(Scalability)：数据量和复杂度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/14.png">
+<meta property="article:published_time" content="2022-10-01T06:39:00.000Z">
+<meta property="article:modified_time" content="2022-10-03T01:42:40.409Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="数据密集型应用系统设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/14.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「书籍阅读」数据密集型应用系统设计",
+  "url": "http://blog.zerorains.top/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/",
+  "image": "http://blog.zerorains.top/img/14.png",
+  "datePublished": "2022-10-01T06:39:00.000Z",
+  "dateModified": "2022-10-03T01:42:40.409Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「书籍阅读」数据密集型应用系统设计',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/14.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「书籍阅读」数据密集型应用系统设计</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「书籍阅读」数据密集型应用系统设计</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-01T06:39:00.000Z" title="发表于 2022-10-01 14:39:00">2022-10-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-03T01:42:40.409Z" title="更新于 2022-10-03 09:42:40">2022-10-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96/">系统优化</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="可靠-可拓展与可维护的应用系统">可靠、可拓展与可维护的应用系统</h2>
+<p>应用系统的组成模块：</p>
+<ol>
+<li>数据库：存储数据</li>
+<li>高速缓存：缓存复杂或操作代价昂贵的结果</li>
+<li>索引：用户可以按关键字搜索并支持各种过滤</li>
+<li>流式处理：持续发送消息至另一进程(异步)</li>
+<li>批处理：定期处理大量的累积数据</li>
+</ol>
+<p>数据软件系统重视的三个问题：</p>
+<ol>
+<li>可靠性(Reliability)：硬件、软件故障、人为失误等，系统仍然可以正常运转。</li>
+<li>可拓展性(Scalability)：数据量和复杂度是可变的</li>
+<li>可维护性(Maintainability)：新人员可以参与到系统开发和运维，维护现有功能或适配新的场景，系统都能够高效运作。</li>
+</ol>
+<h3 id="可靠性">可靠性</h3>
+<p>可能出错的事情称为错误(faults)或故障，系统可应对错误称为容错(fault-tolerant)。与失效(failure)不完全一致，前者表示与预期目的偏离，后者表示整个系统完全停止工作。</p>
+<p><strong>硬件故障</strong>: 硬盘崩溃、内存崩溃、电网停电、误拔网线。</p>
+<p><strong>软件错误</strong>：软件错误导致当输入特定值时应用服务器崩溃；应用程序使用某些共享资源时不行失控跑飞；依赖的服务变慢甚至无响应；小组件故障触发相关组件故障。设计时需要考虑很多细节，认真检查依赖的假设条件与系统之间的交互，进行全面测试，进程隔离，允许进程崩溃并自动重启。</p>
+<p><strong>人为失误</strong>：以最小出错的方式来设计系统；想办法分离出最容易出错的地方；充分测试；设置详细而清晰的监控子系统，包括性能指标和错误率。</p>
+<h3 id="可拓展性">可拓展性</h3>
+<p>这更多的讨论的是：如果系统以某种方式增长，应对增长的方式有哪些</p>
+<p><strong>负载</strong>：负载可以用称为负载参数的若干数字来描述，比如Web服务器的每秒请求处理次数，数据库中写入的比例，缓存命中率等等。</p>
+<p><strong>性能</strong>：在批处理系统中，通常用吞吐量(throughput)，在在线系统更看重服务响应时间(response time)。服务响应时间通常使用百分位数表示(对收集到的响应时间进行排序，然后取第百分位的位置，作为结果，表示有前百分之多少低于这个时间。)通常使用p50(中位数)，p95，p99以及p999来表示。</p>
+<blockquote>
+<p>延迟与响应时间：</p>
+<p>延迟：请求花费在处理上的时间</p>
+<p>相应时间：除了处理时间外，还包括来回网络延迟和各种排队延迟。</p>
+</blockquote>
+<h3 id="可维护性">可维护性</h3>
+<p>这要求我们关注软件系统的三个设计原则：</p>
+<ol>
+<li>可运维性：方便运营团队来保持系统平稳运行</li>
+<li>简单性：简化系统复杂性，使新工程师能够轻松理解系统</li>
+<li>可演化性：后续工程师能够轻松对系统进行改进，并根据需求变化将其是被到非典型场景中</li>
+</ol>
+<p><strong>可运维性</strong>：监视系统的健康状况，并在异常时快速恢复；追踪问题的原因；保持软件和平台至最新状态；了解不同系统如何相互影响；建立用于部署、配置管理等良好的时间规范和工具包；执行复杂的维护任务；当配置更改时，维护系统的安全稳健；指定流程来规范操作行为；保持相关知识的传承；</p>
+<p><strong>简化性</strong>：消除意外复杂性(比如状态空间膨胀，模块耦合，令人纠结的相互依赖关系，不一致的命名和术语等)的最好手段之一就是抽象。好的抽象设计可以隐藏大量的实现细节，并对外提供干净易懂的接口。</p>
+<h2 id="数据模型与查询语言">数据模型与查询语言</h2>
+<h3 id="关系模型与文档模型">关系模型与文档模型</h3>
+<p>关系数据库的核心在于商业数据处理，主要包括事物处理和批处理。</p>
+<h4 id="nosql">NoSQL</h4>
+<p>NoSQL的含义是：不仅仅是SQL</p>
+<p>其驱动因素包括：</p>
+<ol>
+<li>比关系数据库更好的拓展性，包括支持超大数据集或超高写入吞吐量</li>
+<li>普通偏爱免费和开源软件</li>
+<li>关系模型不能很好得支持一些特定的查询操作</li>
+<li>渴望更具有动态和表达能里的数据模型。</li>
+</ol>
+<p>混合持久化：将关系数据库与各种非关系数据库存储一起使用</p>
+<h4 id="网络模型">网络模型</h4>
+<p>网络模型由一个称为数据系统语言会议(Conference on Data System Languages，CODASYL)的委员会进行标准化的，并由多个不同的数据库厂商实施，它也被称为CODASYL模型。</p>
+<p>在层次模型的树结构中，每个记录只有一个父节点，而在网络模型中，一个记录可以有多个父节点。在网络模型中，访问记录的唯一方法是选择一条始于根记录的路径，并沿着相关链接一次访问，这条链接链条被称为<strong>访问路径</strong>。</p>
+<p>网络模型的最大问题在于它们使查询和更新数据库变得异常复杂而没有灵活性。</p>
+<h4 id="关系模型">关系模型</h4>
+<p>关系模型定义了所有数据的格式：关系(表)只是元组(行)的集合。</p>
+<p>在关系数据库中，查询优化器自动决定以何种顺序执行查询，以及使用哪些索引。其与访问路径的最大区别在于，关系数据库中的查询选择是查询优化自动生成的。关系模型的<strong>核心思想</strong>是：只需要构建一次查询优化器，然后使用该数据库的所有应用程序都可以从中受益。</p>
+<h4 id="文档数据库的比较">文档数据库的比较</h4>
+<p>文档数据库是某种方式的层次结构：即在其父记录中保存了嵌套记录，而不是存储在单独的表中。</p>
+<p>在表示多对一和多对多的关系时，关系数据库和文档数据库并没有根本的不同：在两种情况下，相关项都由唯一的标识符引用，该表示在关系模型中称为外键，在文档模型中称为文档引用。</p>
+<h3 id="数据库查询语言">数据库查询语言</h3>
+<p>很多常用的编程语言都是命令式的，比如在动物列表中找到鲨鱼</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getSharks</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">var</span> sharks = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>;i&lt;animal.<span class="property">length</span>;i++)</span><br><span class="line">        <span class="keyword">if</span>(animals[i].<span class="property">family</span>===<span class="string">&quot;Sharks&quot;</span>)</span><br><span class="line">            sharks.<span class="title function_">push</span>(animals[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而SQL则可以表示为</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> animals <span class="keyword">WHERE</span> family <span class="operator">=</span> <span class="string">&#x27;Sharks&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>命令式语言(javascript的代码)会告诉计算机待定顺序执行的某些操作。声明式语言(SQL)则只需指定所需的数据模式，结果满足什么条件，以及如何转换数据。</p>
+<p>声明式查询语言很有吸引力，它比命令式API更加简介和容易使用，此外，声明式语言通常适合于并行执行。</p>
+<p><strong>Web上的声明式查询</strong>：举个例子就是在CSS中针对特定的类别写上相应的样式，然后在HTML语言的标签中加上对应的类别的类名，从而实现样式映射。但如果不是使用CSS而是使用XSL的话，也是使用XPath表达式来选中HTML中的对应标签，然后加上对应的样式。如果非得使用命令式的方法的话，可以直接使用JavaScrpit中的对象模型(Document Object Module, DOM)API，具体流程就是使用DOM的选择器API选出对应的标签，再手动加入对应的样式。</p>
+<p><strong>MapReduce查询</strong>：MapReduce既不是声明式查询语言，也不是一个完全命令式的查询API，而是介于两者之间：查询的逻辑用代码片段来表示，这些代码片段可以被处理框架重复地调用。主要基于map和reduce函数。map函数主要是将数据处理成键值对的形式，然后reduce函数主要是对同一个键的不同值进行相应的处理。但map和reduce函数对于可执行的操作有所限制，他们必须是纯函数，这意味着只能用传递进去的数据作为输入，而不能执行额外的数据库查询，也不能有任何副作用。</p>
+<h3 id="图状数据库模型">图状数据库模型</h3>
+<p>图由顶点和边构成。常见的图结构有：社交网络，Web图，公路或铁路网等。图提供了单个数据存储区中保存完全不同类型对象的一致性方式。常见的三种声明式图查询语言：Cypher，SPARQL和Datalog。</p>
+<h4 id="属性图">属性图</h4>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>图</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>顶点</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>唯一标识符</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>出边的集合</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>入边的集合</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>属性的集合</mtext><mo stretchy="false">(</mo><mtext>键值对</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>边</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>唯一标识符</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>边开始的顶点</mtext><mo stretchy="false">(</mo><mtext>尾部顶点</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>边结束的顶点</mtext><mo stretchy="false">(</mo><mtext>头部顶点</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>描述两个顶点之间关系类型的标签</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>属性的集合</mtext><mo stretchy="false">(</mo><mtext>键值对</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">图\begin{cases}
+顶点\begin{cases}
+唯一标识符\\
+出边的集合\\
+入边的集合\\
+属性的集合(键值对)
+\end{cases}
+\\
+边\begin{cases}
+唯一标识符\\
+边开始的顶点(尾部顶点)\\
+边结束的顶点(头部顶点)\\
+描述两个顶点之间关系类型的标签\\
+属性的集合(键值对)
+\end{cases}
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:12.96em;vertical-align:-6.23em;"></span><span class="mord cjk_fallback">图</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.55em;"><span style="top:-1.366em;"><span class="pstrut" style="height:6.516em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.358em;"><span class="pstrut" style="height:6.516em;"></span><span style="height:4.516em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="4.516em" style="width:0.8889em" viewBox="0 0 888.89 4516" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V4516 H384z M384 0 H504 V4516 H384z"/></svg></span></span><span style="top:-6.516em;"><span class="pstrut" style="height:6.516em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-7.658em;"><span class="pstrut" style="height:6.516em;"></span><span style="height:4.516em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="4.516em" style="width:0.8889em" viewBox="0 0 888.89 4516" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V4516 H384z M384 0 H504 V4516 H384z"/></svg></span></span><span style="top:-12.166em;"><span class="pstrut" style="height:6.516em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.05em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.73em;"><span style="top:-9.45em;"><span class="pstrut" style="height:5.85em;"></span><span class="mord"><span class="mord cjk_fallback">顶点</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.95em;"><span style="top:-1.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.592em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.916em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.916em" style="width:0.8889em" viewBox="0 0 888.89 916" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V916 H384z M384 0 H504 V916 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.916em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.916em" style="width:0.8889em" viewBox="0 0 888.89 916" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V916 H384z M384 0 H504 V916 H384z"/></svg></span></span><span style="top:-5.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.45em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.13em;"><span style="top:-5.13em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">唯一标识符</span></span></span><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">出边的集合</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">入边的集合</span></span></span><span style="top:-0.81em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">属性的集合</span><span class="mopen">(</span><span class="mord cjk_fallback">键值对</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.63em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:5.85em;"></span><span class="mord"><span class="mord cjk_fallback">边</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.85em;"><span style="top:-1.366em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.358em;"><span class="pstrut" style="height:3.816em;"></span><span style="height:1.816em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="1.816em" style="width:0.8889em" viewBox="0 0 888.89 1816" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V1816 H384z M384 0 H504 V1816 H384z"/></svg></span></span><span style="top:-3.816em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.958em;"><span class="pstrut" style="height:3.816em;"></span><span style="height:1.816em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="1.816em" style="width:0.8889em" viewBox="0 0 888.89 1816" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V1816 H384z M384 0 H504 V1816 H384z"/></svg></span></span><span style="top:-6.766em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.35em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.85em;"><span style="top:-5.85em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">唯一标识符</span></span></span><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">边开始的顶点</span><span class="mopen">(</span><span class="mord cjk_fallback">尾部顶点</span><span class="mclose">)</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">边结束的顶点</span><span class="mopen">(</span><span class="mord cjk_fallback">头部顶点</span><span class="mclose">)</span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">描述两个顶点之间关系类型的标签</span></span></span><span style="top:-0.09em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">属性的集合</span><span class="mopen">(</span><span class="mord cjk_fallback">键值对</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.35em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.23em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<blockquote>
+<p>举个例子：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221002141004175.png" alt="image-20221002141004175"></p>
+</blockquote>
+<ol>
+<li>任何顶点都可以连接到其他任何顶点。</li>
+<li>给定某个顶点，可以高效地得到它的所有入边和出边，从而遍历图。</li>
+<li>通过对不同类型的关系使用不同的标签，可以在单个图中存储多钟不同类型的信息，同时仍然保持正解的数据模型。</li>
+</ol>
+<h4 id="cypher查询语言">Cypher查询语言</h4>
+<p>Cypther是一种用于属性图的声明式查询语言。</p>
+<blockquote>
+<p>举个例子：</p>
+<p><code>(Idaho)-[:WITHIN]-&gt;(USA)</code>创建了一个类别为WITHIN的边，其中节点Idaho为尾节点，USA为头节点。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221002141445521.png" alt="image-20221002141445521"></p>
+<p>首先是根据出生边(BORN_IN)和地区具体信息边(WITHIN)搜索出出生在美国的人，然后根据居住边(LIVES_IN)和地区具体信息边(WITHIN)搜索出现在居住在欧洲的人。</p>
+</blockquote>
+<h4 id="三元组存储">三元组存储</h4>
+<p>三元组的主体相当于图中的顶点，客体则是下面两种情况之一：</p>
+<ol>
+<li>原始数据类型中的值，比如字符串或数字</li>
+<li>图的另一个顶点</li>
+</ol>
+<blockquote>
+<p>举个例子：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221002141827315.png" alt="image-20221002141827315"></p>
+<p><code>_:</code>表示节点对应的名称，<code>:name</code>通常表示其属性值，<code>:Person</code>指的是节点的类型。</p>
+</blockquote>
+<h4 id="sparql查询语言">SPARQL查询语言</h4>
+<blockquote>
+<p>举个例子：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221002142155113.png" alt="image-20221002142155113"></p>
+<p>从personName中进行筛选(SELECT所在为第一行)，不管叫什么名字(第二行)；出生在任意节点，但这些节点所属地的name属性必须是没过(第三行)；居住在任意节点，但这些节点的所属地的name属性必须是欧洲(第四行)，满足上面三个约束的交集就是查询的结果。</p>
+<p>其和Cypher很像，下面两个表达式是等价的</p>
+<p><code>(person)-[:BORN_IN]-&gt;()-[:WITHIN*o..]-&gt;(location)</code> # Cypher</p>
+<p><code>?person :bornIn / :within* ?location.</code>                           # SPARQL</p>
+</blockquote>
+<h2 id="数据存储与检索">数据存储与检索</h2>
+<h3 id="数据库核心：数据结构">数据库核心：数据结构</h3>
+<p>数据库最简单的实现方式如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">db_set()&#123;</span><br><span class="line">	echo &quot;$1,$2&quot; &gt;&gt; database</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">db_get()&#123;</span><br><span class="line">	grep &quot;^$1,&quot; database | sed -e &quot;s/^$1,//&quot; | tail -n 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面实现了一个key-value的存储方式，<code>db_set key1 value1</code>的操作就是向database文件中追加一个键值对<code>key1,value1</code>，然后<code>db_get key</code>的操作就是输入对应的键，然后在database文件中进行匹配，然后为了使用最新的结果，通常使用<code>tail -n 1</code>来取出文件中的最后一个匹配项。</p>
+<p>许多数据库内部都使用<strong>日志</strong>(log)，日志是一个仅支持追加式更新的数据文件。</p>
+<blockquote>
+<p>日志通常指的是应用程序的运行输出日志，记录发生了什么事情。书本中的日志表示一个仅能追加的记录序列集合，他可能是人类不可读的，可能是二进制格式而只能被其他程序来读取。</p>
+</blockquote>
+<p>我们可以假设如果database内容很多，那么使用<code>db_get</code>来搜索对应的内容时，要搜索全部的文件，这样时间开销就很大，于是需要新的数据结构——<strong>索引</strong>，通过它来高效地查找数据库中特定的值。索引是基于原始数据派生而来的额外数据结构，其不影响数据库中的内容，只会影响查询性能。而通常维护额外的数据结构，在数据发生变动时，相应的索引结构也会跟着修改，这就意味着索引的存在可能会对数据的写入存在一定的影响。因此，适当的索引可以加速读取查询，但每个索引都会减慢写速度。</p>
+<h4 id="哈希索引">哈希索引</h4>
+<p>假设数据存储全部采用追加式文件组成，那么最简单的索引策略就是：保存内存中的hash map，把每一个键一一映射到数据文件中特定的字节偏移量，这样就可以找到每一个值的位置了。同样的，在插入时，也要更新插入数据的hash值和对应的偏移量。</p>
+<p>如何避免存值可能造成的最终用尽磁盘空间？将日志分解成一定大小的段，当文件到达一定大小时就关闭它，并将后续写入到新的段文件中。然后就可以在这些段中执行压缩(丢掉重复的键，只保留最新的结果)，如下图：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002155709300.png" alt="image-20221002155709300"></p>
+<p>当然，也可以在执行压缩的时候将多个段合并在一起，如下图：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002155755583.png" alt="image-20221002155755583"></p>
+<p>端在写入后不会再进行修改，所以合并的段会被写入一个新的文件中，在合并和压缩运行时，仍然可以使用旧的段文件继续正常的读取和写请求，当合并过程完成后，将读取请求切换到新的合并端上，而旧的段文件可以安全删除。每个段现在都有自己的内存哈希表，将键映射到文件的偏移量。为了找到键的值，首先检查最新的段hash map，如果键不存在，检查第二最新的段，以此类推。</p>
+<p>但是上面的想法在实际使用过程中仍然存在一定的问题：</p>
+<ol>
+<li>文件格式：CSV显然不是最好的选择，最好的选择应该是使用二进制格式。</li>
+<li>删除记录：如果要删除键和相关的值，必须在数据文件中追加一个特殊的删除记录，当合并日志时，一旦发现这个标记，则会丢弃这个已经删除键的所有值</li>
+<li>崩溃恢复：数据库重启后，内存中的hash map就会丢失。这需要从头到尾读取整个段文件，然后记录每个键最新值的偏移量，来回复每个段的hash map。但如果分段文件很大，重新恢复的时间就会比较长。</li>
+<li>部分写入记录：数据库随时可能崩溃，包括将记录助教到日志的过程中。</li>
+<li>并发控制：由于写入以严格的先后顺序追加到日志中，通常的实现选择是只有一个写线程。</li>
+</ol>
+<p>哈希索引存在的局限性：</p>
+<ol>
+<li>当哈希表很大时，内存里装不下，只能在磁盘上进行管理，这就会引入IO时间，性能下降。</li>
+<li>区间查询效率不高，当给定范围查询时，只能按照逐个键遍历，然后筛选的方式进行。</li>
+</ol>
+<h4 id="sstables">SSTables</h4>
+<p>与之前的简单想法相比，排序字符串表(SSTable)就是添加了一个规则：要求key-value对的顺序按键排序。其要求每个键在合并的段文件中只能出现一次，其具有以下优点：</p>
+<ol>
+<li>
+<p>合并段更加简单高校，即使文件大于可用内存。比较每个文件的第一个键，把最小的键拷贝到输出文件中，从而产生新的按键排序的合并文件，即使遇到键相同的情况，也能够根据哪一个是最新的进行写入。</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002161631121.png" alt="image-20221002161631121"></p>
+</li>
+<li>
+<p>在文件中查找特定键时，不在需要在内存中保存所有键的索引。根据有序性，可以根据偏移量进一步确定搜索键的位置。</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002161650584.png" alt="image-20221002161650584"></p>
+</li>
+<li>
+<p>读请求往往需要扫描请求范围内的多个key-value对，可以考虑将这些记录保存到一个块中并在写磁盘之前将其压缩。稀疏内存索引的每个条目指向压缩块的开头。</p>
+</li>
+</ol>
+<p>内存排序的实现主要还是使用红黑树或AVL树，基本工作流程如下：</p>
+<ol>
+<li>写入时，将其添加到内存中的平衡树数据结构中，其被称为内存表。</li>
+<li>当内存大于某个阈值时，将其作为SSTable文件写入磁盘中。新的SSTable文件成为数据的最新部分。当SSTable写磁盘的同时，写入可以继续添加到一个新的内存表实例中。</li>
+<li>为了处理读请求，首先尝试在内存表中找键，然后是最新的磁盘段文件，接下来是次新的磁盘段文件，以此类推。</li>
+<li>后台进程周期性地执行段合并与压缩过程，以合并多个段文件，并丢弃那些已经被覆盖或删除的值。</li>
+</ol>
+<h4 id="lsm-tree">LSM-Tree</h4>
+<p>基于合并和压缩排序文件原理的存储引擎通常被称为LSM存储引擎。在确定键不存在之前，会检查内存表，一直检查到最久的文件，这使得LSM-Tree算法很慢。为了避免这种情况，会使用额外的布隆过滤器(内存高效的数据结构，用于近似计算集合的内容。如果数据库中不存在某个键，就会很快告诉你结果)。</p>
+<p>SSTable压缩和合并的方式——大小分级和分层压缩。在大小分级的压缩中，新而小的SSTable被连续合并到旧而大的SSTable中。在分层压缩中，键的方位分裂成更多的SSTable，旧的会移动到对应的层级中。</p>
+<h4 id="b-tree">B-tree</h4>
+<p>B-tree仍然是几乎所有关系数据库中的标准索引实现，其保留键值排序树，这样可以实现高效的键值查找和区间查询。其会将数据库分解成固定大小的块或页，传统大小为4KB(有时更大)。每一页都会有对应的标识，指向磁盘的地址。下图就是一个简单的B-tree索引：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002163521035.png" alt="image-20221002163521035"></p>
+<p>B-tree的优化</p>
+<ol>
+<li>在恢复时，不采用覆写的方案，而是采用复制的方案维护预写日志(在修改磁盘文件时，要先写入预写日志中再进行，WAL)，然后写好对应的文件后直接修改树的索引位置即可</li>
+<li>保存键的缩略信息，节省页空间</li>
+<li>尝试对树进行布局，以便相邻叶子可以按顺序保存在磁盘上</li>
+<li>添加额外的指针到树中，比如向左向右的指针引用其兄弟页</li>
+<li>使用B-tree的变体，比如分形树</li>
+</ol>
+<h4 id="b-tree与lsm-tree对比">B-tree与LSM-tree对比</h4>
+<p>根据经验：LSM-tree通常对于写入更快，而B-tree被认为对于读取更快。</p>
+<p><strong>LSM-tree的优点</strong>：B-tree索引必须先写入预写日志，再写入树的页本身，即使该页中只有几个字节更改，也必须承受整个页面的开销。LSM-tree能够承受比B-tree更高的写入吞吐量，一方面其具有较低的写放大，另一方面其以顺序方式写入紧凑的SSTable文件，而不是重写树中的多个页(磁盘顺序写比随机写要快得多)。LSM-tree可以支持更好地压缩。</p>
+<p><strong>LSM-tree的缺点</strong>：</p>
+<ol>
+<li>压缩过程有时会干扰正在进行的读写操作。</li>
+<li>高写入吞吐量时，压缩还存在一个问题：磁盘的有限写入带宽需要在初始写入(记录并刷新内存表到磁盘)和后台运行的压缩线程之间所共享。</li>
+<li>当吞吐量和压缩没有仔细配置，高吞吐量的情况机会导致压缩的带宽减小，并且未完成的压缩会产生更多的段，使得压缩过程要查看的段更多，读取速度降低。</li>
+</ol>
+<p><strong>B-tree的优点</strong>：每个键都恰好唯一对应于索引中的某个位置，在许多关系型数据库中，事务隔离是通过键范围上的锁来实现的，并且在B-tree索引中，这些锁可以直接定义到树中。</p>
+<h4 id="其他索引结构">其他索引结构</h4>
+<p><strong>在索引中存储值</strong>：</p>
+<ol>
+<li>聚集索引：索引行直接存储在索引中</li>
+<li>非聚集索引：仅存储索引中的数据的引用</li>
+</ol>
+<p><strong>多列索引（级联索引）</strong>：将一列追加到另一列，将几个字段简单地组合成一个键。</p>
+<p><strong>全文搜索与模糊索引</strong>：支持对一个单词的所有同义词进行查询，并忽略单词语法上的变体。</p>
+<h3 id="事务处理与分析处理">事务处理与分析处理</h3>
+<p>交互式的数据存储事务（博客评论，游戏动作，通讯录像）被统称为在线事务处理(OLTP)。</p>
+<p>由业务分析师编写的查询事务以形成有助于公司管理层更好决策的报告的处理，称为在线分析处理(OLAP)。</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>事务处理系统(OLTP)</th>
+<th>分析系统(OLAP)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主要读特征</td>
+<td>基于键，每次查询返回少量的记录</td>
+<td>对大量记录进行汇总</td>
+</tr>
+<tr>
+<td>主要写特征</td>
+<td>随机访问，低延迟写入用户的输入</td>
+<td>批量导入(ETL)或事件流</td>
+</tr>
+<tr>
+<td>典型使用场景</td>
+<td>终端用户，通过网络应用程序</td>
+<td>内部分析师，为决策提供支持</td>
+</tr>
+<tr>
+<td>数据表征</td>
+<td>最新的数据状态（当前时间点）</td>
+<td>随着时间而变化的所有事件历史</td>
+</tr>
+<tr>
+<td>数据规模</td>
+<td>GB到TB</td>
+<td>TB到PB</td>
+</tr>
+</tbody>
+</table>
+<h4 id="数据仓库">数据仓库</h4>
+<p>公司放弃使用OLTP系统分析目的，而是在单独的数据库上进行分析(避免分析师的查询影响正常业务)，这个单独的数据库被称为数据仓库。数据仓库包含公司所有的OLTP系统的<strong>只读副本</strong>。数据导入数据仓库的过程称为提取-转化-加载(ETL)，如下图所示：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002230254013.png" alt="image-20221002230254013"></p>
+<p><strong>星型模式</strong>：模式的中心是事实表，记录了每一个具体的动作。然后其他具体信息，由不同的表(维度表)进行拓展。（具体就是，以一个事件作为item，其他细节通过外键进行详细连接）举个购物的例子(如下图)：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002230516733.png" alt="image-20221002230516733"></p>
+<p><strong>雪花模式</strong>：就是在星型模式的维度表进一步细分成多个子空间。一般在使用过程中更多地使用星型模式。</p>
+<h3 id="列式存储">列式存储</h3>
+<p>面向列存储的想法很简单：将每列中的所有值存储在一起。</p>
+<h4 id="列压缩">列压缩</h4>
+<p>我们都知道一列中不同元素的数量m通常是小于等于行的数量n的。然后对于某一列如果有m个不同的值，将其作为行标号，然后原始行数据作为列的标号，构建一个mxn的零矩阵。这时候如果原始数据中第i行的列值是j，那么在mxn矩阵中的(j,i)位置被记录为1。然后构建好矩阵后，对于每一个列值，用<code>值:0的个数，1的个数，0的个数，1的个数...</code>表示。然后有m个值就有m个这样的格式，将其存储在列中，从而实现数据压缩，举个例子：</p>
+<p><img src="D:%5CtempMarkdown%5CBlog%5Cblog%5Cthemes%5Cbutterfly%5Csource%5Cimg%5Cimage-20221002231318805.png" alt="image-20221002231318805"></p>
+<h4 id="列存储中的排序">列存储中的排序</h4>
+<p>单独对每一列排序是没有意义的，因为列存储中每一行的元素都是对应的，如果对每一列都进行排序，会导致列存储无法还原出行的原始结构。列存储中的排序实际上是先对行的结构进行排序(先按第一列排序，如果第一列相同就按照第二列排序，以此类推)，然后再将其转化成列存储的形式。这样从某种程度上还是有益于列压缩的，因为经过排序之后，前几列中相同数字彼此接近，使得用于表示0和1个数使用的数字变少，但是到后面几列，几乎是呈随机分布，但是由于前面已经经过了压缩，总体上来讲压缩性能还是有所提高的。当然，还有一种列排序存储的说法，就是在对数据进行冗余备份时，采用按照不同列进行排序的方式进行多个备份，就是说，多个不同列排序的结果作为冗余备份。</p>
+<h4 id="列存储的写操作">列存储的写操作</h4>
+<p>列压缩可以使得列存储占用空间更小，但是这也就意味着写操作更加困难，如果要插入一行，就不得不重新写如这些东西。现在的解决方案是，先将排序的原始数据存放在内存缓存中，当达到一个阈值后就写入磁盘，这时候如果没有达到阈值，写入时直接添加到内存缓存中即可，当达到阈值后，就将他们与磁盘上的列文件合并，并批量写入新文件中。</p>
+<h3 id="聚合：数据立方体和物化视图">聚合：数据立方体和物化视图</h3>
+<p>数据仓库查询通常涉及一些聚合函数，比如SQL的COUNT,SUM,MIN以及MAX。</p>
+<p>物化视图是一个类似表的对选哪个，其内容是一些查询的结果，是查询结果的副本。</p>
+<p>数据立方体(OLAP立方体)是一个多维度的矩阵，用于表示在某几个维度的组合下，某个属性的聚合值。举个例子：使用购买时间(月)，购买商品ID，如果有这个记录，那么这三个指标形成的三维坐标对应位置上，可以记录一个聚合值(比如这个月购买这个商品的次数)。</p>
+<p>通常数据立方体的有点是某些查询会非常快，主要是他们已经被预先计算出来了。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">http://blog.zerorains.top/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/">数据密集型应用系统设计</a></div><div class="post-share"><div class="social-share" data-image="/img/14.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/" title="「书籍阅读」智能计算系统"><img class="cover" src="/img/28.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「书籍阅读」智能计算系统</div></div><div class="info-2"><div class="info-item-1"> 这篇博客用于记录《智能计算系统》一书中的一些关键内容，由于前4章都是深度学习相关知识，我已经基本了解，所以不需要记录太多内容  第5章 TF1的设计原则 {高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果易开发：提取出大量的共性运算，并将这些运算成TF1中的各种算子可移植性：定义不同设备的抽象，其要实现如下方法{1.设备上执行算的启动方法2.输入输出数据地址空间的分配方法3.主机端与设备端的数据传输方法\begin{cases} 高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果\\ 易开发：提取出大量的共性运算，并将这些运算成TF1中的各种算子\\ 可移植性：定义不同设备的抽象，其要实现如下方法\begin{cases} 1. 设备上执行算的启动方法\\ 2. 输入输出数据地址空间的分配方法\\ 3....</div></div></div></a><a class="pagination-related" href="/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/" title="「书籍阅读」分布式计算系统（一）"><img class="cover" src="/img/3.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「书籍阅读」分布式计算系统（一）</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0-%E5%8F%AF%E6%8B%93%E5%B1%95%E4%B8%8E%E5%8F%AF%E7%BB%B4%E6%8A%A4%E7%9A%84%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.</span> <span class="toc-text">可靠、可拓展与可维护的应用系统</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0%E6%80%A7"><span class="toc-number">1.1.</span> <span class="toc-text">可靠性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E6%8B%93%E5%B1%95%E6%80%A7"><span class="toc-number">1.2.</span> <span class="toc-text">可拓展性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7"><span class="toc-number">1.3.</span> <span class="toc-text">可维护性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">数据模型与查询语言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%96%87%E6%A1%A3%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.</span> <span class="toc-text">关系模型与文档模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nosql"><span class="toc-number">2.1.1.</span> <span class="toc-text">NoSQL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.2.</span> <span class="toc-text">网络模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.3.</span> <span class="toc-text">关系模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E6%A1%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-number">2.1.4.</span> <span class="toc-text">文档数据库的比较</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80"><span class="toc-number">2.2.</span> <span class="toc-text">数据库查询语言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%8A%B6%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.3.</span> <span class="toc-text">图状数据库模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E5%9B%BE"><span class="toc-number">2.3.1.</span> <span class="toc-text">属性图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cypher%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80"><span class="toc-number">2.3.2.</span> <span class="toc-text">Cypher查询语言</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E5%85%83%E7%BB%84%E5%AD%98%E5%82%A8"><span class="toc-number">2.3.3.</span> <span class="toc-text">三元组存储</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sparql%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80"><span class="toc-number">2.3.4.</span> <span class="toc-text">SPARQL查询语言</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A3%80%E7%B4%A2"><span class="toc-number">3.</span> <span class="toc-text">数据存储与检索</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A0%B8%E5%BF%83%EF%BC%9A%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">3.1.</span> <span class="toc-text">数据库核心：数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%93%88%E5%B8%8C%E7%B4%A2%E5%BC%95"><span class="toc-number">3.1.1.</span> <span class="toc-text">哈希索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sstables"><span class="toc-number">3.1.2.</span> <span class="toc-text">SSTables</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#lsm-tree"><span class="toc-number">3.1.3.</span> <span class="toc-text">LSM-Tree</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#b-tree"><span class="toc-number">3.1.4.</span> <span class="toc-text">B-tree</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#b-tree%E4%B8%8Elsm-tree%E5%AF%B9%E6%AF%94"><span class="toc-number">3.1.5.</span> <span class="toc-text">B-tree与LSM-tree对比</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="toc-number">3.1.6.</span> <span class="toc-text">其他索引结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%A4%84%E7%90%86"><span class="toc-number">3.2.</span> <span class="toc-text">事务处理与分析处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93"><span class="toc-number">3.2.1.</span> <span class="toc-text">数据仓库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8"><span class="toc-number">3.3.</span> <span class="toc-text">列式存储</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%97%E5%8E%8B%E7%BC%A9"><span class="toc-number">3.3.1.</span> <span class="toc-text">列压缩</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%97%E5%AD%98%E5%82%A8%E4%B8%AD%E7%9A%84%E6%8E%92%E5%BA%8F"><span class="toc-number">3.3.2.</span> <span class="toc-text">列存储中的排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%97%E5%AD%98%E5%82%A8%E7%9A%84%E5%86%99%E6%93%8D%E4%BD%9C"><span class="toc-number">3.3.3.</span> <span class="toc-text">列存储的写操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%81%9A%E5%90%88%EF%BC%9A%E6%95%B0%E6%8D%AE%E7%AB%8B%E6%96%B9%E4%BD%93%E5%92%8C%E7%89%A9%E5%8C%96%E8%A7%86%E5%9B%BE"><span class="toc-number">3.4.</span> <span class="toc-text">聚合：数据立方体和物化视图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

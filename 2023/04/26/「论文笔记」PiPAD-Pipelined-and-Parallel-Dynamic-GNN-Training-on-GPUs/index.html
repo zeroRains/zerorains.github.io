@@ -1,0 +1,431 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="简要 背景：  图神经网络被广泛应用处理图结构的数据并用于提取多种图相关应用的依赖关系 GCN是在图(聚合)和神经（更新）操作中普遍使用的方法。 图的拓扑结构和节点特征可能随着时间的推移而动态发展，由此衍生出动态图。使用GNN的方法可以从动态图中捕获时间和结构信息。根据分区原则和粒度，可以将动态图分为  连续时间动态图(CTDG) 离散时间动态图(DTDG)：对图进行定期采样的快照序列。一般处理方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">
+<meta property="og:url" content="http://blog.zerorains.top/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="简要 背景：  图神经网络被广泛应用处理图结构的数据并用于提取多种图相关应用的依赖关系 GCN是在图(聚合)和神经（更新）操作中普遍使用的方法。 图的拓扑结构和节点特征可能随着时间的推移而动态发展，由此衍生出动态图。使用GNN的方法可以从动态图中捕获时间和结构信息。根据分区原则和粒度，可以将动态图分为  连续时间动态图(CTDG) 离散时间动态图(DTDG)：对图进行定期采样的快照序列。一般处理方">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/22.jpg">
+<meta property="article:published_time" content="2023-04-26T05:34:14.000Z">
+<meta property="article:modified_time" content="2023-05-19T00:00:47.092Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="流水并行">
+<meta property="article:tag" content="DGNN训练加速">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/22.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs",
+  "url": "http://blog.zerorains.top/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/",
+  "image": "http://blog.zerorains.top/img/22.jpg",
+  "datePublished": "2023-04-26T05:34:14.000Z",
+  "dateModified": "2023-05-19T00:00:47.092Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/22.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-05-19T00:00:47.092Z" title="更新于 2023-05-19 08:00:47">2023-05-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GPU%E5%8A%A0%E9%80%9F/">GPU加速</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="简要">简要</h2>
+<p><strong>背景</strong>：</p>
+<ol>
+<li>图神经网络被广泛应用处理图结构的数据并用于提取多种图相关应用的依赖关系</li>
+<li>GCN是在图(聚合)和神经（更新）操作中普遍使用的方法。</li>
+<li>图的拓扑结构和节点特征可能随着时间的推移而动态发展，由此衍生出动态图。使用GNN的方法可以从动态图中捕获时间和结构信息。根据分区原则和粒度，可以将动态图分为
+<ol>
+<li>连续时间动态图(CTDG)</li>
+<li>离散时间动态图(DTDG)：对图进行定期采样的快照序列。一般处理方法是使用静态GNN在所有时间步长上的单个快照进行空间图学习。同时部署RNN来获取不同快照之间的时间特征（本文主要关注DTDG-base的DGNN）</li>
+</ol>
+</li>
+<li>滑动窗机制可以将多个连续快照同时输入到模型中，这种方式被广泛用于捕获更好的时间依赖并提高准确率。（本文将每一个滑动窗称为帧）</li>
+</ol>
+<p><strong>问题</strong>：</p>
+<ol>
+<li>检索稀疏邻接矩阵通常伴随着不规则的内存访问和稀疏计算，SpMM-like的聚合操作通常被认为是GNN的主要瓶颈。</li>
+<li>DGNN引入时间系列组件处理大量的快照，导致了两个主要为的性能问题：
+<ol>
+<li>DGNN训练时要沿着时间轴不断更新图快照，数据传输时间占据了总体训练时间的大部分，进一步加剧了内存密集型的聚合操作产生的GPU利用率不足。</li>
+<li>时间无关（GNN）和时间相关（RNN）的组件产生了大量的并行机会（并发地在多个快照上执行独立的操作），同时相邻帧之间的快照重叠提供了大量的数据重用机会。</li>
+</ol>
+</li>
+<li>现有的解决方案要么主要关注大型图的缩放和分布式训练，要门通过假设图的拓扑（或节点特征）不随时间变化来限制他们的输入场景，这削弱了DGNN的适应性。</li>
+</ol>
+<p><strong>动机</strong>：</p>
+<ol>
+<li>真实世界的动态图通常以缓慢的速度变化，在相邻的快照之间呈现大量的拓扑重叠</li>
+<li>除了SpMM-like聚合的不规则访问模式外，GNN还存在其他类型的内存效率低下的问题，这些问题源于不同节点的特征维度。</li>
+<li>单图聚合往往会引入带宽不饱和，低线程利用率以及请求突增的问题。总的来说one-snapshot-at-a-time的训练范式不可避免地造成了大量冗余数据传输和低效的内存访问。这些冗余数据传输的主要来源是规范的邻接矩阵聚合操作。为此，提取重叠的拓扑结构，对多个快照进行单一时间无关的聚合操作，不仅可以减少通信量，而且有更多机会实现合并内存访问，解决带宽利用率低的问题。</li>
+</ol>
+<p><strong>方案</strong>：PiPAD——Pipelined and PArallel DGNN训练框架，用于从算法和运行时级别优化单个GPU上端到端的性能。PiPAD不假设任何输入场景，其通过从数据组织和传输方法到计算方法，重构整个DGNN的训练过程，使其能够流水并行执行。</p>
+<ol>
+<li>利用图渐变的特性，提出了基于切片的图表示和重叠感知的多快照传输方法（减少从CPU到GPU的数据加载时间，实现高效的并行计算）</li>
+<li>设计了帧内并行，帧间重用的机制，充分释放了在DGNN上的加速潜能。
+<ol>
+<li>帧内并行：通过线程感知的切片合并实现了维度感知的并行GNN，以提高更新的聚合和位置优化权重重用。这个方法支持同时处理多个快照，取得了更好的计算性能，并减少了低效的内存访问。</li>
+<li>帧间重用：最大限度地减少冗余传输和计算开销</li>
+</ol>
+</li>
+<li>为了优化整体训练性能，本文实现了一个流水执行框架来协调CPU端的操作，PCIe数据传输和GPU计算。集成了一个运行时调整器来动态调整DGNN训练的并行性和重用级别，以更好地适应各种数据集。</li>
+<li>本文目标是减少端到端的执行时间，本文执行额外的在线数据处理（图切片）并避免任何离线的模型规模配置。具体来说，PiPAD只提前配置和分析并行GNN内核，以引导在线的调整。</li>
+</ol>
+<h2 id="motivation">Motivation</h2>
+<h3 id="dgnn训练的性能瓶颈">DGNN训练的性能瓶颈</h3>
+<ol>
+<li>
+<p>数据传输开销：图3展示了与GPU相关的训练时间和SM的利用率，从图中可以看出，传输时间占据总时间的<code>38.7%</code>左右。因此为了减小这个传输时间，利用CUDA流来实现异步数据传输是一种简单而基本的解决问题的方法。</p>
+<p><img src="https://blog.zerorains.top/img/image-20230430092738999.png" alt="image-20230430092738999"></p>
+</li>
+<li>
+<p>拓扑重叠：在实际的动态图中，相邻快照之间的变化率通常在10%左右</p>
+</li>
+</ol>
+<h3 id="gnn中的低效内存访问">GNN中的低效内存访问</h3>
+<p><img src="https://blog.zerorains.top/img/image-20230430094142964.png" alt="image-20230430094142964"></p>
+<p>图4展示了GNN kernel的计算是整个DGNN训练的主要负担，因为GNN通常伴随着不规则内存访问的聚合操作（即稀疏矩阵计算相关的内容）。此外，对于不同的输入或聚合特征维度也会导致访存效率低下。在SpMM中，一个warp负责对稀疏矩阵的一个元素与密集矩阵的一行进行计算。为了利用局部性并减小片外访问，GPU核心从全局内存中加载特征，并存储当前迭代的中间结果到共享内存中，在下一次迭代中进行重用。</p>
+<p>主流的GPU通常对全局内存访问采用最小32-byte的粒度。单指令多线程（SIMT）中，一个warp由32个线程组成，其在一次请求中最多可以获取128byte（32×4）个字节。考虑到特征矩阵的行长度等于其特征维度数的(F)的4倍，存在两种类型的内存访问低下：</p>
+<ol>
+<li>当<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>&lt;</mo><mfrac><mn>32</mn><mn>4</mn></mfrac></mrow><annotation encoding="application/x-tex">F&lt; \frac {32}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">32</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>时，带宽未饱和，这意味着有用数据的大小小于单个事物的最小访问粒度</li>
+<li>当<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>&gt;</mo><mfrac><mn>128</mn><mn>4</mn></mfrac></mrow><annotation encoding="application/x-tex">F &gt; \frac{128}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">128</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>时，请求激增，这意味着访问一行需要对共享内存和全局内存进行多个请求才能完成</li>
+</ol>
+<p>图5中展示了随着特征维度变化，全局加载事务数量和请求数量的变化情况，当F小于8时，事务和请求的数量是一致的，大于8时事务会增加，而请求并不会增加，只有F大于32时，请求才会增加。需要注意的是，在处理F小于32的特征矩阵时，将一行分配给一个warp，意味着warp中的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>32</mn><mo>−</mo><mi>F</mi></mrow><annotation encoding="application/x-tex">32-F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span></span></span></span>个线程在执行期间会保持空闲状态。</p>
+<p><img src="https://blog.zerorains.top/img/image-20230430095149038.png" alt="image-20230430095149038"></p>
+<h3 id="数据重用与并行的机会">数据重用与并行的机会</h3>
+<ol>
+<li>数据重用：为了在所有快照之间捕获足够的临时交互，时间动态图帧的时间间隔通常设置为1，因此连续帧之间存在大量的重叠，这意味着可以避免一些相关的冗余存储和计算（具体来说就是缓存聚合结果，并在下一帧中进行重用）</li>
+<li>并行：在之前提到的三种DGNNs中，不同快照中的相同GNN操作能够并行执行。</li>
+</ol>
+<p>具体来说，首先考对应的虑拓扑重叠，然后设计了一个新的图形式，他能够有效地提取重叠部分，从而消除冗余存储。然后设计一个并行的GNN计算模式，其可以同时处理多个图。其基本思想是直接在一个带有所有特征矩阵的快照组的重叠拓扑上执行聚合操作。通过这样的方式可以合并多特征的内存访问，并提高带宽利用率。然后进一步使用合适的访问粒度用于避免因大维度情况产生的请求激增的问题。</p>
+<h2 id="pipad">PiPAD</h2>
+<h3 id="重叠感知的数据组织">重叠感知的数据组织</h3>
+<p><img src="https://blog.zerorains.top/img/image-20230430110413599.png" alt="image-20230430110413599"></p>
+<p>通过提取相邻快照之间的重叠拓扑，并为其构造一个独立的邻接矩阵，能够有效避免不必要的传输，并进一步实现并行计算的思想。传统的CSR存储方式（图6左上角）直接制约了重叠提取的灵活性，导致提取效率低下，此外，在现实世界的图的稀疏性容易导致SpMM的计算不平衡，因为基于CSR表示方式通常将warp设置为处理邻接矩阵的一行或几行。</p>
+<ol>
+<li>
+<p>基于切片的图表示：为解决上述问题，通常有二维tile和一维切片来处理，前者将原始矩阵分为更小的多个矩阵，划分每一行并转化整个矩阵为许多切片。前者会由于子矩阵块中nnz的数量不同导致不均匀稀疏，而后者不但能减少空间开销还能通过压缩提供更好的负载均衡。本文就是基于切片的方式进行的，在CSR的基础上将Row offest转化为Row Indices(RI)和Slice Offsets（SO），其他保持不变（图6左下角）。</p>
+<blockquote>
+<p>具体来说：</p>
+<p>图中的例子限制了每个切片的NNZ为2，原则上这个切片组织形式，每个要处理一行。</p>
+<p>因此RI，用于记录每个切片的行坐标。</p>
+<p>而SO则是用于记录每个切片相对于第一个NNZ的偏移量。</p>
+<p>比如第一个切片中有两个元素，那么第二个切片对应的SO应该就是第一个切片的NNZ，第三个切片就是第一个切片和第二个切片NNZ之和。</p>
+<p>需要注意的是在第三行中分成了两个切片，这主要是图中限制了每个切片的NNZ为2，因此第三行中的三个数据需要分成2个切片。</p>
+<p>所以为什么使用这种新的方式就可以感知overlap了呢？</p>
+<p>我感觉是因为他采用了比CSR更加细粒度的组织形式，可以控制每次传输的</p>
+</blockquote>
+</li>
+<li>
+<p>重叠感知的数据传输：拓扑数据（邻接矩阵）被重新组合为所有快照的一个重叠部分和每个快照的几个排他部分，以减少传输量。</p>
+</li>
+<li>
+<p>空间开销：介于CSR和COO之间（系统默认设置每个切片最多包含32个nnz）</p>
+<ol>
+<li>slice CSR：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mi mathvariant="normal">#</mi><mi>n</mi><mi>n</mi><mi>z</mi><mo>+</mo><mn>2</mn><mo>×</mo><mi mathvariant="normal">#</mi><mi>S</mi><mi>l</mi><mi>i</mi><mi>c</mi><mi>e</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2\times \#nnz + 2\times \#Slice+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">#</span><span class="mord mathnormal">nn</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">#</span><span class="mord mathnormal" style="margin-right:0.01968em;">Sl</span><span class="mord mathnormal">i</span><span class="mord mathnormal">ce</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></li>
+<li>CSR：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mi mathvariant="normal">#</mi><mi>n</mi><mi>n</mi><mi>z</mi><mo>+</mo><mi mathvariant="normal">#</mi><mi>v</mi><mi>e</mi><mi>c</mi><mi>t</mi><mi>o</mi><mi>r</mi><mi>s</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2\times \#nnz+\#vectors+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">#</span><span class="mord mathnormal">nn</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">#</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal">ec</span><span class="mord mathnormal">t</span><span class="mord mathnormal">ors</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></li>
+<li>COO：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo><mi mathvariant="normal">#</mi><mi>n</mi><mi>n</mi><mi>z</mi></mrow><annotation encoding="application/x-tex">3\times \#nnz</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">#</span><span class="mord mathnormal">nn</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span></span></span></span></li>
+</ol>
+</li>
+</ol>
+<h3 id="帧内并行">帧内并行</h3>
+<p>提出了维度感知并行GNN，其同时在多个快照中执行聚合和更新操作(图6的1和2)。进一步设计了三个关键的优化方式</p>
+<ol>
+<li>基于内存访问的向量内存指令：用于大维度场景</li>
+<li>线程感知切片合并：用于解决小维度场景下的线程利用率低的问题（图6的3）</li>
+<li>局部优化的权重重用：以更有效地进行并行更新（图6的4）</li>
+</ol>
+<h4 id="维度感知并行gnn">维度感知并行GNN</h4>
+<p>首先合并不同快照的特征矩阵，然后执行一个聚合能够更有效地利用带宽，尤其是对于那些节点特征维度比较小的图中。接着根据重叠感知的数据组织，我们将原始聚合分成两部分：</p>
+<ol>
+<li>一个快照组中带有所有特征的重叠的邻接矩阵并行聚合（图6的5）</li>
+<li>每个快照带有各自特征的额外拓扑部分非并行聚合。</li>
+</ol>
+<p>利用支持单个请求加载32/64/128浮点数的向量内存指令可以有效解决请求激增的问题。基于这些不同数据获取长度的向量指令，本文在处理具有大维度（大于32）特征的图时，实现了高效的大粒度数据加载。</p>
+<h4 id="线程感知切片合并">线程感知切片合并</h4>
+<p>即使将多个特征矩阵合并成一个，总行数（维度）仍然可能低于32，低线程利用率的问题依然存在。在这种情况下，为了增加每个warp中激活线程的数量，本文合并在邻接矩阵上相邻的线程到一个组中，并设置其作为每个warp基本的处理单元。相应的，同一个warp内的线程被均匀地划分为几个线程组（TGs），每个TG被分配给在一个切片上的单独操作。本文在共享内存上以交互的模式实现切片组布局，以便于从warp的视角出发，单个数据加载访问地址是连续的。在每次计算迭代中，每个TG在对应切片的一个元素和合成特征矩阵的每一行上进行操作。切片组的最大大小(coalesce_num)设置为4，以保证每个TG的数据访问粒度不超过单个内存事务的长度(32bytes)。</p>
+<p>算法1展示了并行聚合（在小维度的场景下）的执行细节，输入为：合并的特征，每个切片拥有的nnz的最大数量，以及切片组的最大大小。在具体实现中，每个线程首先以固定的步长将一个特定片中的元素从全局内存加载到共享内存，并且切片索引直接对应线程索引（第4行和，第一个for的内容）。然后，线程获取与分配给它的特征的一个特定维度相对应的数据（第8行和第二个for中用到comp_dim的部分），用相同的步长模式在共享内存能上加载一个目标切片的元素，最后执行计算。（第4行和第二个for和actomicadd）</p>
+<blockquote>
+<p><strong>算法1</strong>：并行聚合与切片合并</p>
+<p><strong>输入</strong>：feature, slice_size, coalesce_num</p>
+<p><strong>输出</strong>：aggregation_result</p>
+<ol>
+<li>lane_id = getIndexInWarp() // 获取在warp中的id</li>
+<li>// 分别计算分配给当前线程用于加载和计算的特定切片索引</li>
+<li>// 假设有4个TG，那这个共享内存是0,1,2,3,0,1,2,3…排布的，那么下面这一行就是确定要取的是哪一个切片中的元素</li>
+<li>load_index = lane_id % coalesce_num</li>
+<li>//  分母是每个快照的特征dim大小，这个主要用于确定是第几个快照</li>
+<li>comp_index =lane_id/features.dim</li>
+<li>// 计算分配给当前线程的合并特征的特定维度，以进行加载和计算</li>
+<li>comp_dim = lane_id%features.dim  // 这个用于确定这个快照的第几个元素</li>
+<li>// 检查当前线程是否被分配了工作</li>
+<li><strong>if</strong> comp_index &lt; coalesce_num <strong>then</strong>:  // 这个判断的意思每一个快照进行并行计算</li>
+<li>// 为线程计算具体的工作流大小（每个切片），估计就是每个切片的大小是load_size</li>
+<li>load_size,comp_size = compWork(load_index,comp_index)</li>
+<li>// 加载在切片上的目标元素</li>
+<li><strong>for</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mi>i</mi><mi>d</mi><mo>←</mo></mrow><annotation encoding="application/x-tex">nid \leftarrow</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">ni</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span></span></span></span> lane_id <strong>to</strong> <code>(slice_size * coalesce_num)</code> <strong>do</strong>
+<ol>
+<li>// 为加载计算在切片上的元素偏移</li>
+<li>load_offset = nid/coalesce_num</li>
+<li><strong>if</strong> load_offset &gt; load_size <strong>then</strong>:
+<ol>
+<li>break</li>
+</ol>
+</li>
+<li><strong>end</strong></li>
+<li>LoadSliceToSharedMem(load_offset) // 这个应该就是交替加载的函数</li>
+<li>nid += coalesce_num*features.dim</li>
+</ol>
+</li>
+<li><strong>end</strong></li>
+<li>// 加载在特征上的目标维度然后计算</li>
+<li><strong>for</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>d</mi><mi>x</mi><mo>←</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">idx\leftarrow0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> <strong>to</strong> comp_size <strong>do</strong>
+<ol>
+<li>// 计算在切片上的元素偏移并用于计算</li>
+<li>comp_offset = idx*coalese_num+comp_index</li>
+<li>Slice = LoadSliceFromSharedMemToReg(comp_offset) // 加载切片</li>
+<li>Feature = LoadFeatFromGlobalMemToReg(comp_dim) // 加载特征</li>
+<li>MultiplyandACcumulate(Slice,Feature,Partial_result) // 执行一个元素和一行相乘并累加</li>
+<li>idx++ // 所以变动</li>
+</ol>
+</li>
+<li><strong>end</strong></li>
+<li>automicAdd(aggregation_result, partial_result)</li>
+<li><strong>end</strong></li>
+</ol>
+</blockquote>
+<h4 id="局部优化权重重用">局部优化权重重用</h4>
+<p>本文保持一个权重tile（图6中更新部分的白框）在共享内存中，然后依次计算所有快照的特征，然后移动到一下权重tile进行相同的迭代。这个局部优化计算范式可以最大程度地重用权重，值得注意的是，这个技术不能在EvolveGCN上使用，因为他是沿着时间轴更新权重的。</p>
+<p>对于DGNN的其他内核，则是参考OOB，并利用CUDA Graph API去一起加载这些内核，并减少问题开销。</p>
+<h3 id="流水执行框架">流水执行框架</h3>
+<p><img src="https://blog.zerorains.top/img/image-20230430152433801.png" alt="image-20230430152433801"></p>
+<p>图7展示了PiPAD由算法级别优化和多个运行时级别组件组成，以实现高效的多快照计算和协调一般训练过程。</p>
+<ol>
+<li>算法级别：设计了切片CSR，以方便地地区图中重叠部分并重构GNN去实现在一个帧上的多个快照的并行计算</li>
+<li>运行时级别：为了适应新的图格式，首先实现了一个低开销的在线图分析（图7中的1）去有效地将所有的快照格式从原始转化为切片CSR。每个分区的邻接矩阵数据包括公共的重叠和每个快照的单独部分。还设计了一个预处理模块（图7中的2）去执行在所有相邻的快照间提取重叠，为partition-wise的计算方法做准备。上述两个组件只需要在前几个时期(即准备时期)发挥一次作用。为了支持在不同帧之间的数据重用，本文保留了CPU和GPU端的缓存（图7中的3）以缓存聚合结果。基于在准备时期的并行GNN内核和在线配置，在运行时的上层实现了一个动态调整器（图7中的4），用于在线调整并行级别（一个帧内的每个分区中的快照数量）和重用级（缓存在GPU端的聚合结果大小）。最后采用流水线控制器（图7中5）规范了整个训练流程。</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20230430161238852.png" alt="image-20230430161238852"></p>
+<p>图8展示了一个PiPAD的流水执行示例，其中每个分区设置两个快照，帧的大小为4。在preparing epochs，采用传统的单快照方式，数据进行异步传输。在host端，在在线分析中收集必要的统计数据（每个快照/帧的输入数据大小，执行时间和最大内存消耗）。这些数据用于知道动态调整器选择优化的并行选项，避免出发内存不足的异常。此外由于提取图重叠和准备分区邻接矩阵也需要时间，因此一开始就执行图切片和后续的提取。没给分区的快照数量的配置是一个有限的集合（2,4,8），因此提取开销是可控的，同时还存储了没帧快照之间的图变化率，以便进行在线调优卷册。</p>
+<p>对于other epochs，以分区的方式进行训练减少了数据加载开销和提高了计算并行度。首先确定当前帧的并行度，然后传输分区训练数据。由于训练中不同epoch之间的性能相似，本文只执行这个过程一次，并在随后每个epoch中复制到生成的配置中。</p>
+<p><strong>开销分析</strong>：在preparing epochs中，切片图格式需要额外的空间，还需要辅助图切片的过程。还需要提取重叠的操作分别为每个分区构建基于重叠的邻接矩阵。这些过程可以在前1-2个epochs中完成。此外，在完成分区决策后就可以进行每个分区的数据传输了，由于one-off的操作在CPU中异步执行，并且与前面的分区/帧的其他操作重叠，因此开销也可以平摊。</p>
+<h3 id="帧间重用和动态调整">帧间重用和动态调整</h3>
+<ol>
+<li>帧间重用</li>
+</ol>
+<p>GCN的第一层通常是不受时间轴影响的。因此最直接的方法就是存储在preparing epoch中的相关聚合结果到CPU中，并重用这些结果到后续的epoch中。但是这些结果需要传输到GPU并用于下一帧，因此本文设置了GPU端的缓存，基于下一帧的使用顺序缓存一些聚合结果。根据preparing epoch中分析的统计数据，根据需求为每个帧动态分配不同大小的缓冲区。值得注意的是malloc/free函数的执行是耗时的，本文只在先前的内存大小不足以支持新的中间变量存储时才重新分配。</p>
+<ol start="2">
+<li>动态调整</li>
+</ol>
+<p>动态调整器需要为每个帧决定两个关键的参数：每个分区中的快照数量<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>，为下一帧重用所缓存在GPU中的聚合结果大小（由帧间重用提到的GPU内存使用方式决定）。</p>
+<p>对于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>则是有3个影响因子：</p>
+<ol>
+<li>内存开销：多快照的方法会由于要处理每个分区中相关的快照数据而出现GPU内存使用率增加的情况，因此需要避免OOM的异常。</li>
+<li>并行GNN的计算加速：帧内并行的加速效果会随着不同的输入图和<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>的值而变化</li>
+<li>计算和数据传输之间的重叠级别：多快照处理不仅促进了计算阶段的性能还会增加单次传输的数据大小，这可能会拖后流水线的执行并导致GPU利用率较低。</li>
+</ol>
+<p>决定<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>的步骤如下：</p>
+<ol>
+<li>
+<p>由于采用的是重叠感知的数据组织方法，所以N个快照并不需要N倍的内存，本文利用在线分析的统计数据，可以推导出一个上界<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi></mrow><annotation encoding="application/x-tex">U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">U</span></span></span></span>以确保不会出发MMO</p>
+</li>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>，单图节点的维度以及每个分区中所有快照的重叠率（OR）都会影响计算加速的效率。图9展示了不同重叠率，不同<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>以及不同维度对加速的影响。从图中可以看出，在相同的OR或者特征维度下，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>越大，表现越好。本文利用离线分析的结果和在preparing epoch中获得的实际逐帧拓扑变化率统计数据得出所有可用的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">S_{per}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>选项</p>
+<p><img src="https://blog.zerorains.top/img/image-20230501105052658.png" alt="image-20230501105052658"></p>
+</li>
+<li>
+<p>然后使用之前分析的数据大小信息分析了每个选项的数据传输延迟，不采用所有会使流水线延后的方案，并从剩下的方案中选出计算加速最高的一个。通过对每个帧使用特定的并行性和重用选项，我们的管道控制器协调整个训练。</p>
+</li>
+</ol>
+<h3 id="讨论">讨论</h3>
+<p>虽然PiPAD采用pytorch顶层结合C++，CUDA C和python实现，但是这个方法是通用的，独立于任何特定的深度学习或GNN框架。</p>
+<p>限制：多快照的训练会不可避免地阶段性增加内存开销，造成大规模图固有的缩放问题。这个限制将会在PiPAD支持多GPU训练后被解决。</p>
+<h2 id="evalueation">Evalueation</h2>
+<p>PyGT-&gt;PyTorch Geometric Temporal</p>
+<p>PyGT-A：添加了异步数据传输</p>
+<p>PyGT-R：使用帧间重用机制</p>
+<p>PyGT-G：比PyGT-R多使用了GE-SpMM替换原始的GCN模块</p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>PyGT-A</th>
+<th>PyGT-R</th>
+<th>PyGT-G</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asynchronous data transfer</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Inter-frame reuse</td>
+<td></td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>GE-SpMM</td>
+<td></td>
+<td></td>
+<td>√</td>
+</tr>
+</tbody>
+</table>
+<p>大型数据集：amz-Auto，Epinions，Flickr，Youtube</p>
+<p>小型数据集：HepTh，Covid19，PEMS08</p>
+<p><img src="https://blog.zerorains.top/img/image-20230501134534622.png" alt="image-20230501134534622"></p>
+<p>实验结果的总览如图10所示，PiPAD比其他的方法总是取得最佳的结果，并且在小型数据集上的提速更多，因为在大型数据集上帧内包含的快照数比较少，帧内并行的优势无法充分发挥。次优的是PyGT-G，与PiPAD的差距就在于帧内并行。图11展示了GPU利用率，PyGT-R和PyGT-A的GPU利用率更高，这是因为PiPAD和PyGT-G的GPU计算时间大大减少，扩大了CPU端操作所需要的时间占总时间的百分比。并行的GNN减少了发布的内核数量，所以PiPAD的性能由于PyGT-G。</p>
+<p><img src="https://blog.zerorains.top/img/image-20230501134826115.png" alt="image-20230501134826115"></p>
+<p><img src="https://blog.zerorains.top/img/image-20230501140551504.png" alt="image-20230501140551504"></p>
+<p>图11（a）的左轴展示了只用一个GNN模块，分别采用GE-SpMM和并行GNN方法计算的加速比。从速度上后者使用的是低效的单快照处理方法，后者则是同时处理多个快照。显然是后者取得了更快的速度。右轴则是，事务和请求的减少率，两者都使用了共享内存来优化邻接矩阵的访存，而后者采用了合并的内存访问获取多个特征矩阵。对于大规模数据集，加载16byte的特征，并行GNN只用一个事务同时处理两个图，而GE-SpMM则需要两个独立的事务去处理这两个图。对于小规模数据集，GE-SpMM加载64byte的数据会产生一个内存访问请求和两个事务去处理一个图，而PiPAD加载256byte的数据只使用一个内存请求和8个事务同时处理4张图。大粒度的访存避免了请求激增的问题。在Youtube中减少最大，是因为其过于稀疏，需要大量冗余的访存，但是PiPAD中的sliced CSR避免了这个问题。图11（b）则进行了维度的敏感度分析，随着维度的改变PiPAD仍然能取得至少5.2倍的加速</p>
+<p><img src="https://blog.zerorains.top/img/image-20230501142315665.png" alt="image-20230501142315665"></p>
+<p>这里采用了csr和切片CSR两种存储格式对PiPAD进行改造。图12的左轴展示了相对执行时间，其中绿色的条形图表示在完全理想的负载均衡下，执行计算所需的时间，而白色的条形图则是实际的执行情况。从图中可以看出切片CSR的使用显著减少了模型的执行时间，尤其是在大型数据集中，在小型数据不明显的原因主要是其没有太多的冗余数据可以消除（密集的部分太多），同时也可以观察到，采用切片的CSR后在大型数据集中负载均衡的时间基本上是总时间的一半以上。右轴则是表示在不同模型下采用CSR和切片CSR的加速比，表现与负载均衡的结果基本一致。RMM</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/">http://blog.zerorains.top/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B5%81%E6%B0%B4%E5%B9%B6%E8%A1%8C/">流水并行</a><a class="post-meta__tags" href="/tags/DGNN%E8%AE%AD%E7%BB%83%E5%8A%A0%E9%80%9F/">DGNN训练加速</a></div><div class="post-share"><div class="social-share" data-image="/img/22.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img class="cover" src="/img/26.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img class="cover" src="/img/2.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「实习笔记」Paddle组合机制设计与开发</div></div><div class="info-2"><div class="info-item-1">组合机制设计 operator_decomposition_mechanism/design.md) 组合机制开发 operator_decomposition_mechanism/development.md  </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E8%A6%81"><span class="toc-number">1.</span> <span class="toc-text">简要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#motivation"><span class="toc-number">2.</span> <span class="toc-text">Motivation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dgnn%E8%AE%AD%E7%BB%83%E7%9A%84%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88"><span class="toc-number">2.1.</span> <span class="toc-text">DGNN训练的性能瓶颈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gnn%E4%B8%AD%E7%9A%84%E4%BD%8E%E6%95%88%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE"><span class="toc-number">2.2.</span> <span class="toc-text">GNN中的低效内存访问</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%87%8D%E7%94%A8%E4%B8%8E%E5%B9%B6%E8%A1%8C%E7%9A%84%E6%9C%BA%E4%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">数据重用与并行的机会</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pipad"><span class="toc-number">3.</span> <span class="toc-text">PiPAD</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E5%8F%A0%E6%84%9F%E7%9F%A5%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%87"><span class="toc-number">3.1.</span> <span class="toc-text">重叠感知的数据组织</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%A7%E5%86%85%E5%B9%B6%E8%A1%8C"><span class="toc-number">3.2.</span> <span class="toc-text">帧内并行</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%B4%E5%BA%A6%E6%84%9F%E7%9F%A5%E5%B9%B6%E8%A1%8Cgnn"><span class="toc-number">3.2.1.</span> <span class="toc-text">维度感知并行GNN</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%84%9F%E7%9F%A5%E5%88%87%E7%89%87%E5%90%88%E5%B9%B6"><span class="toc-number">3.2.2.</span> <span class="toc-text">线程感知切片合并</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E4%BC%98%E5%8C%96%E6%9D%83%E9%87%8D%E9%87%8D%E7%94%A8"><span class="toc-number">3.2.3.</span> <span class="toc-text">局部优化权重重用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E6%B0%B4%E6%89%A7%E8%A1%8C%E6%A1%86%E6%9E%B6"><span class="toc-number">3.3.</span> <span class="toc-text">流水执行框架</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%A7%E9%97%B4%E9%87%8D%E7%94%A8%E5%92%8C%E5%8A%A8%E6%80%81%E8%B0%83%E6%95%B4"><span class="toc-number">3.4.</span> <span class="toc-text">帧间重用和动态调整</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.5.</span> <span class="toc-text">讨论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#evalueation"><span class="toc-number">4.</span> <span class="toc-text">Evalueation</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>计算机网络总复习 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="计算机网络自救指南 基本缩写词语 ISP、OSl、TCP&#x2F;IP、C&#x2F;S、B&#x2F;S、LAN、WLAN、VLAN、STP、UTP、ADSL、FDM、WDM、TDM、HDLC、PPP、CRC、MAC、CSMA&#x2F;CD、MACA、LLC、CSMA&#x2F;CA、AS、IGP、EGP、CIDR、NAT、ICMP、ARP、RARP、DHCP、OSPF、BGP、TSAP、NSAP、TCP、UDP、RPC、RTP、DNS、S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络总复习">
+<meta property="og:url" content="http://blog.zerorains.top/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="计算机网络自救指南 基本缩写词语 ISP、OSl、TCP&#x2F;IP、C&#x2F;S、B&#x2F;S、LAN、WLAN、VLAN、STP、UTP、ADSL、FDM、WDM、TDM、HDLC、PPP、CRC、MAC、CSMA&#x2F;CD、MACA、LLC、CSMA&#x2F;CA、AS、IGP、EGP、CIDR、NAT、ICMP、ARP、RARP、DHCP、OSPF、BGP、TSAP、NSAP、TCP、UDP、RPC、RTP、DNS、S">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/9.png">
+<meta property="article:published_time" content="2021-12-01T02:58:18.000Z">
+<meta property="article:modified_time" content="2022-06-30T08:17:58.048Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="总复习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/9.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "计算机网络总复习",
+  "url": "http://blog.zerorains.top/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/",
+  "image": "http://blog.zerorains.top/img/9.png",
+  "datePublished": "2021-12-01T02:58:18.000Z",
+  "dateModified": "2022-06-30T08:17:58.048Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '计算机网络总复习',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/9.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">计算机网络总复习</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">计算机网络总复习</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-01T02:58:18.000Z" title="发表于 2021-12-01 10:58:18">2021-12-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-06-30T08:17:58.048Z" title="更新于 2022-06-30 16:17:58">2022-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="计算机网络自救指南">计算机网络自救指南</h1>
+<h2 id="基本缩写词语">基本缩写词语</h2>
+<p>ISP、OSl、TCP/IP、C/S、B/S、LAN、WLAN、VLAN、STP、UTP、ADSL、FDM、WDM、TDM、HDLC、PPP、CRC、MAC、CSMA/CD、MACA、LLC、CSMA/CA、AS、IGP、EGP、CIDR、NAT、ICMP、ARP、RARP、DHCP、OSPF、BGP、TSAP、NSAP、TCP、UDP、RPC、RTP、DNS、SNMP、FTP、SMTP、HTTP、POP3、Email、www、IMAP、HTML、URL、MIME、XML</p>
+<h2 id="第一章-绪论">第一章 绪论</h2>
+<h3 id="分类标准：传输技术和网络尺度">分类标准：传输技术和网络尺度</h3>
+<h3 id="两种传输技术">两种传输技术</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>传输技术</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>点到点链路——单播</mtext><mo stretchy="false">(</mo><mtext>点到点传输只有一个发送方和一个接收方</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>广播式链路——在一个广播网络上，通信信道被网络上的所有机器所共享，任何一台机器发出额数据包能被所有其他任何机器收到</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>广播式链路</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>广播——将一个数据包发送给所有目标机器，只要在地址字段中使用一个特殊的编码</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>组播——将一个数据包发送个一组机器</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">   传输技术\begin{cases}点到点链路——单播(点到点传输只有一个发送方和一个接收方)\\广播式链路——在一个广播网络上，通信信道被网络上的所有机器所共享，任何一台机器发出额数据包能被所有其他任何机器收到\\广播式链路\begin{cases}
+   广播——将一个数据包发送给所有目标机器，只要在地址字段中使用一个特殊的编码\\
+   组播——将一个数据包发送个一组机器
+   \end{cases}\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:5.88em;vertical-align:-2.69em;"></span><span class="mord cjk_fallback">传输技术</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.95em;"><span style="top:-1.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.592em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.916em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.916em" style="width:0.8889em" viewBox="0 0 888.89 916" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V916 H384z M384 0 H504 V916 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.916em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.916em" style="width:0.8889em" viewBox="0 0 888.89 916" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V916 H384z M384 0 H504 V916 H384z"/></svg></span></span><span style="top:-5.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.45em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.19em;"><span style="top:-5.932em;"><span class="pstrut" style="height:3.75em;"></span><span class="mord"><span class="mord cjk_fallback">点到点链路</span><span class="mord">——</span><span class="mord cjk_fallback">单播</span><span class="mopen">(</span><span class="mord cjk_fallback">点到点传输只有一个发送方和一个接收方</span><span class="mclose">)</span></span></span><span style="top:-4.492em;"><span class="pstrut" style="height:3.75em;"></span><span class="mord"><span class="mord cjk_fallback">广播式链路</span><span class="mord">——</span><span class="mord cjk_fallback">在一个广播网络上，通信信道被网络上的所有机器所共享，任何一台机器发出额数据包能被所有其他任何机器收到</span></span></span><span style="top:-2.31em;"><span class="pstrut" style="height:3.75em;"></span><span class="mord"><span class="mord cjk_fallback">广播式链路</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">广播</span><span class="mord">——</span><span class="mord cjk_fallback">将一个数据包发送给所有目标机器，只要在地址字段中使用一个特殊的编码</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">组播</span><span class="mord">——</span><span class="mord cjk_fallback">将一个数据包发送个一组机器</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.69em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h3 id="按照不同尺度对互联器的分类">按照不同尺度对互联器的分类</h3>
+<ol>
+<li>个域网(1m)</li>
+<li>局域网(10m~1km)</li>
+<li>城域网(10km)</li>
+<li>广域网(100km~1000km)</li>
+<li>互联网(10000km)</li>
+</ol>
+<h3 id="协议层次结构-重点">协议层次结构(重点)</h3>
+<ol>
+<li>绝大多数网络都组织成一个层次栈或分级栈，每一层都建立在其下一层的基础之上</li>
+<li>协议：通信双方就如何进行通信的一种约定</li>
+<li>对等体：不同机器上构成相应层次的实体</li>
+<li>接口：每一堆相邻层之间是一个接口。接口定义了下层向上层提供哪些原语操作和服务</li>
+<li>层和协议的集合称为网络体系结构</li>
+<li>一个特定的系统荣所使用的一组协议，即每一层一个协议称为协议栈</li>
+</ol>
+<h3 id="osi参考模型-重点">OSI参考模型(重点)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>O</mi><mi>S</mi><mi>I</mi><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>物理层——物理层关注一条通信信道上传输原始比特</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>数据链路层——数据链路层的主要任务时将原始传输设备施转变成一条没有漏检传输错误的线路</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>网路层——网络层控制子网的运行</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>传输层——传输层的基本功能是接受来自上一层的数据，必要是将其拆分成更小的单元，然后把这些数据单元传递给网络层，并确保这些数据单元都正确地到达另一端</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>会话层——允许不同机器上的用户建立会话</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>表示层——关注传输信息的语法和语义</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>应用层——包含了用户通常需要的多种协议</mtext></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">OSI\begin{cases}
+   物理层——物理层关注一条通信信道上传输原始比特\\
+   数据链路层——数据链路层的主要任务时将原始传输设备施转变成一条没有漏检传输错误的线路\\
+   网路层——网络层控制子网的运行\\
+   传输层——传输层的基本功能是接受来自上一层的数据，必要是将其拆分成更小的单元，然后把这些数据单元传递给网络层，并确保这些数据单元都正确地到达另一端\\
+   会话层——允许不同机器上的用户建立会话\\
+   表示层——关注传输信息的语法和语义\\
+   应用层——包含了用户通常需要的多种协议
+   \end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:10.08em;vertical-align:-4.79em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">OS</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:5.05em;"><span style="top:-1.366em;"><span class="pstrut" style="height:5.016em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.358em;"><span class="pstrut" style="height:5.016em;"></span><span style="height:3.016em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="3.016em" style="width:0.8889em" viewBox="0 0 888.89 3016" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V3016 H384z M384 0 H504 V3016 H384z"/></svg></span></span><span style="top:-5.016em;"><span class="pstrut" style="height:5.016em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-6.158em;"><span class="pstrut" style="height:5.016em;"></span><span style="height:3.016em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="3.016em" style="width:0.8889em" viewBox="0 0 888.89 3016" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V3016 H384z M384 0 H504 V3016 H384z"/></svg></span></span><span style="top:-9.166em;"><span class="pstrut" style="height:5.016em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.55em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:5.29em;"><span style="top:-7.29em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">物理层</span><span class="mord">——</span><span class="mord cjk_fallback">物理层关注一条通信信道上传输原始比特</span></span></span><span style="top:-5.85em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">数据链路层</span><span class="mord">——</span><span class="mord cjk_fallback">数据链路层的主要任务时将原始传输设备施转变成一条没有漏检传输错误的线路</span></span></span><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">网路层</span><span class="mord">——</span><span class="mord cjk_fallback">网络层控制子网的运行</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">传输层</span><span class="mord">——</span><span class="mord cjk_fallback">传输层的基本功能是接受来自上一层的数据，必要是将其拆分成更小的单元，然后把这些数据单元传递给网络层，并确保这些数据单元都正确地到达另一端</span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">会话层</span><span class="mord">——</span><span class="mord cjk_fallback">允许不同机器上的用户建立会话</span></span></span><span style="top:-0.09em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">表示层</span><span class="mord">——</span><span class="mord cjk_fallback">关注传输信息的语法和语义</span></span></span><span style="top:1.35em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">应用层</span><span class="mord">——</span><span class="mord cjk_fallback">包含了用户通常需要的多种协议</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.79em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>相比与TCP/IP模型，OSI模型多了表示层和会话层，这两层在TCP/IP中都被认为是应用层，在OSI的物理层，到TCP/IP模型中被认为是<strong>链路层</strong>的一部分(注意在TCP/IP中是链路层，不是数据链路层)</p>
+<h3 id="osi和tcp-ip参考模型共同点">OSI和TCP/IP参考模型共同点</h3>
+<ol>
+<li>两者都是基于独立的协议栈概念</li>
+<li>各个层的功能大致相似，在两个模型中，传出层及以上的各层都为通信的进程提供端到端的独立与网络的传输服务</li>
+<li>在两个模型中，传输层以上的各层都是传输服务的用户，并且是面向应用的</li>
+</ol>
+<h3 id="osi和tcp-ip的不同点">OSI和TCP/IP的不同点</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">OSI(开发系统互联协议)</th>
+<th style="text-align:center">TCP/IP（传输控制协议/Internet协议）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">OSI是一种通用的协议，独立于协议的标准</td>
+<td style="text-align:center">TCP/IP模型基于Internet开发的标准</td>
+</tr>
+<tr>
+<td style="text-align:center">OSI模型有单独的表示层和会话层</td>
+<td style="text-align:center">TCP/IP模型没有单独的表示层和会话层</td>
+</tr>
+<tr>
+<td style="text-align:center">传输层是面向连接的</td>
+<td style="text-align:center">传输层既面向连接，又面向无连接</td>
+</tr>
+<tr>
+<td style="text-align:center">网络层即面向链接又面向无连接</td>
+<td style="text-align:center">网络层是面向无连接的</td>
+</tr>
+<tr>
+<td style="text-align:center">围绕网络构建的参考模型，一般用作指导工具</td>
+<td style="text-align:center">在某种程度上是OSI模型的一种实现方式</td>
+</tr>
+<tr>
+<td style="text-align:center">隐藏在OSI模型中的协议，很容易随着技术的变化被替换</td>
+<td style="text-align:center">在TCP/IP中替换协议并不容易</td>
+</tr>
+<tr>
+<td style="text-align:center">OSI模型非常清楚地定义了服务、接口和协议，并明确区分了它们</td>
+<td style="text-align:center">在TCP/IP服务中，各种接口和协议没有明确分开</td>
+</tr>
+<tr>
+<td style="text-align:center">7层</td>
+<td style="text-align:center">4层</td>
+</tr>
+</tbody>
+</table>
+<h2 id="第二章-物理层">第二章 物理层</h2>
+<h3 id="带宽">带宽</h3>
+<p>信号占据的频率范围，称为信号的带宽。信道带宽是指在该通信线路上能不失真地传送信号的频率范围。</p>
+<h3 id="信号传输速率">信号传输速率</h3>
+<p>单位时间里传送信号波形的个数，单位为波特</p>
+<p>B=2H（baud）</p>
+<p>(最大采样频率为带宽的2倍)</p>
+<h3 id="数据传输率">数据传输率</h3>
+<p>比特率，单位时间里传送二进制数据的位数，单位b/s,kb/s,Mb/s,简称bps,kbps,Mbps</p>
+<h3 id="信道容量">信道容量</h3>
+<p>表征一个信道传输数字信号的能力，它以数据传输速率作为指标，即信道所能支持的最大数据传输速率</p>
+<h3 id="信道最大数据传输率-重点">信道最大数据传输率(重点)</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>奈氏准则</mtext><mo stretchy="false">(</mo><mtext>理想信道，无噪声信道</mtext><mo stretchy="false">)</mo><mtext>：</mtext><msub><mi>C</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi><mn>1</mn></mrow></msub><mo>=</mo><mn>2</mn><mi>H</mi><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mi>H</mi><mo stretchy="false">(</mo><mi>b</mi><mi>p</mi><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mi>H</mi><mo>:</mo><mtext>带宽</mtext><mo stretchy="false">(</mo><mi>H</mi><mi>z</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>N</mi><mo>:</mo><mtext>离散级数</mtext><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mtext>香农定理</mtext><mo stretchy="false">(</mo><mtext>有噪声信道</mtext><mo stretchy="false">)</mo><mtext>：</mtext><msub><mi>C</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi><mn>2</mn></mrow></msub><mo>=</mo><mi>H</mi><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mfrac><mi>S</mi><mi>N</mi></mfrac><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>b</mi><mi>p</mi><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mi>H</mi><mtext>：信道带宽</mtext><mo stretchy="false">(</mo><mi>H</mi><mi>z</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mfrac><mi>S</mi><mi>N</mi></mfrac><mo>:</mo><mtext>信噪比</mtext><mo stretchy="false">(</mo><mtext>无量纲</mtext><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mtext>信道最大数据传输率：</mtext><msub><mi>C</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><mi>m</mi><mi>i</mi><mi>n</mi><mo stretchy="false">{</mo><msub><mi>C</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>C</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi><mn>2</mn></mrow></msub><mo stretchy="false">}</mo><mspace linebreak="newline"></mspace><mtext>信噪比与分贝之间的转换关系：</mtext><mi>x</mi><mi>d</mi><mi>b</mi><mo>=</mo><mn>10</mn><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>10</mn></msub><mo stretchy="false">(</mo><mfrac><mi>S</mi><mi>N</mi></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">奈氏准则(理想信道，无噪声信道)：C_{max1}=2Hlog_2H(bps),(H:带宽(Hz),N:离散级数)\\
+香农定理(有噪声信道)：C_{max2}=Hlog_2(1+\frac SN)(bps),(H：信道带宽(Hz),\frac SN:信噪比(无量纲))\\
+信道最大数据传输率：C_{max} = min\{C_{max1},C_{max2}\}\\
+信噪比与分贝之间的转换关系：x db = 10log_{10}(\frac SN)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">奈氏准则</span><span class="mopen">(</span><span class="mord cjk_fallback">理想信道，无噪声信道</span><span class="mclose">)</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mord mathnormal">p</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">带宽</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.04398em;">Hz</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">离散级数</span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">香农定理</span><span class="mopen">(</span><span class="mord cjk_fallback">有噪声信道</span><span class="mclose">)</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mord mathnormal">p</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mord cjk_fallback">：信道带宽</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.04398em;">Hz</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">信噪比</span><span class="mopen">(</span><span class="mord cjk_fallback">无量纲</span><span class="mclose">))</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord cjk_fallback">信道最大数据传输率：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">min</span><span class="mopen">{</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">}</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord cjk_fallback">信噪比与分贝之间的转换关系：</span><span class="mord mathnormal">x</span><span class="mord mathnormal">d</span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord">10</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span></span></p>
+<h3 id="引导性传输介质-特点-分类-比较">引导性传输介质(特点，分类，比较)</h3>
+<ol>
+<li>
+<p>双绞线(UTP,STP）：</p>
+<p>由两根采用一定规则排胶合的，相互绝缘的铜导线组成，可在其外面再加上一个由金属丝编织成的屏蔽层，这就是屏蔽双绞线(STP)，无屏蔽层的双绞线就成为非屏蔽双绞线(UTP)。</p>
+<p><img src="https://blog.zerorains.top/img/20210803173008image-20210803173007765.png" alt="image-20210803173007765"></p>
+<p>价格便宜，是最常用的传输介质之一，模拟传输和数字传输都可以使用，距离一般为几公里到数十公里。距离太远时，对于模拟传输，要用放大器放大衰减的信号；对于数字传输，要中继器将失真的信号整形。</p>
+</li>
+<li>
+<p>同轴电缆：</p>
+<p>所有的结构都共用一个轴心所以叫同轴电缆，分为基带同轴电缆(用于局域网)和宽带同轴电缆(用于有线电视系统)</p>
+</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/20210803173459image-20210803173458402.png" alt="image-20210803173458402"></p>
+<p>​		由于外导体屏蔽层的作用，同轴电缆抗干扰特性比双绞线好，被广泛应用与传输较高速率的数据，其传输距离更远，但价格较双绞线贵。</p>
+<ol start="3">
+<li>
+<p>光纤(多模和单模)：</p>
+<p>光纤通信利用光导纤维传递光脉冲进行通信，有光脉冲为1，无为0，宽带和通信量远远大于目前其他各种传输媒体。</p>
+<p><img src="https://blog.zerorains.top/img/20210803174036image-20210803174034754.png" alt="image-20210803174034754"></p>
+<p>光纤有纤芯(实心)和包层构成，前者折射率大于后者，当入射角足够大时就会发生全反射，使得光信号不断在纤芯内传输。损耗小，适用于长距离传输。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">名称</th>
+<th style="text-align:center">定义</th>
+<th style="text-align:center">光源</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">单模光纤</td>
+<td style="text-align:center">一种在横向模式直接传输光信号的光纤</td>
+<td style="text-align:center">定向性很好的激光二极管</td>
+<td style="text-align:center">衰减小，适合远距离传输</td>
+</tr>
+<tr>
+<td style="text-align:center">多模光纤</td>
+<td style="text-align:center">有多种传输光信号模式的光纤</td>
+<td style="text-align:center">发光二极管</td>
+<td style="text-align:center">易失真，适合近距离传输</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>传输损耗小，中继距离长，对远距离传输特别经济</li>
+<li>抗雷电和电磁干扰性能好</li>
+<li>无串音干扰，保密性好，也不易被窃听或截取数据</li>
+<li>体积小，重量轻</li>
+</ol>
+</li>
+</ol>
+<h3 id="中继栈和多路复用">中继栈和多路复用</h3>
+<ol>
+<li>
+<p>FDM(频分多路复用)</p>
+</li>
+<li>
+<p>TDM(时分多路复用)</p>
+</li>
+<li>
+<p>CDM(码分多路复用)</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201164733913.png" alt="image-20211201164733913"></p>
+<p><img src="https://blog.zerorains.top/img/image-20211201164822087.png" alt="image-20211201164822087"></p>
+<p><img src="https://blog.zerorains.top/img/image-20211201164224735.png" alt="image-20211201164148577"></p>
+</li>
+</ol>
+<h3 id="交换">交换</h3>
+<p>电路交换，报文交换，分组交换</p>
+<h2 id="第三章-数据链路层">第三章 数据链路层</h2>
+<h3 id="结点">结点</h3>
+<p>网络中的主机和路由器</p>
+<h3 id="链路">链路</h3>
+<p>通信路径上连接相邻结点的通信信道，中间没有任何其他的交换结点。一条链路只是一条通路的一个组成部分</p>
+<h3 id="数据链路">数据链路</h3>
+<p>在一根线路上传送数据，除了要有一条物理线路外，还要有一些必要的规程来空着这些数据的传输。将实现这些规程的硬件和软件加到链路上，就构成了数据链路。</p>
+<h3 id="点到点通信-数据链路层-：">点到点通信(数据链路层)：</h3>
+<p>在相邻结点间的 一条链路上的通信</p>
+<h3 id="端到端通信-传输层-：">端到端通信(传输层)：</h3>
+<p>从源结点到目的结点通信。通信路径可能由多个链路组成.</p>
+<h3 id="举例说明三种服务">举例说明三种服务</h3>
+<ol>
+<li>无确认的无连接服务(待补全)</li>
+<li>有确认的无连接服务</li>
+<li>有确认的有连接服务</li>
+</ol>
+<h3 id="数据链路层的主要功能">数据链路层的主要功能</h3>
+<ol>
+<li>链路管理</li>
+<li>数据成帧(frame)</li>
+<li>差错控制(error control)</li>
+<li>流量控制(flow control)</li>
+<li>透明传输</li>
+<li>寻址</li>
+</ol>
+<h3 id="成帧方法">成帧方法</h3>
+<p><a href="https://blog.zerorains.top/2021/08/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#%E5%B0%81%E8%A3%85%E6%88%90%E5%B8%A7">封装成帧</a></p>
+<h3 id="差错控制">差错控制</h3>
+<p>错误的检测和纠正：数据之外加冗余编码</p>
+<p>检错码: 通过编码检查能自动发现差错</p>
+<p>纠错码: 除了能知道出错，还能知道错误发生的位置</p>
+<p><a href="https://blog.zerorains.top/2021/08/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6">奇偶校验、水平垂直奇偶校验、CRC校验等</a></p>
+<p>奇偶校验码：是通过增加冗余位来使得码字中“1” 的个数保持奇或偶数的编码方法，是一种检错码。</p>
+<p>目的:使DL能够向上层提供无差错的服务(链路有干扰)</p>
+<p>目的:使DL能够向上层提供无差错的服务(链路有干扰)</p>
+<p><strong>重点：CRC检错码</strong></p>
+<h3 id="滑动窗口协议">滑动窗口协议</h3>
+<h4 id="捎带技术">捎带技术</h4>
+<p>双向通信</p>
+<p>双向通信的帧的种类</p>
+<p>A-B数据帧 , A-B的确认帧</p>
+<p>B-A数据帧 , B-A的确认帧</p>
+<p>确认帧的长度很短,但同样需要帧头,校验,控制 信息和帧尾,效率较低</p>
+<p>将A-B的数据帧, A-B的确认帧,混合在一起</p>
+<p>将A-B的数据帧, A-B的确认帧,混合在一起</p>
+<p>实际上是在一方收到另外一方发来的数据帧之 后,不立即回发确认帧给对方,而是等本站有数 据要发送给对方时,将给对方的确认信息和本站 发向对方的数据混合成一个帧传送给对方。</p>
+<p>将确认暂时延迟以便可以钩到下一个外发数据帧的技术</p>
+<h4 id="捎带技术的优点-重点">捎带技术的优点(重点)</h4>
+<p>更好地利用信道的带宽</p>
+<p>更好地利用信道的带宽</p>
+<p>减少单独发送确认帧带来效率的降低</p>
+<h4 id="捎带技术带来的问题及解决办法-重点">捎带技术带来的问题及解决办法(重点)</h4>
+<p>如果一个站点在收到对方数据帧之后没 有数据发送给对方,源站可能要超时；</p>
+<p>设置辅助计时器,在目标端收到数据时, 启动辅助计时器,如果辅助计时器到时, 没有反向数据传送,则单独发送确认短帧</p>
+<h3 id="流量控制方法-重点">流量控制方法(重点)</h3>
+<p><a href="https://blog.zerorains.top/2021/08/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#%E5%81%9C%E7%AD%89%E5%8D%8F%E8%AE%AE%E2%80%94%E2%80%94%E6%9C%89%E5%B7%AE%E9%94%99%E6%83%85%E5%86%B5">停止等待协议</a></p>
+<p><a href="https://blog.zerorains.top/2021/08/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#%E5%90%8E%E9%80%80N%E5%B8%A7%E5%8D%8F%E8%AE%AE-GBN">后退N帧协议(GBN)</a></p>
+<p><a href="https://blog.zerorains.top/2021/08/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#%E9%80%89%E6%8B%A9%E9%87%8D%E4%BC%A0%E5%8D%8F%E8%AE%AE-SR">选择重传协议(SR)</a></p>
+<p>选择重传可能存在的问题：</p>
+<p>假设发送方发送0~6号帧给接收方，接收方收到了，回复0到6的确认帧，接收窗口移动，但是这些确认帧丢失了。发送方超时重传0到6号帧，老帧进入了新的窗口GG</p>
+<p><strong>解决方案</strong>：限制最大接收窗口<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>r</mi></msub><mo>≤</mo><msup><mn>2</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">w_{r}\leq2^{n-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.786em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h3 id="滑动窗口协议窗口限制">滑动窗口协议窗口限制</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>停止</mtext><mo>−</mo><mtext>等待协议：</mtext><msub><mi>W</mi><mi>s</mi></msub><mo>=</mo><msub><mi>W</mi><mi>r</mi></msub><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext>序列号位数</mtext><mi>n</mi><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>回退</mtext><mi>N</mi><mtext>帧协议：</mtext><msub><mi>W</mi><mi>s</mi></msub><mo>&gt;</mo><mn>1</mn><mo separator="true">,</mo><msub><mi>W</mi><mi>r</mi></msub><mo>=</mo><mn>1</mn><mo separator="true">,</mo><msub><mi>W</mi><mi>s</mi></msub><mo>≤</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>选择重传：</mtext><msub><mi>W</mi><mi>s</mi></msub><mo>&gt;</mo><mn>1</mn><mo separator="true">,</mo><msub><mi>W</mi><mi>r</mi></msub><mo>&gt;</mo><mn>1</mn><mtext>：</mtext><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><msub><mi>W</mi><mi>r</mi></msub><mo>≤</mo><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo separator="true">,</mo><msub><mi>W</mi><mi>s</mi></msub><mo>&gt;</mo><mo>=</mo><msub><mi>W</mi><mi>r</mi></msub></mrow></mstyle></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{cases}
+停止-等待协议：W_s=W_r=1,序列号位数n=1\\
+回退N帧协议：W_s&gt;1,W_r=1,W_s\leq2^n-1\\
+选择重传：W_s&gt;1,W_r&gt;1：W_s+W_r\leq=2^n,W_s&gt;=W_r
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.32em;vertical-align:-1.91em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35em;"><span style="top:-2.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.192em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-4.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.85em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">停止</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord cjk_fallback">等待协议：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">序列号位数</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">回退</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord cjk_fallback">帧协议：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">选择重传：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord cjk_fallback">：</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>3000公里长的主干线路，传播速度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>x</mi><msup><mn>10</mn><mn>8</mn></msup></mrow><annotation encoding="application/x-tex">2x10^8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">2</span><span class="mord mathnormal">x</span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span>米/秒， 链路速率为10Mbps，每帧大小为2500bit。如果两端 使用协议5，发送窗口大小设定为7，则信道利用率为 多少？（5.8%）</p>
+<p>上题。要使信道利用率接近100％，则发送窗口应为 多少？此时帧的序列号应该为多少位？（7位）</p>
+<h2 id="第四章-介质访问控制">第四章 介质访问控制</h2>
+<h3 id="aloha">ALOHA</h3>
+<p>纯ALOHA：如果有数据需要发送就传输。 如果发生冲突， 就完成当前传输并稍后重试。、</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201165129158.png" alt="image-20211201165129158"></p>
+<p>时隙ALOHA：把时间分成若干个相同的时间片，所有用户在时间片开始时刻同步接入网络信道，若发生冲突，则必须等到下一个时间片开始时刻再发送。</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201165144909.png" alt="image-20211201165144909"></p>
+<h3 id="载波监听多路访问协议">载波监听多路访问协议</h3>
+<p><strong>坚持-CSMA</strong>:发送前监听信道是否空 闲。 如果忙，请等到它空闲时，然后立即开始传输。 如果 发生冲突，该站会随机等待一段时间并重新开始</p>
+<p><strong>非坚持CSMA</strong>:不像前一个协议那 么贪婪 — 当信道拥挤时，等待一段随机时间再试一次。 如 果等待时间过长，信道利用率就会下降（利用率低些）。</p>
+<p><strong>P坚持-CSMA</strong>：与分槽系统一起使用， 如果发现当前时隙期间信道空闲，则以概率 p 进行传输， 并以概率 1-p 推迟到下一个时隙。 p＝1 不太好，p＝0 却很 有礼貌。</p>
+<p><strong>带冲突检测的CSMA：</strong></p>
+<ol>
+<li>
+<p>侦听信道是否空闲。如果信道没有被使用，则进 行传输。</p>
+</li>
+<li>
+<p>在传输过程中，继续保持侦听以检测信道是否有 冲突发生。如果有冲突发生，则立即停止传输</p>
+</li>
+<li>
+<p>如果有冲突发生，则等待一个随机时间（二元 指数后退算法），并且再次从（1）开始。</p>
+<p><img src="D:%5CtempMarkdown%5Cdrawing-bed%5Cimage-20211201190722699.png" alt="image-20211201190722699"></p>
+</li>
+</ol>
+<p><strong>CSMA/CA</strong></p>
+<p><img src="https://blog.zerorains.top/img/image-20211201191200967.png" alt="image-20211201191200967"></p>
+<h3 id="无线局域网协议">无线局域网协议</h3>
+<p>IEEE标准：</p>
+<p>802.3：以太网</p>
+<p>802.11:无线LAN</p>
+<p>802.15：蓝牙</p>
+<p>802.16：无线MAN</p>
+<h3 id="以太网">以太网</h3>
+<p>10Base5用得比较多，一般是10Mbps，使用几代信令，分段长度为500米</p>
+<p>10代表传输速率10Mbps，BASE代表基带传输，2 和5代表所支持的分段长度分别为200米左右和500 米，T代表双绞线，F代表光纤。</p>
+<h3 id="曼切斯特编码">曼切斯特编码</h3>
+<p><img src="https://blog.zerorains.top/img/image-20211201181712189.png" alt="image-20211201181712189"></p>
+<h3 id="以太网mac子层协议">以太网MAC子层协议</h3>
+<p><img src="https://blog.zerorains.top/img/image-20211201182224225.png" alt="image-20211201182224225"></p>
+<p>MAC帧的固定字长为18B，为满足64B的最小帧，需要46B的填充位</p>
+<h3 id="为什么要限制最小帧的长度">为什么要限制最小帧的长度</h3>
+<p>如果帧长度太短，虽然冲突发生了，但是在突发噪声回到发送方(2t)之前，传送任务已经完成了，则发送方将不正确地得出结论</p>
+<p>对于最大长度为 2500 米和四个中继器（来自 802.3 规范）的 10 Mbps LAN，最坏情况下的往 返时间（包括通过四个中继器传播的时间）已确定 为接近 50 微秒 . 在 10Mbps 时，一位需要 100 纳 秒，因此 500 位是保证工作的最小帧。 为了增加 一些安全界限，这个数字被四舍五入为 512 位或 64 字节。</p>
+<h3 id="二元指数退避法">二元指数退避法</h3>
+<p>发生碰撞时如何进行随机化</p>
+<p>通常，在 i 次冲突后，会选择 0 到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>i</mi></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^i - 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.908em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>之间的随机数，并跳过该数量的时隙。 然而，在达到 10 次冲突后，随机化间隔被冻 结在最多1023 个时隙。 16 次碰撞后，控制器认输并向计算机 报告故障。 进一步的恢复取决于更高层。</p>
+<h2 id="第五章-网络层">第五章 网络层</h2>
+<h3 id="存储转发数据包交换">存储转发数据包交换</h3>
+<p>若一台主机要发送一个数据包，它将数据包传输给最 近的路由器，在该数据报到达路由器，并且路由器的 链路层完成了对它校验和的验证之后，它先被存储在 路由器上；然后沿着路径被转发到下一个路由器，直 到到达目标主机。这种机制即为存储-转发数据包交换</p>
+<h3 id="无连接服务">无连接服务</h3>
+<p>主机在传输数据之前无需建立连接,主机 有数据就交给网络层,网络层实体直接发送出去，每 一个分组独立选择路由,由上层进行排序和流控。</p>
+<p>在这样的环境中，分组通常称为数据报（datagram）, 对应的网络称为数据报网络（datagram network）。</p>
+<h3 id="无连接服务的实现">无连接服务的实现</h3>
+<p>路由器中存储的表叫路由表，它有路由器到其它各 个可达节点的路径。管理这些路由表并作出路由选择 的算法称为路由算法</p>
+<p>面向连接服务通信过程：</p>
+<pre><code>1. 在主机通信之前，双方硬建立起连接
+1. 在建立起的连接上进行数据的传递
+1. 传输完毕，拆除连接
+</code></pre>
+<p>使用面向连接的服务，必须首先建立一条从源路由 器到目标路由器的路径。这个连接称为虚电路，网络称为虚电路网络</p>
+<p>当一个连接建立起来时，从源机器到目的机器之间的一条路径被选为连接的一部分，并保存在中间这 些路由器的内部表中，对于所有在这个连接上通过的 流量，都使用这条路径。每个分组都包含一个标识符， 指明属于哪个虚电路。</p>
+<h3 id="虚电路和数据报网络比较">虚电路和数据报网络比较</h3>
+<p><img src="https://blog.zerorains.top/img/image-20211201195245972.png" alt="image-20211201195245972"></p>
+<h3 id="路由算法">路由算法</h3>
+<p>路由算法：指管理路由表并作出路由选择的算法。</p>
+<p>非自适应算法：不会根据当前测量或者估计的流 量和拓扑结构，来调整它们的路由决策，所有的路 由选择是预先在离线情况下计算好的，在网络启动 的时候被下载到路由器中，所以又称这种算法是<strong>静态路由</strong>。</p>
+<p>自适应算法：随拓扑结构和流量的变化和改变他们的路由决策，又称这种算法是<strong>动态路由</strong>。</p>
+<h3 id="最短路径算法">最短路径算法</h3>
+<p>属于静态路由选择算法，路由算法的图形抽象</p>
+<p>路由算法的图形抽象，边用于表示路由器之间的链路</p>
+<p>链路的代价(link cost): 表示链路上的距离、 信道带宽、通信开销、延迟, 队列平均长度等参数。</p>
+<p>如图所示，图中的每个节 点代表一台路由器，每条边代 表一条通信线路，线路上的数 字是它的开销。现在我们想找 到从A到D的最短路径。</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201201217908.png" alt="image-20211201201217908"></p>
+<p>最短路径路由算法的工作过程：</p>
+<ol>
+<li>节点A标记为永久节点，依次检查每一个与A相邻的 节点，并检查它们与A之间的距离</li>
+<li>如果新标记距离小于该节点原来的标记，说明找到 了一条更短路径，该节点需要重新标记，作为暂时性标记</li>
+<li>检查图中所有暂时性标记的节点，使其中具有最小 标记的那个节点成为永久节点，并且作为下一个工作节点</li>
+<li>重复上述过程，直到没有新的永久节点为止</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20211201201338679.png" alt="image-20211201201338679"></p>
+<h3 id="距离矢量算法">距离矢量算法</h3>
+<p>距离矢量路由的工作原理，计算过程</p>
+<ul>
+<li>各路由器维护一张路由表,给出了到每个目的地的 已知的最佳距离和路线（表项的两部分）</li>
+<li>各路由器与相邻路由器交换路由表</li>
+<li>根据获得的路由信息,更新路由表</li>
+</ul>
+<p><img src="https://blog.zerorains.top/img/image-20211201203525650.png" alt="image-20211201203525650"></p>
+<h3 id="链路状态路由">链路状态路由</h3>
+<p>1979年以前，ARPANET一直使用距离矢量路由算法， 而之后被同样是动态路由算法的链路状态路由算法取代</p>
+<p>代替Distance Vector Routing的原因：</p>
+<p>距离矢量路由算法需要很长时间才能收敛到稳定状态。（无穷计算问题）</p>
+<p>工作过程：</p>
+<ol>
+<li>发现它的<strong>邻居节点</strong>，并了解其网络地址。</li>
+<li>设置到每个邻居节点的<strong>距离或者成本度量值</strong>。</li>
+<li><strong>构造一个包含</strong>所有刚刚获知的链路信息包。</li>
+<li>将这个包<strong>发送给所有其他的路由器</strong>，并接收来自所 有其他路由器的信息包。</li>
+<li>计算出到每个其他路由器的最短路径。</li>
+</ol>
+<h3 id="拥塞控制概念-原因-条件">拥塞控制概念，原因，条件</h3>
+<p><strong>拥塞(congestion)的概念</strong></p>
+<ul>
+<li>（一部分）网络中存在太多的数据包导致数据包被 延迟和丢失，从而降低了传输性能，这种情况称为拥塞。</li>
+<li>一个比喻：道路交通系统，车辆多会形成拥塞。</li>
+<li>拥塞的表现：对于一部分或全部子网用户而言，感 觉网络响应较慢或分组的丢失率较高；</li>
+</ul>
+<p>对于全部子网或一部分子网路由器而言，有太多 分组要求它(们)传递，超过了它(们)的处理能力。</p>
+<p><strong>拥塞控制</strong></p>
+<p>从各个方面对子网加以控制，规范所有主机和路由器的行为，尽量消除任何可能导致子网通信能力下降的 因素，确保子网的正常运行。</p>
+<p><strong>拥塞的原因</strong></p>
+<ul>
+<li>计算机网络是一个复杂的系统，拥塞原因也是多 种多样的。</li>
+<li>向一个输出线路转发的分组过多</li>
+<li>来自多个输入线路的分组，要求向一个输出线路 转发</li>
+<li>输出线路的带宽有限，来不及转发，在队列中缓 存队列满，抛弃</li>
+<li>局部拥塞</li>
+<li>子网各部分(处理器的处理速度，线路的带宽，缓冲 队列的长度等)不匹配(mismatch)。</li>
+<li>单单增加系统某一方面资源，不会解决拥塞问题， 仅仅将拥塞从某一个部位转移到另外一个部位。</li>
+<li>举例：路由器的处理器慢，来不及处理数据，导致 缓冲区溢出，会拥塞；增加处理器的处理速度，但不 增加线路的带宽，队列同样会溢出，会拥塞。</li>
+</ul>
+<p><strong>拥塞发生的一般条件</strong></p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mtext>对网络资源的需求</mtext><mo>&gt;</mo><mtext>可用资源</mtext></mrow><annotation encoding="application/x-tex">\sum对网络资源的需求&gt;可用资源</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">对网络资源的需求</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">可用资源</span></span></span></span></p>
+<p><strong>拥塞控制与流量控制的区别</strong>：</p>
+<ul>
+<li><strong>拥塞控制</strong>是一个全局性的问题，必须使整个网络的 主机、路由器、线路等资源或能力相匹配，目的是 保障子网能够正常地传输分组。</li>
+<li><strong>流量控制</strong>是一个一对一的问题，使发送方和接收方 的能力匹配，通过一定的机制保证发送方发送的速 度不至于淹没接收方</li>
+</ul>
+<blockquote>
+<p>举个例子：</p>
+<ul>
+<li>超级计算机向一个PC传送文件（流量控制）</li>
+<li>子网1Mbps，网络中500台计算机向另外500台计算机，以100Kbps的速率传送文件（拥塞控制）</li>
+</ul>
+</blockquote>
+<p><strong>拥塞控制方法</strong>：</p>
+<p>增加资源或减少负载</p>
+<p><strong>网络供给</strong>：避免拥塞最基本方 法是建立一个与流量匹配良好的网络。（打开备份路由器或线路）</p>
+<h3 id="ipv4">IPV4</h3>
+<p><img src="https://blog.zerorains.top/img/image-20211201210628901.png" alt="image-20211201210628901"></p>
+<p>版本:协议的版本号；</p>
+<p>IHL:表明头部的长度(以32位的长度（4 bytes）为单位）</p>
+<p>区分服务:区分服务;(Type of service)</p>
+<p>总长度:数据包总长度(以字节为单位）；</p>
+<p>标识:数据包的标识值；</p>
+<p>DF：不分段标志</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201210703337.png" alt="image-20211201210703337"></p>
+<p>MF：更多的段标志；</p>
+<p>分段偏移量：段偏移量，分段在数据包的位置；</p>
+<p>实际偏移量 = 段偏移值 × 8 bytes</p>
+<p>生存期：用来计算包的存活期的计数器(单位为s)；</p>
+<p>协议：发送数据包的上层协议(<strong>TCP:6,UDP:17</strong>)；</p>
+<p>Header  头校验和：头校验和；</p>
+<blockquote>
+<p>协议分析题(重点)</p>
+<p>根据上图中的Ipv4头，分析以下十六进制（十六进制） 形式的IP头部： 45 00 00 30 52 52 40 00 80 06 2c 23  c0 a8 01 01 d8 03 e2 15.</p>
+<ol>
+<li>IP 数据报由报头部分和数据部分组成。该IP 数据报 数据部分有多长？</li>
+<li>数据包的生存时间是多少</li>
+<li>传输层的协议是什么</li>
+<li>十进制形式的源地址和目的地址是什么</li>
+<li>每个数据报最多可以划分多少个片段</li>
+</ol>
+</blockquote>
+<h3 id="ip地址">IP地址</h3>
+<p>Internet上的每台主机和路由器都有一个<strong>32位</strong>长的IP地址，IP地址包含<strong>网络号和主机号</strong>。原则上， 任何两台机器都不会有相同的IP地址。</p>
+<p>实际上，IP地址引用的不是一台主机，它真正 引用的是一个网络接口，所以，如果一台主机同时 位于两个网络上，那么它必须拥有两个IP地址。</p>
+<h3 id="image-20211201214051094"><img src="https://blog.zerorains.top/img/image-20211201214051094.png" alt="image-20211201214051094"></h3>
+<p><strong>重点</strong>：</p>
+<ol>
+<li>给出一个IP地址，指出是哪类地址</li>
+<li>构成</li>
+<li>没类地址最大网络数和最大主机数</li>
+</ol>
+<h3 id="子网掩码">子网掩码</h3>
+<ul>
+<li>
+<p>子网的位数由各个单位确定，如何在IP地址中 区分哪些是网络号，哪些是主机号。</p>
+</li>
+<li>
+<p>子网掩码：网络号＋子网号；32Bits，1和0组成 ，1表示IP地址所在的位为网络号或子网号，0表 示IP地址所在的位为主机号。</p>
+</li>
+<li>
+<p><strong>给出IP地址、子网掩码、所在网络三条件中任 意两项，会计算剩下一项。并能对指定地址指 出有多少个子网和主机可用</strong></p>
+</li>
+</ul>
+<blockquote>
+<p>举个例子</p>
+<p>IP地址为130.50.15.6，子网掩码为255.255.252.0 则：所在网络为： 130.50.12.0，有<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">2^6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span>个子网可用， 该子网中可分配IP的主机为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>10</mn></msup><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2^{10}-2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>个</p>
+</blockquote>
+<h3 id="子网划分">子网划分</h3>
+<p>当主路由器从网络中收到分组的时候，它是如何知道 应该发往哪个子网的，才能找到目标主机呢？</p>
+<p>主路由器中会含有到达三个子网的路由表，当网络 中的IP分组到达路由器时，它的目的IP地址与路由器 的子网掩码进行与操作，即可得到该发往哪个子网的 路由器，再由子网的路由器确定发给该子网的哪个主 机。</p>
+<blockquote>
+<p>举个例子：</p>
+<p>当目标地址为202.120.3.98的IP分组到达路由 器时，它与路由器的子网掩码255.255.255.224进行与 操作，得到的子网地址为202.120.3.96</p>
+</blockquote>
+<h3 id="cidr无类别域间路由">CIDR无类别域间路由</h3>
+<p><strong>为什么引入CIDR</strong>：一个A或B类地址对大多数机构来说还是太大，C 类地址又太小，网络地址本身又非常紧缺</p>
+<p><strong>解决方案</strong>：将剩余的IP地址以可变大小块的方式 进行分配，而不管它们所属类别。——CIDR</p>
+<p>CIDR建立于“超级组网”的基础上，“超级组网”是“子网划分”的派生词，可看作子网划分的逆 过程。子网划分时，从地址主机部分借位，将其合并进网络部分；而在超级组网中，则是将网络部分的某些位合并进主机部分。</p>
+<p>这种无类别超级组网技术通过将一组较小的无 类别网络汇聚为一个较大的单一路由表项，减少了 Internet路由域中路由表条目的数量</p>
+<p><strong>引入CIDR的好处</strong></p>
+<ol>
+<li>提高IP地址的利用率</li>
+<li>缩短路由表</li>
+</ol>
+<p><strong>CIDR路由选择</strong>：对IP地址和每一个表项的子网掩码进行 布尔与操作，得到输出地址，来决定下一跳。若有 多个符合的表项，则取符合掩码长度最长的那个； 若所有表项都不符合，则通过默认路由转发。</p>
+<h3 id="nat-网络地址转换">NAT——网络地址转换</h3>
+<p><strong>原理</strong>：在内部使用私有地址，在边界上使用<strong>NAT盒</strong>，让 私有地址映射到公共的IP地址上。当服务器端的分组到达时，通过<strong>传输层端口号和私有地址</strong>的绑定关系，来确定该分组送往哪个私有地址</p>
+<p><strong>私有网络的IP地址</strong>：</p>
+<p><img src="https://blog.zerorains.top/img/image-20211201221726979.png" alt="image-20211201221726979"></p>
+<p>有三段IP地址范围已经被声明为私有地址， 任何一家公司都可以在他们的内部随意地使用这 些地址，唯一的规则是，包含这些地址的分组不 应该出现在Internet上。</p>
+<h3 id="请求ip包和应答ip包的nat">请求IP包和应答IP包的NAT</h3>
+<ul>
+<li>当请求IP包到达路由器时，将IP包中的<strong>源IP地址和源 端口号信息填入NAT表</strong>（映射表），同时将对应的 <strong>NAT表表项序号取代IP包中的源端口号字段</strong>，并将选定的合法地址（即公开IP地址）<strong>取代IP包中的源IP地 址字段</strong>，重新计算校验和并发送。</li>
+<li>当应答<strong>IP包从ISP发回来时，路由器将抽取该应答IP 包中目的端口号字段</strong>，查NAT表将表中对应的内容放回目的IP地址字段和目的端口号字段，发回源节点。</li>
+</ul>
+<h3 id="nat存在的问题">NAT存在的问题</h3>
+<ul>
+<li>NAT违反了IP的体系结构：IP规定一个IP地址对应一 个网络接口，而在NAT中，某个地址可能会对应成千 上万个地址；</li>
+<li>NAT将Internet的无连接服务变成了有连接服务；因为NAT必须包含所有经过它的连接信息；</li>
+<li>NAT违反了网络分层原则:在第三层用了第四层协议格 式中的字段；</li>
+<li>如果IP包的载荷不是TCP或UDP，则NAT无法工作， 因为在其他协议的信息中不包含源端口号；</li>
+<li>在有些应用中NAT可能会出错:发送方会将源IP地址嵌 在它的消息中，接收方必须从信息中取用源IP地址， 但NAT不作此类处理，因而将导致错误。</li>
+</ul>
+<h3 id="icmp协议-internet控制协议">ICMP协议(INTERNET控制协议)</h3>
+<p><strong>ICMP和IP的关系</strong>：</p>
+<ul>
+<li>ICMP使用IP协议传输，ICMP报文，ICMP报文被 封装在IP数据报中；</li>
+<li>ICMP协议和IP协议同处于 一个互联网层</li>
+</ul>
+<p><strong>ARP——地址解析协议</strong></p>
+<p><strong>ARP的目的</strong>：已知IP地址，求该IP地址对应的MAC地址</p>
+<p>转换过程：</p>
+<ol>
+<li>LAN内部广播发送ARP请求分组，有待求的IP地址</li>
+<li>目标站收到该请求，回答，将本机IP地 址和MAC地址以ARP应答的方式传给对方</li>
+</ol>
+<p><strong>RARP——反向地址解析协议</strong></p>
+<p><strong>RARP的目的</strong>：已知MAC地址，如何求得对 应IP地址（MAC地址映射到IP地址）</p>
+<p>RARP的应用场合：无盘工作站在启动时，知道自己的MAC地 址，但没有硬盘记录自己的IP地址</p>
+<p><strong>RARP的工作原理</strong>：</p>
+<ul>
+<li>
+<p>想要获知自己的IP地址的站点广播RARP 请求：我的MAC地址是 14.04.05.18.01.25，谁知道我的IP地址</p>
+</li>
+<li>
+<p>RARP服务器获知，通过RARP应答</p>
+</li>
+</ul>
+<p><strong>DHCP——动态主机配置协议</strong></p>
+<p>DHCP既允许手工分配IP地址，也允许自动分配IP 地址</p>
+<p><strong>工作过程</strong>：一台新启动的机器，它广播DHCP分组， 它所在LAN上的DHCP中继代理得到分组后，用单播的方式将该分组发送给DHCP服务器。从而从一 个IP地址池内自动为该主机分配IP地址。IP地址分配的有效期只能是一段固定长的时间，称为<strong>租用</strong> （leasing）。在到达租期之间，主机必须<strong>向DHCP 服务器申请续租</strong>（renewal）</p>
+<p><strong>OSPF——内部网关路由协议</strong></p>
+<p>Internet是由大量的<strong>自治系统</strong>(AS)构成的，每个 AS内部可以使用自己的算法。AS<strong>内部</strong>的路由算法称为<strong>内部网关协议</strong>。AS之间的路由算法称为<strong>外部网关协议</strong>。</p>
+<p>最初的Internet内部网关协议是距离矢量协议（RIP），由于存在无穷计算问题，它最终被OSPF（Open Shortest Path First，开放的最短路径优先）所取代。</p>
+<p>OSPF是Internet上主要的内部网关协议，负责AS内部 路由。 1988年开始制定，1990年成为标准，采用L-S路 由算法 。（IS-IS 中间系统到中间系统）</p>
+<p><strong>OSPF同时支持两类网络</strong>：</p>
+<ol>
+<li>点对点网络（SONET，两台路由器直接连接）；</li>
+<li>支持广播传送的多路访问网络（广播网络，大多数 LAN）</li>
+</ol>
+<h3 id="bgp外部网关路由协议">BGP外部网关路由协议</h3>
+<p>在AS之间，则使用另一个协议：BGP（Border Gateway Protocol，边界网关协议）。一台BGP路由 器只负责从AS到AS之间的路由。</p>
+<p>BGP基本上是一个<strong>距离矢量协议</strong>，但是不同在于， 每一台BGP路由器不仅维护它到每个目标的开销值， <strong>还记录下所使用的路径</strong>。BGP路由器会将它所用的确切路径告诉它的邻居们。</p>
+<p>BGP协议解决了困扰距离矢量协议的无穷计算问题，因为路由器可以根据其它路由器传来的路径信息得知自己是否在这条路径上。</p>
+<h3 id="ipv6">IPV6</h3>
+<p>IPv6（Internet Protocol Version 6）主要是为了 解决现在IP地址不足的问题，IPv6是IETF设计的用于 替代现行版本IP协议（IPv4）的下一代IP协议。</p>
+<p><strong>特点</strong>：</p>
+<ol>
+<li>IPV6地址长度为128比特，地址空间增大了2的 96次方倍；</li>
+<li>灵活的IP报文头部格式。使用一系列固定格式 的扩展头部取代了IPV4中可变长度的选项字段。IPV6 中选项部分的出现方式也有所变化，使路由器可以简 单路过选项而不做任何处理，加快了报文处理速度</li>
+</ol>
+<h2 id="第六章-传输层">第六章 传输层</h2>
+<p>传输层提供<strong>端到端</strong>服务</p>
+<ul>
+<li>网络通信的本质是“进程通信(process  communication)”，而非“主机通信”。</li>
+<li>网络层IP协议提供的服务是不可靠的 （数据部分不校验，分组有生存期，拥塞 时可以丢弃分组，等等）</li>
+<li>传输层为应用层提供两类服务：
+<ul>
+<li>面向连接的服务：TCP</li>
+<li>无连接的服务：UDP</li>
+</ul>
+</li>
+</ul>
+<h3 id="端口">端口</h3>
+<ul>
+<li>端口用一个 <strong>16 bit</strong> 端口号进行标志。</li>
+<li>端口号只具有<strong>本地意义</strong>，即端口号只是为了标志本计算机<strong>应用层中的各进程</strong>。在因特网中不同计算机的相同端口号是没有联系的。</li>
+<li>两类端口
+<ul>
+<li>一类是熟知端口(well-known ports)，其数值一般为 0~1023。如： <strong>Web HTTP: 80，File FTP: 20, 21， Email SMTP: 25</strong>等等。当一种新的应用程序出现时， 必须为它指派一个熟知端口。</li>
+<li>另一类则是一般端口1024~65535，用来随时分配给 请求通信的客户进程。</li>
+</ul>
+</li>
+</ul>
+<h3 id="套接字">套接字</h3>
+<p>TCP 使用“连接”(而不仅仅是“端口”) 作为最基本的抽象，同时将 TCP 连接的端 点称为套接字(socket)。</p>
+<p>套接字的基本格式：IP地址:端口号</p>
+<h3 id="udp">UDP</h3>
+<p>UDP协议是<strong>无连接的数据报协议</strong>，它不提供可靠性服务，但其相应的协议开销也较小、效率 较高</p>
+<p><strong>域名系统DNS、简单网络管理协议SNMP</strong>使用 的传输层协议是<strong>UDP</strong></p>
+<h4 id="头部格式">头部格式</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202102911617.png" alt="image-20211202102911617"></p>
+<p>UDP只在IP的数据报服务之上增加了很少 一点的功能，即端口的功能和差错检测的功 能</p>
+<p>UDP源端口：UDP端口号，当不需要返回数据时，源端口域置0</p>
+<p>UDP目的端口：UDP端口号</p>
+<p>UDP长度：整个数据段的长度，包括头部和数据部分以字节计，最小为8(仅头部长度), 最大为 65515</p>
+<p>UDP校验和：可选域，全0为未选，全1表示校验和为0</p>
+<h4 id="udp提供服务的应用">UDP提供服务的应用</h4>
+<ol>
+<li>远程过程调用RPC
+<ol>
+<li>向一台远程主机发送一个消息并获得一个应 答。将网络中的请求-应答交互表示成过程调 用形式，例如：调用get-IP-address（主机名 ）将发送一个UDP包给DNS服务器，并等待回 答</li>
+<li>RPC对程序员屏蔽了网络运作的细节</li>
+<li>RPC是UDP的一个重要应用</li>
+</ol>
+</li>
+<li>实时传输协议RTP
+<ol>
+<li>UDP的另一个重要应用是RTP</li>
+<li>RTP是一个传输层协议，但在应用层实现</li>
+<li>RTP是用于多媒体数据传输的协议</li>
+</ol>
+</li>
+</ol>
+<h3 id="tcp">TCP</h3>
+<ul>
+<li>面向连接</li>
+<li>端到端的服务</li>
+<li>完全可靠性服务——IP协议不提供可靠性服务，而TCP将在IP的基础上提供可靠性服务并保证数据发送和接收次序一致</li>
+<li>全双工服务</li>
+<li>流接口</li>
+<li>可靠的连接建立</li>
+<li>完美的连接终止</li>
+</ul>
+<h4 id="端口">端口</h4>
+<p>TCP的TSAP，与某一个应用程序相关 通用端口（well-known port） 端口号小于1024 其他可由各主机自己定义</p>
+<h4 id="套接字">套接字</h4>
+<p>传输层的通信端点，它由 IP地址 + 端口号组成</p>
+<h4 id="tcp服务模型">TCP服务模型</h4>
+<p>TCP服务由发送方和接收方创建一种称为套接字（socket）的端点来获得。每个套接字都有一个套接字编号(地址)，由主机的IP地址和该主机本地的16位数值组成，称为端口。</p>
+<p><img src="https://blog.zerorains.top/img/image-20211202110801872.png" alt="image-20211202110801872"></p>
+<h4 id="tcp协议交换的数据单位：段-segment">TCP协议交换的数据单位：段(segment)</h4>
+<p><strong>段的结构</strong>：</p>
+<ul>
+<li>20字节的头部+一些字节的选项</li>
+<li>0或多个字节的数据</li>
+</ul>
+<p><strong>段的大小</strong>：</p>
+<ul>
+<li>由TCP实体确定,但是要受到两个限制
+<ol>
+<li>形成的数据段不大于65515个字节</li>
+<li>数据段的长度 &gt; 网络MTU(一般为1500)时
+<ol>
+<li>将该IP分组分段</li>
+<li>每一个fragment都有TCP头和IP头</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<h4 id="tcp的数据编号与确认">TCP的数据编号与确认</h4>
+<ol>
+<li>TCP 协议是面向字节的。TCP 将所要传送的报 文看成是字节组成的数据流，并使每一个字节 对应于一个序号。</li>
+<li>在连接建立时，双方要商定初始序号。TCP 每 次发送的报文段的首部中的序号字段数值表示 该报文段中的<strong>数据部分的第一个字节的序号</strong>。</li>
+<li>TCP 的确认是对接收到的数据的最高序号表示 确认。接收端返回的确认号是已收到的数据的 最高序号加 1。因此确认号表示<strong>接收端期望下 次收到的数据中的第一个数据字节的序号</strong></li>
+</ol>
+<h4 id="tcp段的头部">TCP段的头部</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202111430641.png" alt="image-20211202111430641"></p>
+<p>源端口和目的端口字段——各占 2 字节。端口是传输 层与应用层的服务接口，每个端口对应一个应用程序。</p>
+<p>序号字段(SEQ)——占 4 字节。TCP 连接中传送的数 据流中的每一个字节都编上一个序号。序号字段的值 则指的是本报文段所发送的数据的第一个字节的序号。</p>
+<p>确认号字段(ACK)——占 4 字节，是期望收到对方的 下一个报文段的数据的第一个字节的序号。</p>
+<p>TCP头长度——占 4 bit，它指出 TCP 头部包含多少个32bit的 字。（也指明了报文段的数据起始处距离 TCP 报文段的起始处 有多远。“TCP头长度”的单位不是字节而是 32 bit 字（4 字节 为计算单位）。</p>
+<p>保留字段——占 4bit，保留为今后使用，但目前 应置为 0。</p>
+<p>CWR和ECE用作拥塞控制的信号。</p>
+<p>紧急指针URG —— 当 URG = 1 时，表明紧急指针 字段有效。它告诉系统此报文段中有紧急数据，应 尽快传送(相当于高优先级的数据)。</p>
+<p>确认比特 ACK —— 只有当 ACK = 1 时确认号字 段才有效。当 ACK = 0 时，确认号无效。</p>
+<p>推送比特 PSH (PuSH) —— 接收 TCP 收到推送比特 置 1 的报文段，就尽快地交付给接收应用进程，而不 再等到整个缓存都填满了后再向上交付。</p>
+<p>复位比特 RST (ReSeT) —— 当 RST = 1 时，表明 TCP  连接中出现严重差错（如由于主机崩溃或其他原因）， 必须释放连接，然后再重新建立运输连接。</p>
+<p>同步比特 SYN —— 同步比特 SYN 置为 1，就表示 这是一个连接请求或连接接受报文。</p>
+<p>终止比特 FIN (FINal) —— 用来释放一个连接。当 FIN = 1 时，表明此报文段的发送端的数据已发送完 毕，并要求释放传输连接。</p>
+<p>窗口字段(WIN)——占2字节。窗口字段用来控制对方发送的数据量,单位为字节。TCP 连接的一端根据设置的缓存空间大小确定自己的接收窗口大小,然后通知对方以确定对方的发送窗口的上限。</p>
+<p>检验和 —— 占 2 字节。检验和字段检验的范围包括 首部和数据这两部分。在计算检验和时，要在 TCP 报文段的前面加上 12 字节的伪首部。</p>
+<p>紧急指针字段 —— 占 16 bit。紧急指针指出在本报 文段中的紧急数据的最后一个字节的位置。</p>
+<p>选项字段 —— 长度可变。TCP 只规定了一种选项， 即最大报文段长度 MSS (Maximum Segment Size)。 MSS 告诉对方 TCP： “我的缓存所能接收的报文段 的数据字段的最大长度是 MSS 个字节。 ”</p>
+<p>(MSS 是 TCP 报文段中的数据字段的最大长度。 数据字段加上 TCP 首部才等于整个的 TCP  报文段)</p>
+<p>填充字段 —— 这是为了使整个首部长度是 4 字节的 整数倍。</p>
+<h3 id="tcp连接建立与释放">TCP连接建立与释放</h3>
+<h4 id="三次握手-tcp连接建立">三次握手(TCP连接建立)</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202132316320.png" alt="image-20211202132316320"></p>
+<h4 id="四次握手-tcp连接释放">四次握手(TCP连接释放)</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202132920958.png" alt="image-20211202132920958"></p>
+<h3 id="tcp拥塞控制">TCP拥塞控制</h3>
+<ol>
+<li>接收窗口 rwnd (receiver window) 这是<strong>接收端</strong>根据其目前的接收缓存大小所许诺的最新的窗口值，是<strong>来自接收端的流量控制</strong>。接收端将此<strong>窗口值放在 TCP 报文的首部中的窗口字段</strong>，传送给发送端。</li>
+<li>拥塞窗口 cwnd (congestion window) 是<strong>发送端</strong>根据自己估计的网络拥塞程度而设置的窗口值， 是<strong>来自发送端的流量控制</strong></li>
+</ol>
+<h4 id="发送窗口的控制端">发送窗口的控制端</h4>
+<p>发送端的发送窗口的上限值应当取为接收窗口 rwnd  和拥塞窗口 cwnd 这两个变量中较小的一个，即应按 以下公式确定：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>发送窗口的上限值</mtext><mo>=</mo><mi>M</mi><mi>i</mi><mi>n</mi><mo stretchy="false">[</mo><mi>r</mi><mi>w</mi><mi>n</mi><mi>d</mi><mo separator="true">,</mo><mi>c</mi><mi>w</mi><mi>n</mi><mi>d</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">发送窗口的上限值 = Min [rwnd, cwnd]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">发送窗口的上限值</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">in</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">n</span><span class="mord mathnormal">d</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">n</span><span class="mord mathnormal">d</span><span class="mclose">]</span></span></span></span></span></p>
+<p>当 rwnd &lt; cwnd 时，是接收端的接收能力限制发送窗口的最大值</p>
+<p>当 cwnd &lt; rwnd 时，则是网络的拥塞限制发送窗口的最大值。</p>
+<h4 id="慢启动算法">慢启动算法</h4>
+<p>当连接建立时，发送方将拥塞窗口的初始大小设置为<strong>最大的数据段长度（MSS)</strong>，并随后发一个<strong>最大长度的数据段</strong>，如该数据段在定时器超时前得到 了确认，<strong>发送方在原来的拥塞窗口的基础上再增加一倍长度</strong>，发送两个数据段，如两个数据段都<strong>得到了确认</strong>，则再增加一倍长度，拥塞窗口一直<strong>呈指数增长</strong>，直至发生<strong>超时或达到接收方的窗口大小</strong>。</p>
+<p><strong>慢启动算法</strong>实际上一点也不慢，它是<strong>呈指数级</strong>的</p>
+<p>除了接收窗口和拥塞窗口外，还增加第三个 参数：<strong>阈值</strong>（threshold）。当一次<strong>超时发生</strong>的时候， <strong>阈值被设置为当前拥塞窗口的一半</strong>，而拥塞窗口被 重置为一个MSS.然后使用<strong>慢启动算法</strong>来决定网络的 处理能力，不过当<strong>增长到阈值的时候便停止</strong>。从这个点开始，每一次成功的传输都会使<strong>拥塞窗口线性地增长，而不是成倍地增长</strong></p>
+<h4 id="具体过程">具体过程</h4>
+<ol>
+<li>初始拥塞窗口大小为<strong>1个MSS</strong>，当没有超过阈 值时，采用<strong>慢启动算法</strong>指数增长。</li>
+<li>拥塞窗口大小增长到<strong>阈值</strong>时，慢启动算法停 止，拥塞窗口呈<strong>线性地</strong>增长。</li>
+<li>发生超时，阈值变为<strong>当前拥塞窗口值的一半</strong>， 然后拥塞窗口大小重置为<strong>1个MSS</strong> ，再继续采用 <strong>慢启动算法</strong>。转到2</li>
+</ol>
+<p>如果不再发生超时，则拥塞窗口将继续增长， 直至到达<strong>接收方窗口的大小</strong></p>
+<blockquote>
+<p>例题：</p>
+<p>TCP的Threshold初始值为8，拥塞窗口上升为12 时网络发生了超时。求第1次到第15次传输的各拥 塞窗口大小。（要求画图）</p>
+</blockquote>
+<h3 id="tcp滑动窗口">TCP滑动窗口</h3>
+<p>TCP使用与数据链路层不同的窗口协议来实现流量控制</p>
+<ul>
+<li>
+<p>数据链路层：在数据链路层的滑动窗口协议中， <strong>发送窗口的滑动依赖于确认的到达</strong></p>
+</li>
+<li>
+<p>TCP层：TCP的窗口大小是其缓冲区的尺寸，建 立连接的双方都将分配一个缓冲区作为接收数据 的存放空间，并相互通知对方，此后，每次对接 收数据确认的同时发布一个<strong>窗口公告</strong>（window  advertisement），报告剩余窗口的大小，<strong>任何时刻，剩余的缓冲区空间的数量叫窗口大小</strong> 。</p>
+</li>
+</ul>
+<p>发送方收到一个<strong>零窗口公告时</strong>，必须停止发送， 直到接收方重新发送一个<strong>非零的窗口公告</strong>，但有 两种情况可以除外</p>
+<pre><code>1. 发送**紧急数据**，如允许用户终止（kill）当前 正在远端机上运行的进程
+1. 发送方可以发送一个字节的数据段通知对方， 要求接收方重申希望接收的**下一字节及当前的窗口大小**，以防止可能的窗口公告丢失而导致 的死锁
+</code></pre>
+<p><img src="https://blog.zerorains.top/img/image-20211202134606970.png" alt="image-20211202134606970"></p>
+<h2 id="第七章-应用层">第七章 应用层</h2>
+<h3 id="dns-域名解析系统">DNS——域名解析系统</h3>
+<p><strong>必要性</strong>：</p>
+<ol>
+<li>IP地址可以标识主机、路由器。</li>
+<li>但IP地址不好记忆，不便使用。</li>
+<li>一般倾向于使用一些有意义的字符串来标 识Internet上的某个资源。</li>
+<li>存在着字符串与IP地址转换的必要性</li>
+<li>用户提供要访问资源的“字符串”名称。</li>
+<li>由DNS负责转换成为二进制的网络地址</li>
+</ol>
+<p><strong>名词</strong>：</p>
+<ul>
+<li>DNS Name Space——DNS名字空间</li>
+<li>Resource records——资源记录</li>
+<li>Name Servers——名字服务器</li>
+</ul>
+<h3 id="电子邮件">电子邮件</h3>
+<h4 id="电子邮件最主要的组成构件">电子邮件最主要的组成构件</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202134921476.png" alt="image-20211202134921476"></p>
+<h4 id="多用途因特网邮件扩充mime">多用途因特网邮件扩充MIME</h4>
+<h4 id="smtp的缺点">SMTP的缺点</h4>
+<ol>
+<li>SMTP不能传送可执行文件或其他的二进制对象。</li>
+<li>SMTP限于传送7位的ASCII码。许多其他非英 语国家的文字（如中文、俄文，甚至带重音符 号的法文或德文）就无法传送。</li>
+<li>SMTP服务器会拒绝超过一定长度的邮件。</li>
+<li>某些SMTP的实现并没有完全按照[RFC 821]的 SMTP标准</li>
+</ol>
+<h4 id="mime的特点">MIME的特点</h4>
+<ul>
+<li>MIME并没有改动SMTP或取代它。</li>
+<li>MIME 的意图是继续使用目前的 [RFC 822]格式，但增加了邮件主体 的结构，并定义了传送非 ASCII 码 的编码规则</li>
+</ul>
+<h4 id="mime和smtp的关系">MIME和SMTP的关系</h4>
+<p><img src="https://blog.zerorains.top/img/image-20211202135403023.png" alt="image-20211202135403023"></p>
+<h4 id="pop3协议">POP3协议</h4>
+<ul>
+<li>邮局协议POP是一个非常简单、但功 能有限的邮件读取协议，现在使用的 是它的第三个版本 POP3。</li>
+<li>POP也使用客户/服务器的工作方式。</li>
+<li>在接收邮件的用户PC机中必须运行 POP客户程序，而在用户所连接的 ISP的邮件服务器中则运行POP服务 器程序</li>
+</ul>
+<h4 id="imap-internet-邮件访问协议">IMAP (Internet 邮件访问协议)</h4>
+<ul>
+<li>IMAP 也是按客户/服务器方式工作，现 在较新的版本是 IMAP4。</li>
+<li>用户在自己的 PC机上就可以操纵ISP的 邮件服务器的邮箱，就像在本地操纵一 样。</li>
+<li>因此IMAP是一个联机协议。当用户PC 机上的 IMAP客户程序打开IMAP服务器 的邮箱时，用户就可看到邮件的首部。 若用户需要打开某个邮件，则该邮件才 传到用户的计算机上</li>
+</ul>
+<h3 id="万维网">万维网</h3>
+<ul>
+<li>万维网 WWW (World Wide Web)并非某种特殊的计 算机网络。</li>
+<li>WWW的历史
+<ul>
+<li>WWW的发展
+<ul>
+<li>Andreessen建立Netscape公司，生产一系列 的WWW产品</li>
+<li>Netscape公司与Microsoft公司的浏览器之争</li>
+<li>世纪诉讼</li>
+</ul>
+</li>
+<li>WWW的现状
+<ul>
+<li>成为Internet上最主要的应用，很多人心中的 Internet</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="万维网必须解决的问题">万维网必须解决的问题</h4>
+<ol>
+<li>怎样标志分布在整个因特网上的万维网文档？
+<ol>
+<li>使用统一资源定位符 URL (Uniform  Resource Locator)来标志万维网上的 各种文档。</li>
+<li>使每一个文档在整个因特网的范围 内具有惟一的标识符 URL</li>
+</ol>
+</li>
+<li>用何协议实现万维网上各种超链的链接？
+<ol>
+<li>在万维网客户程序与万维网服务器程序 之间进行交互所使用的协议，是HTTP。</li>
+<li>HTTP（HyperText Transfer Protocol, 超文本传输协议）是一个应用层协议， 它使用 TCP 连接进行可靠的传送</li>
+</ol>
+</li>
+<li>怎样使各种万维网文档都能在因特网上 的各种计算机上显示出来，同时使用户清 楚地知道在什么地方存在着超链？
+<ol>
+<li>HTML （HyperText Markup Language,超文本标记语言） 使得万维网页面的设计者可以很方便地用 一个超链从本页面的某处链接到因特网上 的任何一个万维网页面，并且能够在自己 的计算机屏幕上将这些页面显示出来。</li>
+</ol>
+</li>
+<li>怎样使用户能够很方便地找到所需的 信息？
+<ol>
+<li>为了在万维网上方便地查找信息，用 户可使用各种的搜索工具（即搜索引 擎）。</li>
+</ol>
+</li>
+</ol>
+<h4 id="url的一般形式">URL的一般形式</h4>
+<p>URL 包括三部分：<strong>协议</strong>（如HTTP）,<strong>主机的DNS域名</strong>，和路径名。</p>
+<p>URL 的一般形式是：</p>
+<p><img src="https://blog.zerorains.top/img/image-20211202135823435.png" alt="image-20211202135823435"></p>
+<h4 id="一次成功的web访问">一次成功的Web访问</h4>
+<ol>
+<li>浏览器分析超链指向页面的 URL。</li>
+<li>浏览器向 DNS <a target="_blank" rel="noopener" href="http://xn--www-lf0g90sk03cmbd.cs.washington.edu">请求解析www.cs.washington.edu</a> 的 IP 地址</li>
+<li>域名系统 DNS 解析出IP地址为128.208.3.88。</li>
+<li>浏览器与128.208.3.88的80端口建立TCP连接， 使用HTTP协议</li>
+<li>浏览器发出HTTP请求要求取页面：/index.html</li>
+<li>www.cs.washington.edu服务器给出HTTP响应， 把文件index.html发给浏览器。</li>
+<li>浏览器显示文件 index.html 中的所有文本。</li>
+<li>TCP 连接释放</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/">http://blog.zerorains.top/2021/12/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%80%BB%E5%A4%8D%E4%B9%A0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%80%BB%E5%A4%8D%E4%B9%A0/">总复习</a></div><div class="post-share"><div class="social-share" data-image="/img/9.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2021/11/08/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/" title="大数据技术原理与应用"><img class="cover" src="/img/2.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">大数据技术原理与应用</div></div><div class="info-2"><div class="info-item-1">Big Data(大数据应用技术) 第一章：大数据概述(看好例题即可) 1. 大数据的概念 例:简述大数据的4V特征?并分别简要解释每个特征的意义? 答案：  数据量大(Volume)——各行各业每时每刻都在生产数据，生产速度非常块，产生的数量非常大。 数据类型繁多(Variety)——每个领域都会产生不同的数据类型，因此数据类型非常多。 处理速度快(Velocity)——数据生成速度很快，因此对这些数据的处理也要非常快。 价值密度低(Value)——我们的视频监控可能要录制很长时间，并且存储量特别大，但是有价值的部分可能只有几分钟。  2. 大数据的应用实例 智能推荐系统，信贷评估系统，无人驾驶汽车，优化物流网络，智慧交通，智能安防 3. 大数据的关键技术 从数据分析全流程角度，大数据技术包含哪些内容？每个内容请至少列出至少2个该内容包含的功能？  数据采集与预测——清洗，转化，集成 数据存储和管理——利用分布式文件系统，数据仓库等，实现海量数据的存储和管理 数据处理与分析——分布式并行编程，机器学习和数据挖掘 数据安全和隐私保护——保护数据安全和个人隐私  4....</div></div></div></a><a class="pagination-related" href="/2021/12/19/%E3%80%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8DLearning-from-Pixel-Level-Label-Noise-A-New-Perspective-for-Semi-Supervised-Semantic-Segmentation/" title="「论文阅读」Learning from Pixel-Level Label Noise: A New Perspective for Semi-Supervised Semantic Segmentation"><img class="cover" src="/img/15.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「论文阅读」Learning from Pixel-Level Label Noise: A New Perspective for Semi-Supervised Semantic Segmentation</div></div><div class="info-2"><div class="info-item-1">Learning from Pixel-Level Label Noise: A New Perspective for Semi-Supervised Semantic Segmentation  论文名称：Learning from Pixel-Level Label Noise: A New Perspective for Semi-Supervised Semantic Segmentation 作者：Rumeng Yi; Yaping Huang; Qingji Guan; Mengyang Pu; Runsheng Zhang 期刊：IEEE Transactions on Image Processing,2021  原文摘要  This paper addresses semi-supervised semantic segmentation by exploiting a small set of images with pixel-level annotations (strong supervisions) and a large set of...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E8%87%AA%E6%95%91%E6%8C%87%E5%8D%97"><span class="toc-number">1.</span> <span class="toc-text">计算机网络自救指南</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E7%BC%A9%E5%86%99%E8%AF%8D%E8%AF%AD"><span class="toc-number">1.1.</span> <span class="toc-text">基本缩写词语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%BB%AA%E8%AE%BA"><span class="toc-number">1.2.</span> <span class="toc-text">第一章 绪论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%B1%BB%E6%A0%87%E5%87%86%EF%BC%9A%E4%BC%A0%E8%BE%93%E6%8A%80%E6%9C%AF%E5%92%8C%E7%BD%91%E7%BB%9C%E5%B0%BA%E5%BA%A6"><span class="toc-number">1.2.1.</span> <span class="toc-text">分类标准：传输技术和网络尺度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E4%BC%A0%E8%BE%93%E6%8A%80%E6%9C%AF"><span class="toc-number">1.2.2.</span> <span class="toc-text">两种传输技术</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E7%85%A7%E4%B8%8D%E5%90%8C%E5%B0%BA%E5%BA%A6%E5%AF%B9%E4%BA%92%E8%81%94%E5%99%A8%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">1.2.3.</span> <span class="toc-text">按照不同尺度对互联器的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84-%E9%87%8D%E7%82%B9"><span class="toc-number">1.2.4.</span> <span class="toc-text">协议层次结构(重点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#osi%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B-%E9%87%8D%E7%82%B9"><span class="toc-number">1.2.5.</span> <span class="toc-text">OSI参考模型(重点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#osi%E5%92%8Ctcp-ip%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B%E5%85%B1%E5%90%8C%E7%82%B9"><span class="toc-number">1.2.6.</span> <span class="toc-text">OSI和TCP&#x2F;IP参考模型共同点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#osi%E5%92%8Ctcp-ip%E7%9A%84%E4%B8%8D%E5%90%8C%E7%82%B9"><span class="toc-number">1.2.7.</span> <span class="toc-text">OSI和TCP&#x2F;IP的不同点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-%E7%89%A9%E7%90%86%E5%B1%82"><span class="toc-number">1.3.</span> <span class="toc-text">第二章 物理层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%A6%E5%AE%BD"><span class="toc-number">1.3.1.</span> <span class="toc-text">带宽</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E4%BC%A0%E8%BE%93%E9%80%9F%E7%8E%87"><span class="toc-number">1.3.2.</span> <span class="toc-text">信号传输速率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E7%8E%87"><span class="toc-number">1.3.3.</span> <span class="toc-text">数据传输率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E9%81%93%E5%AE%B9%E9%87%8F"><span class="toc-number">1.3.4.</span> <span class="toc-text">信道容量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E9%81%93%E6%9C%80%E5%A4%A7%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E7%8E%87-%E9%87%8D%E7%82%B9"><span class="toc-number">1.3.5.</span> <span class="toc-text">信道最大数据传输率(重点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC%E6%80%A7%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8-%E7%89%B9%E7%82%B9-%E5%88%86%E7%B1%BB-%E6%AF%94%E8%BE%83"><span class="toc-number">1.3.6.</span> <span class="toc-text">引导性传输介质(特点，分类，比较)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E7%BB%A7%E6%A0%88%E5%92%8C%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="toc-number">1.3.7.</span> <span class="toc-text">中继栈和多路复用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A4%E6%8D%A2"><span class="toc-number">1.3.8.</span> <span class="toc-text">交换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82"><span class="toc-number">1.4.</span> <span class="toc-text">第三章 数据链路层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E7%82%B9"><span class="toc-number">1.4.1.</span> <span class="toc-text">结点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%B7%AF"><span class="toc-number">1.4.2.</span> <span class="toc-text">链路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF"><span class="toc-number">1.4.3.</span> <span class="toc-text">数据链路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%82%B9%E5%88%B0%E7%82%B9%E9%80%9A%E4%BF%A1-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82-%EF%BC%9A"><span class="toc-number">1.4.4.</span> <span class="toc-text">点到点通信(数据链路层)：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF%E9%80%9A%E4%BF%A1-%E4%BC%A0%E8%BE%93%E5%B1%82-%EF%BC%9A"><span class="toc-number">1.4.5.</span> <span class="toc-text">端到端通信(传输层)：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%BE%8B%E8%AF%B4%E6%98%8E%E4%B8%89%E7%A7%8D%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.4.6.</span> <span class="toc-text">举例说明三种服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="toc-number">1.4.7.</span> <span class="toc-text">数据链路层的主要功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%90%E5%B8%A7%E6%96%B9%E6%B3%95"><span class="toc-number">1.4.8.</span> <span class="toc-text">成帧方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6"><span class="toc-number">1.4.9.</span> <span class="toc-text">差错控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.4.10.</span> <span class="toc-text">滑动窗口协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8D%8E%E5%B8%A6%E6%8A%80%E6%9C%AF"><span class="toc-number">1.4.10.1.</span> <span class="toc-text">捎带技术</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8D%8E%E5%B8%A6%E6%8A%80%E6%9C%AF%E7%9A%84%E4%BC%98%E7%82%B9-%E9%87%8D%E7%82%B9"><span class="toc-number">1.4.10.2.</span> <span class="toc-text">捎带技术的优点(重点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8D%8E%E5%B8%A6%E6%8A%80%E6%9C%AF%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95-%E9%87%8D%E7%82%B9"><span class="toc-number">1.4.10.3.</span> <span class="toc-text">捎带技术带来的问题及解决办法(重点)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E6%96%B9%E6%B3%95-%E9%87%8D%E7%82%B9"><span class="toc-number">1.4.11.</span> <span class="toc-text">流量控制方法(重点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%8D%8F%E8%AE%AE%E7%AA%97%E5%8F%A3%E9%99%90%E5%88%B6"><span class="toc-number">1.4.12.</span> <span class="toc-text">滑动窗口协议窗口限制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E4%BB%8B%E8%B4%A8%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6"><span class="toc-number">1.5.</span> <span class="toc-text">第四章 介质访问控制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aloha"><span class="toc-number">1.5.1.</span> <span class="toc-text">ALOHA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E5%A4%9A%E8%B7%AF%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.5.2.</span> <span class="toc-text">载波监听多路访问协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E7%BA%BF%E5%B1%80%E5%9F%9F%E7%BD%91%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.5.3.</span> <span class="toc-text">无线局域网协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91"><span class="toc-number">1.5.4.</span> <span class="toc-text">以太网</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%BC%E5%88%87%E6%96%AF%E7%89%B9%E7%BC%96%E7%A0%81"><span class="toc-number">1.5.5.</span> <span class="toc-text">曼切斯特编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91mac%E5%AD%90%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.5.6.</span> <span class="toc-text">以太网MAC子层协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%99%90%E5%88%B6%E6%9C%80%E5%B0%8F%E5%B8%A7%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-number">1.5.7.</span> <span class="toc-text">为什么要限制最小帧的长度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E5%85%83%E6%8C%87%E6%95%B0%E9%80%80%E9%81%BF%E6%B3%95"><span class="toc-number">1.5.8.</span> <span class="toc-text">二元指数退避法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E7%BD%91%E7%BB%9C%E5%B1%82"><span class="toc-number">1.6.</span> <span class="toc-text">第五章 网络层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E8%BD%AC%E5%8F%91%E6%95%B0%E6%8D%AE%E5%8C%85%E4%BA%A4%E6%8D%A2"><span class="toc-number">1.6.1.</span> <span class="toc-text">存储转发数据包交换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.6.2.</span> <span class="toc-text">无连接服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.6.3.</span> <span class="toc-text">无连接服务的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E7%94%B5%E8%B7%AF%E5%92%8C%E6%95%B0%E6%8D%AE%E6%8A%A5%E7%BD%91%E7%BB%9C%E6%AF%94%E8%BE%83"><span class="toc-number">1.6.4.</span> <span class="toc-text">虚电路和数据报网络比较</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95"><span class="toc-number">1.6.5.</span> <span class="toc-text">路由算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95"><span class="toc-number">1.6.6.</span> <span class="toc-text">最短路径算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%9D%E7%A6%BB%E7%9F%A2%E9%87%8F%E7%AE%97%E6%B3%95"><span class="toc-number">1.6.7.</span> <span class="toc-text">距离矢量算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E8%B7%AF%E7%94%B1"><span class="toc-number">1.6.8.</span> <span class="toc-text">链路状态路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%E6%A6%82%E5%BF%B5-%E5%8E%9F%E5%9B%A0-%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.6.9.</span> <span class="toc-text">拥塞控制概念，原因，条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ipv4"><span class="toc-number">1.6.10.</span> <span class="toc-text">IPV4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ip%E5%9C%B0%E5%9D%80"><span class="toc-number">1.6.11.</span> <span class="toc-text">IP地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#image-20211201214051094"><span class="toc-number">1.6.12.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E7%BD%91%E6%8E%A9%E7%A0%81"><span class="toc-number">1.6.13.</span> <span class="toc-text">子网掩码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86"><span class="toc-number">1.6.14.</span> <span class="toc-text">子网划分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cidr%E6%97%A0%E7%B1%BB%E5%88%AB%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1"><span class="toc-number">1.6.15.</span> <span class="toc-text">CIDR无类别域间路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nat-%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="toc-number">1.6.16.</span> <span class="toc-text">NAT——网络地址转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82ip%E5%8C%85%E5%92%8C%E5%BA%94%E7%AD%94ip%E5%8C%85%E7%9A%84nat"><span class="toc-number">1.6.17.</span> <span class="toc-text">请求IP包和应答IP包的NAT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nat%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.6.18.</span> <span class="toc-text">NAT存在的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#icmp%E5%8D%8F%E8%AE%AE-internet%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.6.19.</span> <span class="toc-text">ICMP协议(INTERNET控制协议)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bgp%E5%A4%96%E9%83%A8%E7%BD%91%E5%85%B3%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.6.20.</span> <span class="toc-text">BGP外部网关路由协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ipv6"><span class="toc-number">1.6.21.</span> <span class="toc-text">IPV6</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0-%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="toc-number">1.7.</span> <span class="toc-text">第六章 传输层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3"><span class="toc-number">1.7.1.</span> <span class="toc-text">端口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="toc-number">1.7.2.</span> <span class="toc-text">套接字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#udp"><span class="toc-number">1.7.3.</span> <span class="toc-text">UDP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%B4%E9%83%A8%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.7.3.1.</span> <span class="toc-text">头部格式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#udp%E6%8F%90%E4%BE%9B%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">1.7.3.2.</span> <span class="toc-text">UDP提供服务的应用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp"><span class="toc-number">1.7.4.</span> <span class="toc-text">TCP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3"><span class="toc-number">1.7.4.1.</span> <span class="toc-text">端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="toc-number">1.7.4.2.</span> <span class="toc-text">套接字</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tcp%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.7.4.3.</span> <span class="toc-text">TCP服务模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tcp%E5%8D%8F%E8%AE%AE%E4%BA%A4%E6%8D%A2%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8D%95%E4%BD%8D%EF%BC%9A%E6%AE%B5-segment"><span class="toc-number">1.7.4.4.</span> <span class="toc-text">TCP协议交换的数据单位：段(segment)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tcp%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BC%96%E5%8F%B7%E4%B8%8E%E7%A1%AE%E8%AE%A4"><span class="toc-number">1.7.4.5.</span> <span class="toc-text">TCP的数据编号与确认</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tcp%E6%AE%B5%E7%9A%84%E5%A4%B4%E9%83%A8"><span class="toc-number">1.7.4.6.</span> <span class="toc-text">TCP段的头部</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B%E4%B8%8E%E9%87%8A%E6%94%BE"><span class="toc-number">1.7.5.</span> <span class="toc-text">TCP连接建立与释放</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B-tcp%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B"><span class="toc-number">1.7.5.1.</span> <span class="toc-text">三次握手(TCP连接建立)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B-tcp%E8%BF%9E%E6%8E%A5%E9%87%8A%E6%94%BE"><span class="toc-number">1.7.5.2.</span> <span class="toc-text">四次握手(TCP连接释放)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6"><span class="toc-number">1.7.6.</span> <span class="toc-text">TCP拥塞控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%91%E9%80%81%E7%AA%97%E5%8F%A3%E7%9A%84%E6%8E%A7%E5%88%B6%E7%AB%AF"><span class="toc-number">1.7.6.1.</span> <span class="toc-text">发送窗口的控制端</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%85%A2%E5%90%AF%E5%8A%A8%E7%AE%97%E6%B3%95"><span class="toc-number">1.7.6.2.</span> <span class="toc-text">慢启动算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="toc-number">1.7.6.3.</span> <span class="toc-text">具体过程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-number">1.7.7.</span> <span class="toc-text">TCP滑动窗口</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0-%E5%BA%94%E7%94%A8%E5%B1%82"><span class="toc-number">1.8.</span> <span class="toc-text">第七章 应用层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.8.1.</span> <span class="toc-text">DNS——域名解析系统</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6"><span class="toc-number">1.8.2.</span> <span class="toc-text">电子邮件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6%E6%9C%80%E4%B8%BB%E8%A6%81%E7%9A%84%E7%BB%84%E6%88%90%E6%9E%84%E4%BB%B6"><span class="toc-number">1.8.2.1.</span> <span class="toc-text">电子邮件最主要的组成构件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E7%94%A8%E9%80%94%E5%9B%A0%E7%89%B9%E7%BD%91%E9%82%AE%E4%BB%B6%E6%89%A9%E5%85%85mime"><span class="toc-number">1.8.2.2.</span> <span class="toc-text">多用途因特网邮件扩充MIME</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#smtp%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="toc-number">1.8.2.3.</span> <span class="toc-text">SMTP的缺点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mime%E7%9A%84%E7%89%B9%E7%82%B9"><span class="toc-number">1.8.2.4.</span> <span class="toc-text">MIME的特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mime%E5%92%8Csmtp%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">1.8.2.5.</span> <span class="toc-text">MIME和SMTP的关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pop3%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.8.2.6.</span> <span class="toc-text">POP3协议</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#imap-internet-%E9%82%AE%E4%BB%B6%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.8.2.7.</span> <span class="toc-text">IMAP (Internet 邮件访问协议)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%87%E7%BB%B4%E7%BD%91"><span class="toc-number">1.8.3.</span> <span class="toc-text">万维网</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%87%E7%BB%B4%E7%BD%91%E5%BF%85%E9%A1%BB%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.8.3.1.</span> <span class="toc-text">万维网必须解决的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#url%E7%9A%84%E4%B8%80%E8%88%AC%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.8.3.2.</span> <span class="toc-text">URL的一般形式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E6%AC%A1%E6%88%90%E5%8A%9F%E7%9A%84web%E8%AE%BF%E9%97%AE"><span class="toc-number">1.8.3.3.</span> <span class="toc-text">一次成功的Web访问</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

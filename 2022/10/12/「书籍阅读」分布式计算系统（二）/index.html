@@ -1,0 +1,791 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「书籍阅读」分布式计算系统（二） | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  流计算系统Storm 与批处理系统处理静态数据不同，这种大量、快速、时变并持续到达的数据称为流数据(stream data)，针对流数据的计算称为流计算。实时性需求是流计算的显著特征，需要设计相应的流计算系统。 设计思想 Storm流计算系统需要处理的数据以流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「书籍阅读」分布式计算系统（二）">
+<meta property="og:url" content="http://blog.zerorains.top/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  流计算系统Storm 与批处理系统处理静态数据不同，这种大量、快速、时变并持续到达的数据称为流数据(stream data)，针对流数据的计算称为流计算。实时性需求是流计算的显著特征，需要设计相应的流计算系统。 设计思想 Storm流计算系统需要处理的数据以流">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/26.jpg">
+<meta property="article:published_time" content="2022-10-12T09:18:04.000Z">
+<meta property="article:modified_time" content="2022-10-19T09:20:35.072Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/26.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「书籍阅读」分布式计算系统（二）",
+  "url": "http://blog.zerorains.top/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/",
+  "image": "http://blog.zerorains.top/img/26.jpg",
+  "datePublished": "2022-10-12T09:18:04.000Z",
+  "dateModified": "2022-10-19T09:20:35.072Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「书籍阅读」分布式计算系统（二）',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/26.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「书籍阅读」分布式计算系统（二）</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「书籍阅读」分布式计算系统（二）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-12T09:18:04.000Z" title="发表于 2022-10-12 17:18:04">2022-10-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-19T09:20:35.072Z" title="更新于 2022-10-19 17:20:35">2022-10-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答)</p>
+<p>(ps：本文只是粗略记录，想了解具体细节还是建议要看原书)</p>
+</blockquote>
+<h2 id="流计算系统storm">流计算系统Storm</h2>
+<p>与批处理系统处理静态数据不同，这种大量、快速、时变并持续到达的数据称为流数据(stream data)，针对流数据的计算称为流计算。实时性需求是流计算的显著特征，需要设计相应的流计算系统。</p>
+<h3 id="设计思想">设计思想</h3>
+<p>Storm流计算系统需要处理的数据以流的形式存在，理论上是无界，并且计算要持续进行。Storm系统将流数据抽象为无界的元组序列，并使用拓扑抽象计算过程。</p>
+<h4 id="连续处理">连续处理</h4>
+<p><strong>批处理系统在获取全部要处理的数据时，就开始计算这批数据，计算结束后就自动结束进程</strong>。而流计算系统的输入数据是无界的，任务本身需要长期运行在计算节点上，简单来说，就是负责执行计算任务的现成或进程需要长期驻留在系统中。</p>
+<p><strong>连续处理是执行流计算的一种直观的方式，输入的流数据记录不断地进入系统，计算任务长期驻留在计算节点并且更新自身的状态</strong>。其中，状态是一种特殊的数据，用于保存从流计算开始到目前为止得到的计算结果，对于流计算系统而言非常重要。</p>
+<h4 id="数据模型">数据模型</h4>
+<p>Storm将流数据看做一个无界的、连续的元组序列。该序列中的元组类似于关系数据库中的元组，一个元组即为系统处理的一条记录，每条记录包含若干字段。字段类似于关系数据库中的属性，可以是基本类型，字符类型、字节数组等。如下图：</p>
+<p><img src="https://blog.zerorains.top/img/07.1Sotrm%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B.png" alt="07.1Sotrm数据模型"></p>
+<h4 id="计算模型">计算模型</h4>
+<p>Storm使用拓扑抽象描述计算过程，拓扑是由Spout和Bolt组成的网络，在逻辑上是一个有向无环图。顶点为Spout或Bolt，用于描述数据处理逻辑，并且定义了输入和输出元组的模式。</p>
+<p>通常Spout是流数据的源头，负责从数据源不断地读取数据，然后封装成元组形式发送给Bolt。Bolt描述针对流数据的转换过程，其内封装了消息处理逻辑，负责将接收的流数据转换为新的流数据。</p>
+<p>Storm在物理设计时的主要思想是利用分布式架构降低数据处理的延迟，因而拓扑中的Bolt在物理上由若干个任务实现，如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221013101547174.png" alt="image-20221013101547174"></p>
+<blockquote>
+<p>这种使用拓扑的抽象描述有什么好处呢？拓扑的抽象描述在直观的感觉上就是一个有向图，图中的节点只有两种结构Spout和Bolt，由于流计算的输入是不断进行的，在每一个节点的计算都是不断进行的，于是使用拓扑的方式，解释起来会更加轻松。因为，可以将一连串的输入看成一条线，然后在图中的节点进行传递，根据节点中相连的边，可以更直观地感受流数据的流动方向。</p>
+</blockquote>
+<h3 id="体系架构">体系架构</h3>
+<h4 id="架构图">架构图</h4>
+<p>Storm也是采用&quot;主从&quot;架构，主、从节点之间的协调和控制依赖于ZooKeeper，具体架构图如下：</p>
+<p><img src="https://blog.zerorains.top/img/07.2Storm%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="07.2Storm架构图"></p>
+<ol>
+<li>Nimbus：主节点运行的后台程序，充当管理员的角色。存储用户提交的Topology程序代码，并负责分发代码，分配任务和检测故障等。</li>
+<li>Supervisor：从节点运行的后台程序，负责监听所在机器的工作，根据Nimbus分配的任务决定启动或停止Worker进程，一个从节点上同时运行若干Worker进程。</li>
+<li>ZooKeeper：负责Nimbus和Supervisor之间的协调工作。Supervisor的地址以及作业的元信息均存储于ZooKeeper中。若Nimbus进程或Supervisor进程以外终止，则重启是需要读取ZooKeeper的数据进行恢复。</li>
+<li>Worker：负责任务运行的进程，进程内部运行一个或多个Executor线程，从而实际执行任务。</li>
+</ol>
+<p>Storm与MapReduce、Spark对比</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>MapReduce</th>
+<th>Storm</th>
+<th>Spark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>系统进程</td>
+<td>JobTracker</td>
+<td>Nimbus</td>
+<td>Master</td>
+</tr>
+<tr>
+<td>系统进程</td>
+<td>TaskTracker</td>
+<td>Supervisor</td>
+<td>Worker</td>
+</tr>
+<tr>
+<td>系统进程</td>
+<td>Child</td>
+<td>Worker</td>
+<td>CoarseGrainedExecutorBackend</td>
+</tr>
+<tr>
+<td>工作线程</td>
+<td>-</td>
+<td>Executor</td>
+<td>Task</td>
+</tr>
+<tr>
+<td>任务代码</td>
+<td>Task</td>
+<td>Task</td>
+<td>Task</td>
+</tr>
+<tr>
+<td>基础接口</td>
+<td>Map/Reduce</td>
+<td>Spout/Blot</td>
+<td>RDD API</td>
+</tr>
+</tbody>
+</table>
+<h4 id="应用程序执行流程">应用程序执行流程</h4>
+<p><img src="https://blog.zerorains.top/img/image-20221013110028139.png" alt="image-20221013110028139"></p>
+<ol>
+<li>用户编写程序，经过序列化、打包并提交给主节点Nimbus</li>
+<li>Nimbus创建一个组件与物理节点的对应关系文件，并将该文件原子地写入ZooKeeper中的某一Znode</li>
+<li>所有的Supervisor监听ZooKeeper中的Znode以得到通知，从而获取所在节点需要执行的组件任务。</li>
+<li>Supervisor从Nimbus处拉取可执行的代码</li>
+<li>Supervisor启动若干Worker进程执行具体的任务</li>
+<li>Worker进程根据从ZooKeeper中获取的文件信息启动若干Executor线程，该线程负责执行组件所描述的任务。</li>
+</ol>
+<p>Executor线程执行同一个组件的一个或多个任务，但通常只执行一个任务，如果执行多个任务，这些任务必然属于同一个组件，并且由Executor线程串行执行。Spout和Bolt组件的Task数量是不变的，因此对Topology中组件并行度的动态调整实际上是通过改变Executor的数量完成的。</p>
+<h3 id="工作原理">工作原理</h3>
+<p>Storm系统在数据输入、转换以及输出的过程中，由Spout负责数据的输入，而Bolt负责数据的转化以及输出。不同组件之间是通过元组传输进行的，为了完成元组传输需要解决如下问题：</p>
+<ol>
+<li>对流数据来说，上游组件的任务发送哪些元组给下游组件的任务</li>
+<li>对于一条元组来说，上游组件的任务如何向下游组件的任务传递</li>
+</ol>
+<p>Storm通过流数据分组策略(steam grouping)确定元组传输的方式，且发送的过程一次只传递一条元组。</p>
+<blockquote>
+<p>Spark Streaming中有一个逆函数的机制，可以减少窗口计算时的重复计算。而Storm中好像是没有这样的一个机制的。其实可以像Flink一样添加一个Acker进程，用于在对应的节点记录计算状态。同时Storm只有Bolt和Spout两种接口，和MapReduce有着相似的弊病，就是用于描述数据计算的API过少，造成了用户需要手动编写大量的计算处理代码，使用比较麻烦。</p>
+</blockquote>
+<h4 id="流数据分组策略">流数据分组策略</h4>
+<p>流数据分组策略定义了两个存在订阅关系的组件之间进行元组传输的方式。常见流数据分组策略如下：</p>
+<ol>
+<li>随机分组(shuffle grouping)：随机分发元组，保证下游组件任务接收元组的数量大致相当</li>
+<li>按字段分组(fields grouping)：保证指定字段内容相同的元组分配到同一个任务中</li>
+<li>部分按字段分组(partial key grouping)：与按字段分组类似，但当数据倾斜时下游组件的任务之间会进行负载均衡。</li>
+<li>广播分组(all grouping)：每个任务均会收到所有的元组</li>
+<li>全局分组(global grouping)：所有的元组均发送到同一个任务中</li>
+<li>不分组(non grouping)：目前和随机分组一致</li>
+<li>直接分组(direct grouping)：允许上游组件直接指定其发出的元组由下游组件的哪个任务接收并处理</li>
+<li>本地或随机分组(local or shuffle grouping)：入股下游组件有一个或多个任务与上游组件的任务处于同一个Worker进程中，则元组将被随机分发到该进程的任务中。</li>
+</ol>
+<blockquote>
+<p>为什么要使用分组策略？分组策略可以有效地指定流数据中的数据将流向哪一个计算节点，同时按照不同的分组策略使其满足一定的条件。在一些情况下，如果不同类型的数据需要进行不同的处理，则可以通过分组策略，将数据进行划分，交给不同的算子进行处理。</p>
+</blockquote>
+<h4 id="元组传递方式">元组传递方式</h4>
+<p>Storm采用一次一元组(一次一记录)的消息传递机制，一档上游组件的任务处理完毕一条元组，则立即发送给下游组件的任务，并且一次发送一条元组。这种立即发送的消息传递机制有利于减少处理的延迟，从而满足实时性需求。</p>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>主节点的Nimbus发生故障：系统无法接受新的作业，但运行当前作业的从节点Supervisor和Worker仍可以继续工作。
+<ol>
+<li>如果某个Worker发生故障，则所在节点的Supervisor可以试图重启Worker进程</li>
+<li>但Nimbus无法正常工作，因此无法将该Worker调度到其他节点并重新启动</li>
+<li>为了保证高可用性，Storm可以配置一个Nimbus列表，以其中一节点为主Nimbus，其余节点作为备Nimbus，元信息存储在所有主、备Nimbus或可靠的外部分布式存储系统中。一旦Nimbus发生故障，则系统将从备Nimbus中选择一个作为新的Nimbus</li>
+</ol>
+</li>
+<li>仅Supervisor出现故障：Worker进程会继续执行，利用外部监控程序判断该节点能够重启Supervisor，如果可以就重启，否则Nimbus将在其他节点启动新的Supervisor进程，所有受其监控的Worker进程均需重新调度。</li>
+<li>仅Worker出现故障：Supervisor会试图重启Worker。若无法成功重启，Nimbus将命令其他节点的Supervisor启动Worker进程。</li>
+<li>Worker和Supervisor同时故障：Nimbus将命令其他节点的Supervisor启动Worker进程</li>
+</ol>
+<h4 id="容错语义">容错语义</h4>
+<p>Worker中的Executor线程负责执行处理组件的任务，一旦Worker发生故障即表示进入节点的信息可能由Executor线程负责的Task处理，也可能未经处理即随着故障的发生而丢失。因此，<strong>容错保障还需要考虑语义的正确性，理想情况下，可靠的容错保障应该使得流计算系统正常运行所处理的消息与发生故障重启后处理的消息完全一致</strong>，通常有以下3个级别：</p>
+<ol>
+<li>至多一次(at most once)：消息可能会丢失</li>
+<li>至少一次(at least once)：消息不会丢失，但可能会重复</li>
+<li>准确一次(exactly once)：消息不丢失，不重复</li>
+</ol>
+<p>仅重启Worker，则容错语义的级别为至多一次。原生Storm系统将Spout发出的每一条元组及其后续衍生得到的元组视为一棵元组树，如果该元组树的所有元组均由系统成功输出，则表示源元组得到成功处理。<strong>Storm使用ACK机制对元组树中的元组进行确认</strong>，一旦元组树中的某一元组因故障而无法得到确认，则系统从Spout将元组进行重放。</p>
+<blockquote>
+<p>因为Storm执行过程中，会出现因只有一个元组没得到确认而全部重放的情况，所以这种方式达到至少一次的容错语义</p>
+</blockquote>
+<h4 id="元组树">元组树</h4>
+<p>Spout中的每条元组对应一棵元组树。在Storm中，Spout发出元组时用户可以为其指定标识，称为Spout-Tuple-id（STid），STid可以是任意对象，在后续Bolt处理中，该标识会传递给新的元组。如果Spout中的多个元组共用一个STid，则在逻辑上将这些元组及其衍生元组构成一棵元组树。</p>
+<p>如下图所示，椭圆形表示Tuple1，并将STid1绑定在Tuple1上面，Tuple1会随着拓扑结构流向Bolt E中。值得注意的是，如果Tuple1在拓扑中经过其他Bolt节点产生了新的Tuple，也将这些Tuple绑上STid1。只有在拓扑结构的最终节点处理完对应STid1的数据后，Tuple1才算处理完成。当然也可以在Spout中给多个Tuple1绑上相同的STid，但只有所有的Tuple都在拓扑结构中处理完成，才算结束，如果其中一部分Tuple没有处理成功，则这一部分的Tuple都得重新再来。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221015221130716.png" alt="image-20221015221130716"></p>
+<h4 id="ack机制">ACK机制</h4>
+<p>在Storm中存在一类特殊的任务，叫做Acker，负责跟踪Spout发出的元组及其元组树。Acker的数量的默认值为1，用户编程是可以设置拓扑中的Acker数量。</p>
+<p>元组树中的元组传输在物理上表现为组件的任务之间的消息传输，该消息包含一个64位标识，称为Mid(里面包含有STid)。如果正常传输，上游组件的任务发送消息的Mid和下游组件的任务接收消息的Mid相同，同时任务发送消息和任务接收消息时，都会向Acker进行报告。在Acker中会对报告的Mid和STid进行记录，其维护类似<code>&lt;STid,ack_val&gt;</code>的映射表。当收到Spout发送的消息时<strong>将相应的STid的ack_val初始化为0</strong>。然后在后面计算过程中，<strong>不论是收到任务发送消息的Mid还是收到任务接收消息的Mid都会将其STid与映射表中STid对应的ack_val做异或操作</strong>。如果ack_val为0，则Acker会告知相应的Spout，表示对应的STid已经处理完毕。</p>
+<p>对于设置了多个Acker的情况，Storm会使用一致性哈希将一个STid对应到Acker上，从而使多个Acker之间不会互相干扰。</p>
+<blockquote>
+<p>有没有ack_val为0，但是元组树没有处理完的情况？有可能，比如Spout A 发送Mid1给Bolt B并向Acker汇报，然后Bolt B接收Spuout发来的Mid并向Acker汇报，这时候对应STid的ack_val正好为0，但元组树并未执行完成。然而，系统中消息接收和发送是并发进行的，因此发生这种情况的可能性很低。</p>
+</blockquote>
+<h4 id="消息重放">消息重放</h4>
+<p>若Acker在设定时间范围内收到处于拓扑末端Bolt的报告并且STid对应的ack_val为0，则Storm将任务系统成功处理了STid的元组树。如果Worker进程发生故障，导致没能出现正确的情况，<strong>就需要Spout重新发送以STid为标识的元组，但是该消息重放机制可能会导致消息的重复计算，实现了至少一次的容错语义</strong>。</p>
+<p>举个例子，如下图，Bolt C发生了故障，此时Sotrm认为消息传输出了故障，需要Spout重新发送以STid为标识的元组，因此Mid1、Mid2、Mid4为表示的消息中的元组因重放而被系统计算了两次，所以也达成了至少一次的容错语义。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221015224729900.png" alt="image-20221015224729900"></p>
+<h2 id="流计算系统spark-streaming">流计算系统Spark Streaming</h2>
+<p>Spark Streaming 能够将连续的流数据进行离散化后交给Spark批处理系统。</p>
+<h3 id="设计思想">设计思想</h3>
+<h4 id="微批处理">微批处理</h4>
+<p>**微批处理方式对批处理系统进行改造，将流计算作业转化为一小组微小的批处理作业。批处理系统能够较快地执行这些微小的批处理作业，从而满足流计算低延迟的需求。**在未批处理方式中，批处理引擎处理完毕一批数据后，负责x处理该批数据的任务即结束，而不是像Storm的连续处理方式一样长期驻留，这是微批处理和连续处理的重要区别。</p>
+<h4 id="数据模型">数据模型</h4>
+<p>Storm采用连续处理方式，其数据模型将流数据看作一系列连续的元组。Spark Streaming采用微批处理方式，将连续的流数据进行切片(离散化)，生成一系列小块数据。值得注意的是，流数据经过离散化后得到的每一个小批量数据都是一个独立的RDD，一个RDD通常包括若干分区。将流数据离散化出的一组组RDD序列抽象为离散化的流(discretized stream, DStream)。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016100145717.png" alt="image-20221016100145717"></p>
+<h4 id="计算模型">计算模型</h4>
+<p>输入DStream由一组RDD序列构成，这些RDD都会得到相同的处理，与Spark批处理相比，Spark Streaming与Spark拥有几乎相同的API（map, reduceByKeyAndWindow等），其只是在处理流数据时进行了微批处理，使用DStream作为抽象数据，使用与Spark几乎相同的API，也有着基于Operator DAG和Lineage的逻辑计算结构和物理计算结构。与Spark不同的是，Spark Streaming在每一个时间处理的微批数据是不同的，而Spark则是读入所有数据后直接进行处理。</p>
+<p>举个例子，加入输入数据以流形式发送文本语句，目标为统计过去2s内的单词即词频，每隔1s统计一次。从Operator DAG角度看待这个问题的逻辑计算模型和物理计算模型如下图：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016101929321.png" alt="image-20221016101929321"></p>
+<p>从DStream Lineage角度来看到这个问题的计算模型和物理计算模型如下图。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016102648290.png" alt="image-20221016102648290"></p>
+<p>在<code>ReduceByKeyAndWindows</code>和<code>DStream C</code>中，不同批次间的RDD同样存在一条连线，这说明某些算子在语义上是跨批次的。</p>
+<h3 id="体系架构">体系架构</h3>
+<h4 id="架构图">架构图</h4>
+<p>从物理架构上看，Spark Streaming和Spark相同，不同的是Spark Streaming对驱动器和执行器部件进行了拓充。</p>
+<p><img src="https://blog.zerorains.top/img/8.2SparkStraming%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="8.2SparkStraming架构图"></p>
+<ol>
+<li>驱动器：StreamingContext对SparkContext进行了拓充，构造了StreamingContext，包含用于管理流计算的元数据</li>
+<li>执行器：负责运行任务以执行相应的算子操作，其中作为接收者(Receiver)的某些任务负责从外部数据源持续获取流数据，这和Spark批处理引擎中读取输入数据的方式不同。</li>
+</ol>
+<h4 id="应用程序执行流程">应用程序执行流程</h4>
+<p><img src="https://blog.zerorains.top/img/08.2SparkStram%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png" alt="08.2SparkStram执行流程"></p>
+<ol>
+<li>启动驱动器。以Standalone为例，集群管理器由Master和Worker构成。如果使用Client部署方式，则客户端直接启动驱动器，并向Master注册。如果使用Cluster部署方式，则客户端将应用程序提交给Master，由Master选择一个工作节点启动驱动器进程(DriverWrapper)</li>
+<li>由驱动器创建StreamingContext，向集群管理器进行资源申请，并由驱动器进行任务分配和监控。</li>
+<li>集群管理器令工作节点启动执行器进程，该进程内部以多线程的方式运行</li>
+<li>执行器进程向驱动器进行注册</li>
+<li>StreamingContext根据DStream的Opeator DAG，生成关于RDD转换的Operator DAG，从而将其交给执行器进程中的线程以执行任务。</li>
+</ol>
+<h3 id="工作原理">工作原理</h3>
+<p>Spark Streaming将数据流分解为一系列短小的批数据，交给底层的Spark批处理引擎。在Spark Streaming中需要将DStream的转化操作转化为Spark中对RDD的转换操作，生成关于RDD操作的DAG。简单来说，就是Spark Steaming执行包括两个部分，一个部分是将输入的流数据分解成一批一批的RDD，第二部分是将用户对DStream转化的描述，转化为对RDD操作的Spark转化描述。再由生成的对RDD的转化执行在第一部分中产生的一批批RDD中。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016112901918.png" alt="image-20221016112901918"></p>
+<blockquote>
+<p>为什么要对DStream的操描述转化成对RDD操作？Spark Streaming本质上还是使用Spark的方式进行计算，但是其采用微批处理的方式，实现了流计算。DStream的操作描述是为流计算设计的，而不是为Spark设计的，因此要使用Spark完成相应的计算，还是需要将DStream的操作描述，转换为RDD的操作，才能交给Spark进行计算。同时流数据在Spark Streaming中，会被分成一批批的RDD，DStream的操作描述也不能直接作用于RDD，只有Spark中的操作，才能直接作用于RDD。</p>
+</blockquote>
+<h4 id="数据输入">数据输入</h4>
+<p>对于一个Spark Streaming应用程序来说，其输入数据可以来自一个或多个流。系统接收数据的方式有两种一种：</p>
+<ol>
+<li>从外部数据源直接获取数据：从socket端口获取网络数据或接收外部传感器产生的数据。
+<ol>
+<li>Spark Streaming确保新输入的数据在两个工作节点得到备份后才会向客户端发送确认信息，旨在支持系统容错。</li>
+</ol>
+</li>
+<li>从外部的存储系统周期性地得去数据：其他应用系统将其日志存入HDFS等分布式存储系统中。Spark Streaming从其中周期性地读取日志数据。
+<ol>
+<li>虽然HDFS中的数据一般用于批处理，但是依然能够以流的方式读取此类数据。</li>
+</ol>
+</li>
+</ol>
+<h4 id="数据转换">数据转换</h4>
+<p>Spark Streaming中的操作可以分为四类：类似RDD转换的操作，使用RDD转换的操作，窗口操作和状态操作。</p>
+<p>比如Spark Streaming中的map操作，从执行结果上他与Spark的map操作相同，但是在实际执行过程中，DStreaming的每个批次都是一个RDD，Spark Streaming中的<strong>map操作需要转换成一个或多个Spark的RDD操作，这样才能将Spark Streaming的实际计算过程交给底层的Spark框架</strong>(DStream转化的Operator DAG转变为描述RDD转换的Operator DAG)。</p>
+<p>窗口是流计算中常用的操作，由于流计算中的输入数据理论上是无界的，窗口可以为流动的数据指定一定的计算范围，并且每隔一定间隔指定一次。Spark Streaming支持以时间为单位的窗口操作。(因为微批处理是按照时间进行分批的，所以对应的时间窗口相对好操作)</p>
+<p>根据窗口大小和间隔之间的关系，可以将窗口分为下面3类：</p>
+<ol>
+<li>滑动窗口（sliding window）：窗口大小大于间隔</li>
+<li>固定窗口（fixed window）：窗口大小等于间隔</li>
+<li>跳跃窗口（tumbling window）：窗口大小小于间隔</li>
+</ol>
+<p>在Spark Streaming的reduceByKeyAndWindows提供了使用逆函数的API，举个例子，当进行两个时刻的窗口计算时，后一时刻的计算结果与前一时刻的计算结果存在比较大的重合部分，于是就<strong>可以定义逆函数利用前一时刻计算结果进行少量操作得到后一时刻的计算结果</strong>(而不是在后一时刻重新计算所有数据)，通过这种方式实现了增量式计算，提高了计算效率。下图为区间计数的例子：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016150926350.png" alt="image-20221016150926350"></p>
+<p>状态是流计算系统与批处理系统存在显著差异之处。<strong>如果某一操作保存的数据将在新数据到达后进行的计算中重新使用，则保存的数据即为状态</strong>。在直接提到的计算重合部分，就需要在对应的windows中进行局部统计并保存，这个“局部”统计的结果就是状态，在Spark Streaming中以RDD的形式存在。对于每一小批数据在计算过程中产生的RDD，可将其中参与后续批次计算的RDD视为状态。<strong>DStream中涉及到多个小批次数据的转换操作称为有状态的操作，反之则为无状态的操作</strong>。Spark Streaming也提供了一种特殊的，直接针对状态进行转换的操作<code>updateStateByKey</code>，本质上是针对状态RDD进行用户定义的转换操作。</p>
+<h4 id="数据输出">数据输出</h4>
+<p>Spark在遇到动作操作时就会触发DAG的生成，但是Spark Streaming中并没有行动操作的概念，而是<strong>遇到输出操作就生成DAG</strong>，这些DAG是已经转换成了Spark中的RDD操作的DAG，因此是可以交给Spark框架进行执行的。值得注意的是在Spark Streaming中可以由多个count(在Spark中是动作操作)，但是在执行翻译好的DAG时却不会执行动作操作，这是因为在翻译过程中Spark Streaming将count转换操作转化成了其他的RDD操作。</p>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>集群管理器故障：导致系统无法正常工作，需要重新启动或借助ZooKeeper实现高可用性</li>
+<li>客户端故障：如果其没有和驱动器运行在一个进程中，则只要作业成功提交给系统则不会影响系统中作业的运行。</li>
+</ol>
+<h4 id="基于rdd-lineage容错">基于RDD Lineage容错</h4>
+<p>执行器发生故障，并且执行器不包含Receiver任务，则表示只有负责数据处理的任务受到了影响。因此执行器中运行的任务实际为底层Spark批处理引擎的任务，这种情况下可以使用Spark批处理引擎的容错机制进行恢复（即使用数据根据RDD的Lineage进行重新计算）。</p>
+<h4 id="基于日志的容错">基于日志的容错</h4>
+<p>基于日志的容错策略可以解决含有Receiver的执行器故障的问题。如果执行器和Receiver同时故障，则只能从外部存储中重新获取数据，但是这时候Receiver经过重启之后，又会接收新的数据，这时候就存在应该获取那些数据以及是否存在重复读取的数据等问题。</p>
+<p>因此Spark Streaming的<strong>Receiver需要使用日记记录已经获取的数据，Receiver接收数据后除将其存入本地执行器的内存外，还会以日志的新式存入外部的文件系统</strong>。作业中可能运行多个Receiver，所有Reciever向驱动器汇报自己读取的数据信息，驱动器同样将这些信息写入日志，从而掌握整个作业读取到的数据情况：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016155457532.png" alt="image-20221016155457532"></p>
+<p>当执行器发生故障重启后，Receiver从外部文件系统加载日志并<strong>重新读取输入数据，确保不重复读取日志中已经存在的数据</strong>。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016155910146.png" alt="image-20221016155910146"></p>
+<h4 id="基于检查点的容错">基于检查点的容错</h4>
+<p>基于RDD Lineage的容错可以结合检查点使用避免重复计算。该类检查点称为数据检查点，本质也是RDD检查点。</p>
+<p>除数据检查点外，为了支持驱动器的故障恢复，Spark Streaming还需设置元组数据检查点。元数据检查点包含以下内容：</p>
+<ol>
+<li>配置信息：创建Spark Streaming应用程序的配置信息</li>
+<li>DStream操作信息：定义应用程序计算逻辑的DStream操作的信息</li>
+<li>未处理的批次数据的信息：正在排队尚未处理的批次数据的信息</li>
+</ol>
+<p>驱动器将检查点写入可靠的外部文件系统，当发生驱动器故障并重启后，驱动器从外部文件系统加载元数据检查点以及日志，根据这些信息继续进行计算。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016160434514.png" alt="image-20221016160434514"></p>
+<p>在Spark Streaming的检查点中，包含数据检查点和元数据检查点。数据检查点旨在加快执行器发生故障后的回复过程，元数据检查点旨在保证驱动器能够从故障中回复到正常状态。</p>
+<h4 id="端到端的容错语义">端到端的容错语义</h4>
+<p>Spark Streaming的容错机制能够保证准确一次的容错语义。但还要<strong>考虑提供数据源和接收处理结果的问题</strong>，如果提供数据源的系统无法支持数据的重放，那么即便Spark Streaming中的Receiver因故障重启，也无法重新获取丢失的数据。因此，对于整个流计算系统，还需提供数据源和接收处理结果的系统能够支持准确一次的容错语义。</p>
+<h2 id="批流融合基础">批流融合基础</h2>
+<h3 id="批流融合的背景">批流融合的背景</h3>
+<p>批处理适用于处理大批量数据、对实时性要求不高的场景。</p>
+<p>流计算系统适用于处理快速产生的数据，对实时性要求较高的场景。</p>
+<p>存在一些应用场景需要同时使用批处理和流数据，比如微博热门话题的统计，对于已有的微博需要使用批处理的方式进行统计，而最新产生的微博则需要通过流计算进行统计，此外，新产生的部分经过一段时间后，也需要使用批处理进行处理。因此，批流融合的应用场景也是比较常见的。</p>
+<h3 id="lambda架构及其局限性">Lambda架构及其局限性</h3>
+<p>Lambda架构认为数据处理系统由数据和查询两部分组成，理想状态下的表达式为：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>q</mi><mi>u</mi><mi>e</mi><mi>r</mi><mi>y</mi><mo>=</mo><mi>f</mi><mi>u</mi><mi>n</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo stretchy="false">(</mo><mtext>all data</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">query = function(\text{all data})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.03588em;">ery</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">c</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord text"><span class="mord">all data</span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>即针对所有数据的查询可以得到正确的结果。但通常数据量都很大，查询很难得到快速响应，实时查询也需要消耗大量的资源。</p>
+<p>一种解决方案就是针对查询进行预计算，所得的结果称为批处理视图(batch view)。当需要执行查询操作时，则可以从批处理视图中读取结果。查询过程的表达式变为：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>bactch view</mtext><mo>=</mo><mi>f</mi><mi>u</mi><mi>c</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mtext>all data</mtext><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mi>q</mi><mi>u</mi><mi>e</mi><mi>r</mi><mi>y</mi><mo>=</mo><mi>f</mi><mi>u</mi><mi>n</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mtext>batch view</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{bactch view} = fucntion_1(\text{all data})\\
+query = function_2(\text{batch view})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">bactch view</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">all data</span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.03588em;">ery</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">c</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">batch view</span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>但这个思路还忽略了一个重要的问题：数据往往是快速，动态增加的，因而批处理视图的结果存在一定的滞后性。为了解决这个问题，Lambda架构将数据处理系统分为以下3个层次：</p>
+<ol>
+<li>批处理层(batch layer)：离线批处理数据，生成批处理视图</li>
+<li>加速层(speed layer)：实时处理新数据，增量补偿批处理视图</li>
+<li>服务层(serving layer)：响应用户的查询请求</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20221016163215893.png" alt="image-20221016163215893"></p>
+<p>实时获取所有数据并进行查询通常也是比较难实现的，因此Lambda架构将所有数据视为主数据集(master dataset)和新数据(new data)的组合。主数据主要用于批处理层，生成批处理视图，但是在接收到新数据时，批处理层又要重新计算，并且等到批处理计算完成之后，服务层的批处理视图才会更新，这就导致服务层查询的数据并不是最新的结果。于是引入了加速层，其只处理最新的数据，并生成实时视图(real-time view)以补偿批处理视图的不足，加速层在接收到新数据时会不断地更新视图，使用增量算法对批处理视图陈旧的结果进行补偿，从而降低查询延迟。所以Lambda的最终架构可以使用下面的表达式表示:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>batch view</mtext><mo>=</mo><mi>f</mi><mi>u</mi><mi>c</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mtext>master dataset</mtext><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mtext>real-time view</mtext><mo>=</mo><mi>f</mi><mi>u</mi><mi>c</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mtext>real-time, view, new data</mtext><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><mi>q</mi><mi>u</mi><mi>e</mi><mi>r</mi><mi>y</mi><mo>=</mo><mi>f</mi><mi>u</mi><mi>c</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>3</mn></msub><mo stretchy="false">(</mo><mtext>batch view, real-time view</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{batch view} = fucntion_1(\text{master dataset})\\
+\text{real-time view} = fucntion_2(\text{real-time, view, new data})\\
+query =fucntion_3(\text{batch view, real-time view})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">batch view</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">master dataset</span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">real-time view</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">real-time, view, new data</span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal" style="margin-right:0.03588em;">ery</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">u</span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">batch view, real-time view</span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>Lambda架构可以融合批处理和流计算两类系统，在一定程度上平衡了重新计算和延迟之间的矛盾，但是，在该架也存在明显的缺点：</p>
+<ol>
+<li>Lambda架构的开发人需要将所有算法那在批处理层和加速层实现两次。并且要求查询结果为两个系统结果的合并，大大增加了开发的复杂度。</li>
+<li>Lambda架构的运维人员需要同时维护批处理和流计算两套执行引擎，增加了运维的复杂度。</li>
+</ol>
+<h3 id="批处理与流计算的统一性">批处理与流计算的统一性</h3>
+<p>这里先要引入有界数据和无界数据的概念</p>
+<p>有界数据：表示系统处理的数据有限</p>
+<p>无界数据：表示系统可以处理无限的数据</p>
+<p>批处理/流计算系统表示底层特定的执行引擎，在实际应用中，无界数据集可以使用批处理系统反复调度处理，经过良好设计的流计算系统也可以完美地处理有界数据集。</p>
+<h4 id="窗口操作">窗口操作</h4>
+<p><strong>窗口操作可以将数据集切分为有限的数据片，以便针对该数据片进行处理</strong>。对于无界数据，诸如聚合等操作需要使用窗口定义边界，映射和过滤则不需要。对于有界数据来说，窗口是可选的，或者说默认有一个窗口包含了有界数据的所有数据。</p>
+<p>从基于的要素来看，窗口可以分为<strong>基于时间的窗口和基于记录数的窗口</strong>。按照窗口大小和间隔之间的关系，可以将窗口分为滑动窗口，固定窗口和跳跃窗口。还有一种较为特殊的基于时间的会话窗口(session windows)，一般按照超时时间定义，任何在超时时间内的记录均视为属于同一个会话。</p>
+<h4 id="时间域">时间域</h4>
+<p>对于一条记录来说，其涉及事件时间和处理时间</p>
+<ol>
+<li><strong>事件时间</strong>是指产生该记录的事件实际发生的时间(记录产生时其所在系统的当前时间)</li>
+<li><strong>处理时间</strong>是指在系统执行数据处理的过程中，一条记录被数据处理系统观察到的时间(该记录被数据处理系统处理时数据处理系统的当前时间)</li>
+</ol>
+<p>一条记录的事件时间永远不变，但处理时间随着记录在系统中各个物理节点的流动而持续变化。基于时间的时间窗在计算过程中到了对应的计算时间仍然拿不到完整的数据，举个例子，比如统计<code>[12:00:00,12:01:00]</code>的事件时间记录，当系统时间到达<code>12:01:00</code>时，仍然可能有<code>12:00:54</code>的记录并传递到系统中，因此此时系统处理的这个时间时间窗处理的数据并不完整。</p>
+<p>从上面的描述中可知，记录的事件时间总是和记录时间存在一定偏差值。对于有界数据而言，因为总是能获取所有数据，所以偏差并没有太大的影响；而对于无界数据而言，由于无法获取所有的数据，如果无法判断系统当前处理时间与记录时间时间之间存在的差值，则将直接影响应用的系统。</p>
+<p>为了衡量处理时间和事件时间之间的差值，需要引入水位线的概念。其是一个时间时间戳，指示的事件时间表示早于该时间时间的记录已经完全被系统观测，因此系统可根据水位线“认定”当前时间时间域所处的时间。下图为水位线的示例，立项状态下的水位线应该是一条斜率为1的直线。点状虚线为实际的水位线，这个图的看法一般是从处理时间开始看，因为处理时间是系统真正的时间，然后从图中红线部分可以看到<code>12:03:00</code>时，对应到<code>12:02:10</code>左右。这表明在系统时间为<code>12:03:00</code>时，<code>12:02:10</code>以前的数据都已经读取完成，这时候计算<code>12:02:10</code>之间的事件窗口，能包含所有的数据。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016203037150.png" alt="image-20221016203037150"></p>
+<h3 id="dataflow统一编程模型">Dataflow统一编程模型</h3>
+<p>Dataflow编程模型将所有输入数据均视为无界数据集，仅将有界数据集视为无界数据集的一个特例。将数据集视为记录的集合，变成模型处理的输入数据存在以下特点：</p>
+<ol>
+<li>无界(unbounded)：由于记录在数据处理系统中是不断动态到达且永无止境的，因此输入数据是无界的。</li>
+<li>延迟(delay)：由于网络传输等原因，记录从产生到进入数据处理系统通常会产生延迟</li>
+<li>乱序(out-of-order)：由于产生的延迟不同，输入数据的顺序和原始数据的顺序不一定相同</li>
+</ol>
+<blockquote>
+<p>针对这三个特点有什么相应的应对方法吗？</p>
+<ol>
+<li>对于无界的特点，其实可以直接当成流计算进行处理，或者使用窗口操作的方式使其变成一个有界的数据再进行计算。</li>
+<li>对于延迟的特点，通常是指事件时间和处理时间不统一，导致了对事件时间窗口的计算不友好。这种情况其实可以依靠水位线的方式进行处理(后面讲到的)。</li>
+<li>对于乱序的问题，这个会使得顺序不统一，如果计算不要求顺序的话，则可以使用后面提到的结果修正对迟到数据进行处理。如果计算要求顺序时，这时候有一个很容易想到的解决方案，就是给每个流数据添加一个标识表示ID，对于连续的数据这个ID是递增的，如果计算系统中出现了间断(指系统中的数据ID不连续)，则等待缺失的数据到达再进行计算。但这种方式无疑会增加系统的延迟。</li>
+</ol>
+</blockquote>
+<p>Dataflow编程模型又时也称为What-Where-When-How（WWWH）模型，通过操作描述，窗口定义，触发器和结果修正4个方面可花针对无界、乱序输入数据的处理过程</p>
+<ol>
+<li>操作描述：需要对输入数据执行什么(What)操作</li>
+<li>窗口定义：在何处(Where)进行数据切分</li>
+<li>触发器：系统在处理时间域应该何时(When)触发基于事件时间定义的窗口</li>
+<li>结果修正：当输入数据无界时，由于输入数据的乱序，系统互发窗口计算后仍然可能有迟到的数据抵达，那么如何(How)修正已经触发的窗口的计算结果？</li>
+</ol>
+<h4 id="操作描述">操作描述</h4>
+<p>Dataflow变成模型使用<code>PCollection&lt;KV&lt;键类型，值类型&gt;&gt;</code>表示数据集，是一系列键值对的集合，提供预定义的一系列操作，其中最核心的是<code>ParDo</code>、<code>GroupByKey</code>操作。</p>
+<ol>
+<li><code>ParDo</code>：该操作对每个键值对执行相同的处理，获得0个或多个输出键值对</li>
+<li><code>GroupByKey</code>：该操作用于将剪枝对按键进行重新分组</li>
+</ol>
+<p>以数据求和为例子，对于有界数据，只需要等待所有的数据都读取完成后，再进行计算即可，可以使用下面的代码执行这个过程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PCollection&lt;KV&lt;String,Integer&gt;&gt; output = input.apply(Sum.integersPerKey());</span><br></pre></td></tr></table></figure>
+<p>其中<code>integersPerKey</code>是用户自定义的操作。最后这些数据的计算结果为51</p>
+<p><img src="https://blog.zerorains.top/img/image-20221016222633660.png" alt="image-20221016222633660"></p>
+<h4 id="窗口定义">窗口定义</h4>
+<p>针对无界数据集的操作通常需要先定义窗口，再确定的窗口中执行操作。还是以有界数据整数求和为例子，此时需要按照时长为2min的基于事件时间的固定窗口执行操作，可以用下面的代码表示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PCollection&lt;KV&lt;String,Integer&gt;&gt; output = input</span><br><span class="line">    .apply(Window.&lt;KV&lt;String,Integer&gt;&gt;into(</span><br><span class="line">           FixedWindows.of(Duration.standardMinutes(<span class="number">2</span>))))</span><br><span class="line">    .apply(Sum.integersPerKey())</span><br></pre></td></tr></table></figure>
+<p>按照下图的方式进行划分，最终每个窗口的计算结果为14、22、3、12</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017090956137.png" alt="image-20221017090956137"></p>
+<p>对于有界数据而言，确定数据全部到达的时间很容易，但是对于无界数据而言，通过窗口定义，可以仅针对窗口中的数据执行啊哦做而不必获取所有数据。但还是有一个问题：在输入为无界数据的情况下，应何时输出窗口中的计算结果？</p>
+<h4 id="触发器">触发器</h4>
+<p>触发器机制描述了何时将窗口的结果输出，这个可以定义在水位线到达窗口指定的事件时间戳时输出结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PCollection&lt;KV&lt;String,Integer&gt;&gt; output = input</span><br><span class="line">    .apply(Window.&lt;KV&lt;String,Integer&gt;&gt;into(</span><br><span class="line">           FixedWindows.of(Duration.standardMinutes(<span class="number">2</span>)))</span><br><span class="line">    .triggering(AfterWatermark.pastEndOfWindow()))</span><br><span class="line">    .apply(Sum.integersPerKey())</span><br></pre></td></tr></table></figure>
+<p>如下图，这就使得当水位线越过窗口指定的事件时间后出发结果的输出。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017092142432.png" alt="image-20221017092142432"></p>
+<p>但水位线本质是对事件时间的一种猜测，其与真实事件时间相比可能过快或过慢。</p>
+<p>如果水位线设置过慢，则根据水位线时间出发窗口计算很可能导致整个处理结果存在较高的延迟。因此，除水位线时间到达窗口指定的时间戳外，还可以设置触发器“提前”出发结果的输出。比如添加一个触发器，在处理时间域上每隔1分钟输出一次结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PCollection&lt;KV&lt;String,Integer&gt;&gt; output = input</span><br><span class="line">    .apply(Window.&lt;KV&lt;String,Integer&gt;&gt;into(</span><br><span class="line">           FixedWindows.of(Duration.standardMinutes(<span class="number">2</span>))) <span class="comment">// 2分钟一个窗口</span></span><br><span class="line">    .triggering(AfterWatermark.pastEndOfWindow() <span class="comment">// 超过水位线</span></span><br><span class="line">               .withEarlyFirings(AfterProcessingTime.pastFirstElementInPane()</span><br><span class="line">                                .plusDelayOf(Duration.standardMinutes(<span class="number">1</span>))))) <span class="comment">// 1分钟1次</span></span><br><span class="line">    .apply(Sum.integersPerKey()) <span class="comment">// 求和</span></span><br></pre></td></tr></table></figure>
+<p>于是求和结果会变为：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017092832828.png" alt="image-20221017092832828"></p>
+<h4 id="结果修正">结果修正</h4>
+<p>如果水位线设置过快，则在水位线之后仍然有记录到达，为此，触发器提供了3种不同的方式以进行修正同一窗口的不同计算结果</p>
+<ol>
+<li>抛弃(discarding)窗口内容：触发器一旦触发，窗口内容即被抛弃，之后窗口计算的结果和之前的结果不存在任何相关性</li>
+<li>累积(accumulating)窗口内容：触发器触发后，窗口内容进行持久化，而新得到的结果称为对已输出结果的一个修正版本。</li>
+<li>累积和撤回(accumulating &amp; retracting)窗口内容：触发器触发后，不仅将窗口内永久保留，还需记录已经输出的结果。当窗口再次触发时，首先撤回已经输出的结果，然后输出新得到的结果。</li>
+</ol>
+<p>还是使用之前的例子，这次每遇到一个迟到的记录时将修正已经输出的结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PCollection&lt;KV&lt;String,Integer&gt;&gt; output = input</span><br><span class="line">    .apply(Window.&lt;KV&lt;String,Integer&gt;&gt;into(</span><br><span class="line">           FixedWindows.of(Duration.standardMinutes(<span class="number">2</span>))) <span class="comment">// 2分钟一个窗口</span></span><br><span class="line">    .triggering(AfterWatermark.pastEndOfWindow() <span class="comment">// 超过水位线</span></span><br><span class="line">               .withEarlyFirings(AfterProcessingTime.pastFirstElementInPane()</span><br><span class="line">                                .plusDelayOf(Duration.standardMinutes(<span class="number">1</span>))) <span class="comment">// 1分钟1次</span></span><br><span class="line">               .withLateFirings(AfterPane.elementCountAtLeast(<span class="number">1</span>))) <span class="comment">// 迟到记录修正</span></span><br><span class="line">    .accumulatingFiredPanes()) <span class="comment">// 使用累积的方式修正</span></span><br><span class="line">    .apply(Sum.integersPerKey()) <span class="comment">// 求和</span></span><br></pre></td></tr></table></figure>
+<p>最终得到结果：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017095757713.png" alt="image-20221017095757713"></p>
+<h3 id="关系化dataflow编程模型">关系化Dataflow编程模型</h3>
+<p>Dataflow将输入数据看做一系列的键值对记录构成的数据，<strong>如果将这些键值对看成关系表，此时就不再需要提供对键值对进行转化操作，而是针对关系表的SQL。这种提供了SQL描述的Dataflow编程模型称为关系化的Dataflow编程模型</strong>。由于Dataflow认为输入的数据是无界的，因此这种输入的关系表示动态变化的，并且输出的关系表同样是动态变化的。</p>
+<p>Dataflow编程模型在触发器定义的时刻针对关系表进行SQL操作得到新的关系表，再将新的关系表相应地转换为无界数据集。关系化的Dataflow编程模型将无界数据集中的记录看做元组，无界数据集记录向关系表的转换可以视为像关系表中不断添加新的元组。</p>
+<p><img src="https://blog.zerorains.top/img/09.1%E5%85%B3%E7%B3%BB%E5%8C%96%E7%9A%84Dataflow%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B.png" alt="09.1关系化的Dataflow编程模型"></p>
+<h3 id="一体化执行引擎">一体化执行引擎</h3>
+<p>统一编程可以从两个层面理解：</p>
+<ol>
+<li>多个不同执行引擎之间批处理与流计算编程模型进行统一</li>
+<li>在同一个执行引擎中是按批处理与流计算的统一编程</li>
+</ol>
+<p>当前通用的核心执行引擎为批处理引擎或流处理引擎，因此一体化执行引擎需要选择其中一种作为核心。</p>
+<p>一体化执行引擎的实现或选择批处理引擎作为核心执行引擎并基于批出来来处理无界数据集，或选择流计算引擎为核心执行引擎并基于流计算来处理有界数据集。</p>
+<p><strong>以批处理为核心</strong>：这个在之前就已经提到过了，就是微批处理，将无界数据按照时间进行划分，然后形成一批批连续的，小型的有界数据，输入到批处理引擎中进行处理。但是会产生一个问题，就是新的短时应用必须在率先启动的短时应用执行完毕后才能启动。这种操作本质上是串行执行的，这种串行执行短时应用的方式带来的延迟通常在秒级。同时，这种思路不易于实现基于记录计数的窗口，会话窗口等操作，并且造成了较高的延迟。</p>
+<p><strong>以流计算为核心</strong>：这种方式下，就需要使用连续处理进行计算，一次性启动一个长时运行的应用，而非像微批处理模式中那样不断启动一系列短时应用。在该模式中，由于长时间运行的应用一旦读取到数据则立即进行处理，因此产生的延迟低于微批处理的延迟，这种系统产生的延迟通常在毫秒级。</p>
+<h2 id="批流融合系统flink">批流融合系统Flink</h2>
+<h3 id="设计思想">设计思想</h3>
+<p>Flink系统的设计思想是以流计算为中心，将有界数据视为无界数据的特例。类似于Storm，Flink系统将需要处理的数据抽象为DataStream形式，并使用DAG描述计算过程。</p>
+<h4 id="数据模型">数据模型</h4>
+<p>Flink将输入数据看作一个不间断的、无界的记录序列，一系列记录构成DataStream，并且DataStream中的记录是不可变的，一旦创建即无法在物理上改变。Flink使用DataSet类表示有界数据，其中的记录也是不可变的。Flink在记录集合的级别对数据进行抽象。</p>
+<h4 id="计算模型">计算模型</h4>
+<p>Flink系统提供了丰富的操作算子对DataStream进行转化，其一系列转换操作构成一张向无环图(描述计算过程的DAG)，操作算子可以分为</p>
+<ol>
+<li>数据源(DataSource)：描述DataStream数据的来源</li>
+<li>转换(Transformation)：描述DataStream在系统中的转换逻辑</li>
+<li>数据池(DataSink)：描述DataStream数据的走向（这个应该是在迭代算子那一部分用到了）</li>
+</ol>
+<p>其逻辑计算模型也是由算子构成的DAG，在物理设计层面，利用分布式架构加快数据处理，每个操作算子实际上由若干实例任务(Task)实现。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017151338262.png" alt="image-20221017151338262"></p>
+<h4 id="迭代模型">迭代模型</h4>
+<p>MapReduce和Spark的迭代计算的过程由用户编写的外部驱动程序控制，而Flink系统将迭代作为内部算子嵌入到DAG中实现迭代计算。DAG是有向无环图，但是迭代计算必然存在环路，看似存在矛盾，但实际上，<strong>迭代计算作为一个算子嵌套在DAG中，对于DAG来说整个迭代过程就是一个算子，该迭代算子的内部实现存在反馈环路</strong>。如下图</p>
+<p><img src="https://blog.zerorains.top/img/10.1%E8%BF%AD%E4%BB%A3DAG.png" alt="10.1迭代DAG"></p>
+<p>批式迭代和流式迭代计算在语义上有所差异，<strong>批式迭代的输入数据是有界的，每轮迭代计算的全部结果作为下一轮迭代计算的输入</strong>。在流式迭代中，输入数据是无界的，<strong>通常每轮迭代计算的部分结果作为输出向后传递，而另一部分结果作为下一轮迭代计算的输入，并且迭代过程是无限的</strong>。之前提到了DataStream既可以表示有界数据也可以表示无界数据，但是由于二者在迭代计算上的语义差异，针对两者的迭代计算需要使用不同的算子。</p>
+<h3 id="体系架构">体系架构</h3>
+<h4 id="架构图">架构图</h4>
+<p>Flink的抽象架构图与Spark类似，根据是否使用Yarn资源管理系统进行系统部署，也可以分为Standalone和Yarn两种模式。与Spark不同的是，Flink目前没有使用驱动器进行作业管理，而是由JobManager负责，因此不存在Client和Cluster之分。Flink同样采用&quot;主从&quot;架构。</p>
+<p><img src="https://blog.zerorains.top/img/10.2Flink%E6%8A%BD%E8%B1%A1%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="10.2Flink抽象架构图"></p>
+<ol>
+<li>Client：客户端，将用户编写的DataStream程序翻译为逻辑执行图并进行优化，并将优化后的逻辑执行图提交到JobManager。</li>
+<li>JobManager：作业管理器，根据逻辑执行图生成物理执行图，负责协调系统的作业执行，包括作业调度，协调检查点和故障恢复。(Standalone模式下的进程名为：StandaloneSessionClusterEntrypoint)</li>
+<li>TaskManager：任务管理器，用于执行JobManager分配的任务，并且负责读取数据、缓存数据以及其他TaskManger进行数据传输。(Standalong模式加的进程名为：TaskManagerRunner)</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>MapReduce</th>
+<th>Storm</th>
+<th>Spark</th>
+<th>Flink</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>系统进程</td>
+<td>JobTracker</td>
+<td>Nimbus</td>
+<td>Master</td>
+<td>StandaloneSessionClusterEntrypoint</td>
+</tr>
+<tr>
+<td></td>
+<td>TaskTracker</td>
+<td>Supervisor</td>
+<td>Worker</td>
+<td>TaskManagerRunner</td>
+</tr>
+<tr>
+<td></td>
+<td>Child</td>
+<td>Worker</td>
+<td>CoarseGrainedExecutorBackend</td>
+<td></td>
+</tr>
+<tr>
+<td>工作线程</td>
+<td>—</td>
+<td>Executor</td>
+<td>Task</td>
+<td>Task</td>
+</tr>
+<tr>
+<td>任务代码</td>
+<td>Task</td>
+<td>Task</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>基础接口</td>
+<td>Map/Reduce</td>
+<td>Spout/Bolt</td>
+<td>RDD API</td>
+<td>DataStream(DataSet) API</td>
+</tr>
+</tbody>
+</table>
+<p>Flink的Yarn的部署方式和其他框架也差不多，就是使用Yarn的相关进程替换JobManager和TaskManager，具体对比如下：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>Standalone</th>
+<th>Yarn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>资源管理</td>
+<td>StandaloneSessionClusterEntrypoint、TaskManagerRunner</td>
+<td>ResourceManager</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>NodeManager</td>
+</tr>
+<tr>
+<td>作业管理</td>
+<td></td>
+<td>YarnJobClusterEntrypoint</td>
+</tr>
+<tr>
+<td>任务执行</td>
+<td>TaskManagerRunner</td>
+<td>YarnTaskExecutorRunner</td>
+</tr>
+</tbody>
+</table>
+<h4 id="应用程序执行流程">应用程序执行流程</h4>
+<p>Standalone模式的Flink执行流程如下，客户端在提交Flink应用程序时，可以选择Attached（客户端与JobManger保持连接，可以获取关于应用程序执行的信息），也可以选择Detached（客户端与JobManger断开连接，无法获取关于应用程序执行的信息）</p>
+<blockquote>
+<p>为什么要区分Attached和Detached呢？我认为Attache模式下可以获取应用程序的执行信息，因此可以用在开发前期用于测试环境中，判断程序是否能够正常执行。经过完善的测试后，就可以确保程序在大部分的情况下都能处于稳定的运行状态中，因此在部署时就可以采用Detached的方式。</p>
+</blockquote>
+<p><img src="https://blog.zerorains.top/img/image-20221017171353345.png" alt="image-20221017171353345"></p>
+<ol>
+<li>客户端将用户编写的程序进行解析，并将解析后的作业描述交给StandaloneSessionClustingEntrypoint。</li>
+<li>StandaloneSessionClustingEntrypoint根据作业描述进行任务分解，确定各个TaskManager负责执行的任务</li>
+<li>TaskManager执行各自的任务</li>
+</ol>
+<p>Yarn模式的Flink执行流程如下，同样可以选择Attached和Detached的方式进行提交：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221017172000387.png" alt="image-20221017172000387"></p>
+<ol>
+<li>
+<p>用户在客户端提交Flink作业，客户端启动ChiFrontend进程，CliFrontend将用户编写的程序进行解析，并将运行Flink系统的jar包以及配置文件上传至HDFS。</p>
+</li>
+<li>
+<p>CliFrontend进程向Resource发起请求，申请启动YarnJobClusterEntrypoint（ApplicationMaster），ResourceManager确定启动YarnJobClusterEntrypoint的节点。</p>
+</li>
+<li>
+<p>需启动YarnJobClusterEntrypoint进程的节点中的NodeManager将HDFS中的jar包与配置文件下载至该节点</p>
+</li>
+<li>
+<p>NodeManager启动YarnJobClusterEntrypoint进程</p>
+</li>
+<li>
+<p>CliFrontend进程将解析后的作业描述交给YarnJobClusterEntrypoint</p>
+</li>
+<li>
+<p>YarnJobClusterEntrypoint向ResourceManager注册，此时客户端可以通过ResourceManager查看Flink应用程序的资源使用情况。YarnJobClusterEntrypoint根据作业描述进行任务分解，并向ResourceManager申请启动这些任务的资源</p>
+</li>
+<li>
+<p>ResouceManger以Container形式想提出申请的YarnJobClusterEntrypoint分配资源。一旦YarnSessionClusterEntrypoint申请到资源，即在多个任务之间进行资源分配</p>
+</li>
+<li>
+<p>YarnJobClusterEntrypoint确定资源分配方案后，与对应的NodeManager通信</p>
+</li>
+<li>
+<p>如果该NodeManager所在节点尚未下载，则将HDFS中的jar包与配置文件下载至本地，并在相应的Container中启动相应的YarnTaskExecutorRunner进程以执行任务。</p>
+</li>
+<li>
+<p>各个任务向YarnJobClusterEntrypoint汇报进度和状态，一边令YarnJobClusterEntrypoint随时掌握各个任务的运行状态</p>
+</li>
+<li>
+<p>随着部分任务执行结束，YarnJobClusterEntrypoint逐步释放占用的资源，最终向ResourceManager注销并自行关闭</p>
+</li>
+</ol>
+<blockquote>
+<p>Yarn的执行方式看着虽然比较复杂，但是其实还是遵循了资源管理和作业管理分离的思想，这样的方式可以使得不同的系统在同一个集群中互不干扰彼此任务执行的条件下，充分利用集群各种资源。</p>
+</blockquote>
+<h3 id="工作原理">工作原理</h3>
+<p>在Flink应用程序的执行过程中，Client根据DataStream程序生成逻辑执行图并进行优化，之后将优化后的逻辑执行图提交给JobManager。JobManager获得逻辑执行图后生成物理执行图，从而分配给TaskManager执行。TaskManager启动Task线程执行JobManager分配的任务。由于Flink系统内置了迭代算子，在TaskManager中的任务可以分为实现迭代算子的迭代任务和其他非迭代任务。</p>
+<p><img src="https://blog.zerorains.top/img/10.3%E5%86%85%E9%83%A8%E5%B7%A5%E4%BD%9C.png" alt="10.3内部工作"></p>
+<h4 id="逻辑执行图的生成与优化">逻辑执行图的生成与优化</h4>
+<p><img src="https://blog.zerorains.top/img/image-20221018102930771.png" alt="image-20221018102930771"></p>
+<p>给定用户编写的DataStream程序，Flink的Client将其解析生成如上图所示的逻辑执行图(DAG)。Client对各个算子的依赖关系进一步分析，借助Spark中RDD依赖关系的宽依赖和窄依赖的概念，如果算子之间的数据依赖为窄依赖关系，则算子之间呈现一对一的数据传递关系。因为算子处于不同TaskManager的任务实现会带来TaskManager之间的数据传输开销，Flink使用Chaining机制进行优化，将部分算子合并成一个“大”算子。Chaining优化并不改变算子的语义，但是可以避免数据在不同TaskManager之间的非必要传输。</p>
+<h4 id="物理执行图的生成与任务配置">物理执行图的生成与任务配置</h4>
+<p>JobManager在收到Client提交的逻辑执行图后，根据算子的并行度，将逻辑执行图转换为物理执行图。物理执行图中的一个节点对应一个任务，分配给TaskManager执行。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221018104126671.png" alt="image-20221018104126671"></p>
+<p>JobManager在生成物理制图后，将各个算子的任务分配给TaskManager。原则是：根据任务槽(TaskSolt)的容量，尽可能<strong>将存储与数据传输关系的算子实例放在同一个任务槽中，以保持数据传输的本地性</strong>。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221018104311626.png" alt="image-20221018104311626"></p>
+<h4 id="非迭代任务间的数据传输">非迭代任务间的数据传输</h4>
+<p>Shuffle是一种阻塞式的数据传输方式，位于上游的任务必须等到所有记录均计算结束后才可向下游任务传递数据。（MapReduce，Spark）</p>
+<p>消息传递机制是一种非阻塞式的数据传输方式，位于上游的任务处理一条记录后则立即向下游任务传递数据。(Storm)</p>
+<p>如果实现非迭代算子的任务位于不同的TaskManager，则**Flink将采用流水线机制(非阻塞式)进行数据传输。流水线机制一次传输一个缓冲区(buffer)，该缓冲区中通常存储不止一条记录。**假设每个TaskManager仅包含1个任务槽并且任务槽的容量为2，TaskManager设置固定大小的缓冲区，一旦缓冲区满或者达到阈值，则向负责接收数据的TaskManager发送数据。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221018105526947.png" alt="image-20221018105526947"></p>
+<h4 id="迭代任务间的数据传输">迭代任务间的数据传输</h4>
+<p>在Flink系统中，利用了迭代前端(Iteration Source)和迭代末端(Iteration Sink)两类特殊的任务实现数据反馈，两类任务成对处于同一个TaskManager，迭代末端任务的输出可以再次作为迭代前端任务的输入。</p>
+<p>在流式迭代计算中，通常每轮迭代的部分计算结果作为输出，传递给后续的算子，而另一部分作为下一轮迭代计算的输入。</p>
+<p>在批式迭代计算中，通常需要将上一轮迭代结算的全部结果作为输入(要取得所有的计算结果，通常会存在一定的阻塞情况)，直到满足迭代的结束条件。当然满足结束条件的时候，迭代前端会发出特殊出的控制事件，表示迭代计算结束。</p>
+<h4 id="dataflow编程模型的实现">Dataflow编程模型的实现</h4>
+<p>Dataflow统一编程模型4个方面：操作描述，窗口定义，触发器和结果修正。<strong>Flink中实现算子的任务必须维护自身的水位线，位于下游的任务根据上游任务发出的水位线不断更新自身的水位线，并向后传递</strong>（如果一个算子有多个输入，则需要等待所有输入的水位线都传递到该算子之后，算子再使用这些输入中时间最早的水位线作为当前算子的水位线）。系统一般提供预定义的水位线计算方式，同时用户也可以自定义DataSource算子，并实现其水位线计算方式。</p>
+<p>窗口本质上也是一种算子，并且在特定时刻触发计算。从系统实现的角度看，窗口定义、触发器和结果修正是绑定在一起的。Flink中的窗口操作由分配器(window assigner)、窗口实例(window instance)、窗口函数(window function)构成，其中<strong>窗口实例均设有相应的触发器</strong>。</p>
+<p>如下图：输入数据的形式为<code>数字,事件时间</code>或<code>水位线,事件时间</code>，在<code>9:01</code>时，窗口分配器收到<code>3,8:50</code>的数据，将其放入到<code>[8:50,9:00]</code>的窗口实例中。接着<code>9:02</code>时，窗口分配器收到<code>4,8:58</code>这个数据，符合两个窗口实例的要求，因此放入到两个窗口实例中。在下来<code>9:03</code>时，窗口分配器收到<code>|,9:00</code>的水位线，然后发送到窗口实例1,并进行水位线的更新，此时水位线达到窗口的结束位置，窗口开始计算，于是得到结果7。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221018134158745.png" alt="image-20221018134158745"></p>
+<p>除了用于触发窗口计算的触发器外，用户还可以自定义其他触发器，用于提前输出结果。<strong>对于迟到的数据Flink也需要根据用户选择的结果修正方式修正窗口计算的结果</strong>。Flink在一定超时范围内使用累积模式对迟到的记录进行结果修正，一旦超时则忽略迟到的记录。<strong>基于事件时间的窗口需要利用水位线触发，而基于处理时间的窗口仅需使用系统时间触发</strong>。</p>
+<h4 id="关系化dataflow编程模型的实现">关系化Dataflow编程模型的实现</h4>
+<p><img src="https://blog.zerorains.top/img/image-20221018135630126.png" alt="image-20221018135630126"></p>
+<p>Flink系统可将输入的一系列记录转换为关系表，也可以将关系表转换为一系列记录，关系表是动态变化的，因此Flink中称其为动态表。Flink提供了Table和SQL两个支持关系型运算的编程接口，用以支持关系化的Dataflow编程模型。</p>
+<p>Flink利用Apache Calcite进行SQL解析，并根据编目(catalog)进行校验，生成Calcite执行逻辑，然后Calcite基于常用的优化规则(算子下推，剪枝等关系查询优化规则)，以及Flink提供的针对DataStream的优化规则对逻辑执行计划进行优化，从而生成面向DataStream的物理执行计划，依据物理执行计划，Flink通过代码生成方式产生可执行的DataStream程序。</p>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>如果仅Clint发生故障，则只要作业成功提交给系统即不会影响系统中作业的运行</li>
+<li>JobManager故障，则需要重新启动或借助ZooKeeper实现高可用性</li>
+<li>TaskManager故障，则可以重启TaskManager或者将本由这些TaskManager负责执行的任务交给新的TaskManager。</li>
+</ol>
+<h4 id="状态管理">状态管理</h4>
+<p>和之前提到的概念相同，<strong>窗口中需要保留的内容即为状态，其可以保留已处理记录的结果，并对后续记录的处理造成影响</strong>。如果状态使用进程进行管理，当进程发生故障时，状态也会一并丢失，因此状态应该由系统进行管理。Flink系统提供了特殊的数据结构(状态，State)，用于保存操作算子的计算结果。提供了以下3种存储算子的状态MemoryStateBackend、FsStateBackend和RockDBStateBackend，前两者将算子的状态存储在TaskManager的内存中，而后者将算子的状态存储在TaskManager内置的RockDB数据库中。</p>
+<table>
+<thead>
+<tr>
+<th>状态存储范式</th>
+<th>正常运行时</th>
+<th>写入检查点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MemoryStateBackend</td>
+<td>本地内存</td>
+<td>JobManager内存</td>
+</tr>
+<tr>
+<td>FsStateBackend</td>
+<td>本地内存</td>
+<td>HDFS</td>
+</tr>
+<tr>
+<td>RockDBStateBackend</td>
+<td>本地RocksDB</td>
+<td>HDFS</td>
+</tr>
+</tbody>
+</table>
+<h4 id="非迭代计算过程的容错">非迭代计算过程的容错</h4>
+<p>在某一时刻，系统处理的记录可以分为3种类型：</p>
+<ol>
+<li>已经处理完毕的记录</li>
+<li>正在处理的记录</li>
+<li>尚未处理的记录</li>
+</ol>
+<p>虽然绝对同步的时钟不存在，但是同一时刻保存所有算子状态到检查点的目的是区分第一种情况和后两种情况。Flink借鉴分布式系统中用于保存系统状态的Chandy-Lamport算法的思想，实现异步屏障快照(ABS)算法，所保存的快照即为检查点。异步屏障快照算法通过在输入数据中注入屏障并异步地保存快照，达到和在同一时刻保存所有算子状态到检查点相同的目的。</p>
+<p>异步屏障快照算法会在输入数据中间断地插入屏障，并随着记录一起向下游任务流动，每个屏障指示对应的检查点ID。算子在收到屏障后，便将算子当前的状态写入外部可靠的存储系统中。需要注意的时候，在写入时要进行屏障对齐，屏障对齐的含义就是如果一个算子的数据源有多个的话，该算子如果只接收到1个算子的屏障是不会进行状态写入检查点的，而是等待该算子的所有数据源的相同屏障到达后，才将状态写入检查点。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221018144343882.png" alt="image-20221018144343882"></p>
+<p>当发生故障时，Flink选择最近完整的检查点n将系统中每个算子的状态重置为检查点中保存的状态，并从数据源中重新读取属于屏障n之后的记录。当然，该过程要求数据源具备一定的记忆功能。通过这种容错机制，Flink能够满足准确一次的容错语义。</p>
+<h4 id="迭代计算过程的容错">迭代计算过程的容错</h4>
+<p>迭代反馈的数据和输入数据将继续进行新的计算，因而在该情况下仅靠屏障无法将属于检查点n和检查点n+1的记录区分。根据Chandy-Lamport算法，反馈环路中的所有记录需要以日志形式保存，当故障发生后，系统需要根据最忌你的完整的检查点n重置各个算子的状态，还需要重新读取属于屏障n之后的记录以及日志中的记录。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/">http://blog.zerorains.top/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></div><div class="post-share"><div class="social-share" data-image="/img/26.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/" title="「书籍阅读」分布式计算系统（一）"><img class="cover" src="/img/3.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「书籍阅读」分布式计算系统（一）</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2022/10/28/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DUser-Defined-Operators-Efficiently-Integrating-Custom-Algorithms-into-Modern-Databases/" title="「论文笔记」User-Defined Operators: Efficiently Integrating Custom Algorithms into Modern Databases"><img class="cover" src="/img/23.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「论文笔记」User-Defined Operators: Efficiently Integrating Custom Algorithms into Modern Databases</div></div><div class="info-2"><div class="info-item-1"> 论文名称：User-Defined Operators: Efficiently Integrating Custom Algorithms into Modern Databases 作者：Moritz Sichert, Thomas...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/" title="「书籍阅读」分布式计算系统（一）"><img class="cover" src="/img/3.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-09</div><div class="info-item-2">「书籍阅读」分布式计算系统（一）</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2023/02/10/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DAutoShard-Automated-Embedding-Table-Sharding-for-Recommender-Systems/" title="「论文笔记」AutoShard: Automated Embedding Table Sharding for Recommender Systems"><img class="cover" src="/img/20.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-10</div><div class="info-item-2">「论文笔记」AutoShard: Automated Embedding Table Sharding for Recommender Systems</div></div><div class="info-2"><div class="info-item-1">简要 problem：大规模的embedding表参数会影响到推荐系统embedding模型的训练过程，这些大规模的embedding表如果使用不平衡的分布式存储方式，会严重影响模型的执行效率。这就涉及到一个挑战：embedding表分片问题（embedding table sharding）  如上图所示，蓝色的框表示一个embedding表，然后框内的数字表示执行操作执行时间的成本。紫色的框表示一个分片（sharding）旁边的数字表示这个分片的执行时间成本。 如果在分片过程中没有考虑到分片的平衡（图左边），就可能会导致GPU之间的不平衡，其中所有的GPU必须强制等待最慢的GPU（图中的bottleneck）。相反，如果分片是平衡的（图右边），就可以通过减小等待时间来显著加速embedding的操作。  因为sharding内部是并行执行的，所以sharding内部的执行时间是显著小于所有embedding表的执行时间之和的，比如...</div></div></div></a><a class="pagination-related" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img class="cover" src="/img/25.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-27</div><div class="info-item-2">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2023/03/25/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DFleche-An-Efficient-GPU-Embedding-Cache-for-Personalized-Recommendations/" title="「论文笔记」Fleche: An Efficient GPU Embedding Cache for Personalized Recommendations"><img class="cover" src="/img/16.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-25</div><div class="info-item-2">「论文笔记」Fleche: An Efficient GPU Embedding Cache for Personalized Recommendations</div></div><div class="info-2"><div class="info-item-1">简要 问题：  CPU端的DRAM数据访问与GPU处理之间的差距成为深度embedding模型推理性能的阻碍，用GPU-resident cache缓存embedding表可以解决这个差距，但是这个方案并没有被完全探索。 现有的缓存方案为每个embedding表维护一个固定大小的cache表，防止在表重分区期间发生大量的数据移动。这样的设计有两个重要的影响因素：缓存利用率低（静态单表缓存的结构缺陷）和内核维护开销（过多的小缓存查询内核）  方案：FLECHE——用于有效GPU-resident embedding caching的新颖缓存机制  主要思想：联合设计缓存结构和工作流，从而促进缓存利用率并减少缓存查询时间。 结构：GPU-HBM层用于缓存hot embedding，CPU-DRAM层存储所有的embedding（这里只考虑了模型能完全放入内存中的情况，大型模型会另外讨论） 为了解决缓存利用率低的问题，提出了flat cache(FC)。其通过将所有的embedding表输入id重新编码为统一格式的flat key，让所有embedding...</div></div></div></a><a class="pagination-related" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img class="cover" src="/img/26.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-04</div><div class="info-item-2">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2023/03/15/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DHercules-Heterogeneity-Aware-Inference-Serving-for-At-Scale-Personalized-Recommendation/" title="「论文笔记」Hercules: Heterogeneity-Aware Inference Serving for At-Scale Personalized Recommendation"><img class="cover" src="/img/26.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-15</div><div class="info-item-2">「论文笔记」Hercules: Heterogeneity-Aware Inference Serving for At-Scale Personalized Recommendation</div></div><div class="info-2"><div class="info-item-1">简要 现象：数据中心的深度学习推荐系统具有许多独特的工作负载特征和系统需求——模型多样性、云规模的系统异构行和时变负载模式。这些都需要特定于应用程序的解决方案来提高执行效率。 问题：   模型多样性：推荐模型的迅速发展，以支持新的用例，并实现更高的预测精度。这种不同算法结构导致了不同的性能瓶颈。最先进的推荐模型的计算和内存强度可以变化1~2个数量级。    云规模的系统异构：各种各样的系统架构可以在数据中心中共存，其原因如下：  系统升级会周期性的发生，不同微架构的服务器一代又一代地出现 特定领域的加速器越来越多地部署在数据中心，以最大化执行效率    时变负载模式：查询到达服从泊松分布，查询大小呈明显的重尾分布。动态变化的条件要求调度程序在不同级别运行，以快速适应和响应负载变化。   最优调度鞠策高度依赖于模型和硬件，并且需要一个有效的搜索机制来充分探索所有SLA（服务级协议）目标在模型并行、操作员并行和数据并行维度上的大调度空间。但现有的任务调度器设计缺乏遍历整个并行空间的能力。   方案： Herules——heterogeneity-aware...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9Fstorm"><span class="toc-number">1.</span> <span class="toc-text">流计算系统Storm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">1.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%A4%84%E7%90%86"><span class="toc-number">1.1.1.</span> <span class="toc-text">连续处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.3.</span> <span class="toc-text">计算模型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">1.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.2.</span> <span class="toc-text">应用程序执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%81%E6%95%B0%E6%8D%AE%E5%88%86%E7%BB%84%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.1.</span> <span class="toc-text">流数据分组策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%83%E7%BB%84%E4%BC%A0%E9%80%92%E6%96%B9%E5%BC%8F"><span class="toc-number">1.3.2.</span> <span class="toc-text">元组传递方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">1.4.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E8%AF%AD%E4%B9%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">容错语义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%83%E7%BB%84%E6%A0%91"><span class="toc-number">1.4.2.</span> <span class="toc-text">元组树</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ack%E6%9C%BA%E5%88%B6"><span class="toc-number">1.4.3.</span> <span class="toc-text">ACK机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%87%8D%E6%94%BE"><span class="toc-number">1.4.4.</span> <span class="toc-text">消息重放</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9Fspark-streaming"><span class="toc-number">2.</span> <span class="toc-text">流计算系统Spark Streaming</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">2.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%AE%E6%89%B9%E5%A4%84%E7%90%86"><span class="toc-number">2.1.1.</span> <span class="toc-text">微批处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.2.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.3.</span> <span class="toc-text">计算模型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">2.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">2.2.2.</span> <span class="toc-text">应用程序执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%BE%93%E5%85%A5"><span class="toc-number">2.3.1.</span> <span class="toc-text">数据输入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.3.2.</span> <span class="toc-text">数据转换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%BE%93%E5%87%BA"><span class="toc-number">2.3.3.</span> <span class="toc-text">数据输出</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">2.4.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8Erdd-lineage%E5%AE%B9%E9%94%99"><span class="toc-number">2.4.1.</span> <span class="toc-text">基于RDD Lineage容错</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%97%A5%E5%BF%97%E7%9A%84%E5%AE%B9%E9%94%99"><span class="toc-number">2.4.2.</span> <span class="toc-text">基于日志的容错</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%A3%80%E6%9F%A5%E7%82%B9%E7%9A%84%E5%AE%B9%E9%94%99"><span class="toc-number">2.4.3.</span> <span class="toc-text">基于检查点的容错</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF%E7%9A%84%E5%AE%B9%E9%94%99%E8%AF%AD%E4%B9%89"><span class="toc-number">2.4.4.</span> <span class="toc-text">端到端的容错语义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%B9%E6%B5%81%E8%9E%8D%E5%90%88%E5%9F%BA%E7%A1%80"><span class="toc-number">3.</span> <span class="toc-text">批流融合基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%B9%E6%B5%81%E8%9E%8D%E5%90%88%E7%9A%84%E8%83%8C%E6%99%AF"><span class="toc-number">3.1.</span> <span class="toc-text">批流融合的背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lambda%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%85%B6%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">3.2.</span> <span class="toc-text">Lambda架构及其局限性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86%E4%B8%8E%E6%B5%81%E8%AE%A1%E7%AE%97%E7%9A%84%E7%BB%9F%E4%B8%80%E6%80%A7"><span class="toc-number">3.3.</span> <span class="toc-text">批处理与流计算的统一性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E6%93%8D%E4%BD%9C"><span class="toc-number">3.3.1.</span> <span class="toc-text">窗口操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%9F%9F"><span class="toc-number">3.3.2.</span> <span class="toc-text">时间域</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dataflow%E7%BB%9F%E4%B8%80%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.4.</span> <span class="toc-text">Dataflow统一编程模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E6%8F%8F%E8%BF%B0"><span class="toc-number">3.4.1.</span> <span class="toc-text">操作描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E5%AE%9A%E4%B9%89"><span class="toc-number">3.4.2.</span> <span class="toc-text">窗口定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="toc-number">3.4.3.</span> <span class="toc-text">触发器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E4%BF%AE%E6%AD%A3"><span class="toc-number">3.4.4.</span> <span class="toc-text">结果修正</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB%E5%8C%96dataflow%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.5.</span> <span class="toc-text">关系化Dataflow编程模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%BD%93%E5%8C%96%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E"><span class="toc-number">3.6.</span> <span class="toc-text">一体化执行引擎</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%B9%E6%B5%81%E8%9E%8D%E5%90%88%E7%B3%BB%E7%BB%9Fflink"><span class="toc-number">4.</span> <span class="toc-text">批流融合系统Flink</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">4.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.1.1.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.1.2.</span> <span class="toc-text">计算模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.1.3.</span> <span class="toc-text">迭代模型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">4.2.</span> <span class="toc-text">体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">4.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.2.2.</span> <span class="toc-text">应用程序执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">4.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E6%89%A7%E8%A1%8C%E5%9B%BE%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="toc-number">4.3.1.</span> <span class="toc-text">逻辑执行图的生成与优化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%89%A9%E7%90%86%E6%89%A7%E8%A1%8C%E5%9B%BE%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE"><span class="toc-number">4.3.2.</span> <span class="toc-text">物理执行图的生成与任务配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%9E%E8%BF%AD%E4%BB%A3%E4%BB%BB%E5%8A%A1%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">4.3.3.</span> <span class="toc-text">非迭代任务间的数据传输</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E4%BB%BB%E5%8A%A1%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">4.3.4.</span> <span class="toc-text">迭代任务间的数据传输</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dataflow%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.3.5.</span> <span class="toc-text">Dataflow编程模型的实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB%E5%8C%96dataflow%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.3.6.</span> <span class="toc-text">关系化Dataflow编程模型的实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">4.4.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"><span class="toc-number">4.4.1.</span> <span class="toc-text">状态管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%9E%E8%BF%AD%E4%BB%A3%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B%E7%9A%84%E5%AE%B9%E9%94%99"><span class="toc-number">4.4.2.</span> <span class="toc-text">非迭代计算过程的容错</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B%E7%9A%84%E5%AE%B9%E9%94%99"><span class="toc-number">4.4.3.</span> <span class="toc-text">迭代计算过程的容错</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

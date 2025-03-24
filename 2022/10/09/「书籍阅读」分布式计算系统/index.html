@@ -1,0 +1,894 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「书籍阅读」分布式计算系统（一） | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  分布式系统：若干独立计算机的集合，这些计算机对于用户来说就像是一个单机系统。 分布式系统{分布式计算系统——利用分布式技术支持高性能计算和大规模数据处理分布式信息系统——利用分布式系统技术构建信息管理分布式系统\begin{cases} 分布式计算系统——利用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「书籍阅读」分布式计算系统（一）">
+<meta property="og:url" content="http://blog.zerorains.top/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  分布式系统：若干独立计算机的集合，这些计算机对于用户来说就像是一个单机系统。 分布式系统{分布式计算系统——利用分布式技术支持高性能计算和大规模数据处理分布式信息系统——利用分布式系统技术构建信息管理分布式系统\begin{cases} 分布式计算系统——利用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/3.png">
+<meta property="article:published_time" content="2022-10-09T01:53:02.000Z">
+<meta property="article:modified_time" content="2022-10-18T14:40:56.349Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/3.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「书籍阅读」分布式计算系统（一）",
+  "url": "http://blog.zerorains.top/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/",
+  "image": "http://blog.zerorains.top/img/3.png",
+  "datePublished": "2022-10-09T01:53:02.000Z",
+  "dateModified": "2022-10-18T14:40:56.349Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「书籍阅读」分布式计算系统（一）',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/3.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「书籍阅读」分布式计算系统（一）</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「书籍阅读」分布式计算系统（一）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-09T01:53:02.000Z" title="发表于 2022-10-09 09:53:02">2022-10-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-18T14:40:56.349Z" title="更新于 2022-10-18 22:40:56">2022-10-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答)</p>
+<p>(ps：本文只是粗略记录，想了解具体细节还是建议要看原书)</p>
+</blockquote>
+<p><strong>分布式系统</strong>：若干独立计算机的集合，这些计算机对于用户来说就像是一个单机系统。</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>分布式系统</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>分布式计算系统——利用分布式技术支持高性能计算和大规模数据处理</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>分布式信息系统——利用分布式系统技术构建信息管理</mtext></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">分布式系统\begin{cases}
+分布式计算系统——利用分布式技术支持高性能计算和大规模数据处理\\
+分布式信息系统——利用分布式系统技术构建信息管理
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="mord cjk_fallback">分布式系统</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">分布式计算系统</span><span class="mord">——</span><span class="mord cjk_fallback">利用分布式技术支持高性能计算和大规模数据处理</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord cjk_fallback">分布式信息系统</span><span class="mord">——</span><span class="mord cjk_fallback">利用分布式系统技术构建信息管理</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>大数据的5个特征：</p>
+<ol>
+<li>数量(volume)：数据量大</li>
+<li>种类(variety)：数据类型多</li>
+<li>速度(velocity)：数据生产速度快</li>
+<li>价值(value)：数据中存在很多的潜在价值</li>
+<li>质量(veracity)：自动采集的数据通常质量比较低</li>
+</ol>
+<p>数据库系统的主要功能模块：</p>
+<ol>
+<li>数据存储</li>
+<li>数据组织模型与访问</li>
+<li>查询处理</li>
+<li>事务管理</li>
+</ol>
+<p>计算密集型应用：计算机在处理时，CPU的处理能力成为了首要限制性因素</p>
+<p>数据密集型应用：计算机在处理时，I/O带宽成为了首要限制因素</p>
+<p>数据处理系统：</p>
+<ol>
+<li>批处理系统：处理静态数据，对吞吐量要求较高实时性较低</li>
+<li>流计算系统：处理动态数据，对实时性要求较高吞吐量要求较低</li>
+<li>批处理融合系统：同一场景不同模块的数据特征和计算需求不同的场景</li>
+</ol>
+<h2 id="hadoop文件系统">Hadoop文件系统</h2>
+<p>现有问题：</p>
+<ol>
+<li>如何存储上百GB/TB级别的大文件？</li>
+<li>如何保证文件系统的容错？</li>
+<li>如何进行大文件的并发读写控制？</li>
+</ol>
+<p>HDFS在解决上述问题时使用的思想：</p>
+<ol>
+<li>
+<p>文件分块存储：HDFS将大文件切分成块(128MB或其他大小)，这些文件块可以分布到集群中不同的节点上。</p>
+<blockquote>
+<p>为什么这么做？如果是1TB级别的大文件，不按照分块的方式存储，那么就意味着这个文件就直接占满了1个1TB的硬盘，如果比他小的硬盘甚至无法存储。</p>
+<p>这样做有什么好处？分块之后，可以将不同的块存储在不同大小的磁盘中，这些磁盘可以分布在其他机器上。虽然总容量还是1TB的大文件，但是可以存储在不同的机器上，减小了对硬盘容量的要求。</p>
+<p>这样做有什么缺点？先说如果全部塞到一个硬盘中有什么优点，全塞到一个硬盘时，对这个文件的读取和写入的IO过程都是在同一个磁盘上，读取速度相对较快并且可以指定任意读取部分。而采用分块的读取方式后，则在进行读取和写入的IO时是在不同的磁盘上进行的，会产生消息传递的一个延迟，同时每次都只能读取一个完整的块。同时一个文件如果是129MB，块的大小是128MB，那么多出来的这1MB，也要占用一个新的块。</p>
+<p>分块是怎么做的？其实就是针对文件的每128MB取一个切片，形成一个块进行存储，并给这个块赋予一个唯一的编号，方便在对文件进行读写操作时，知道从哪一块中获取数据。</p>
+</blockquote>
+</li>
+<li>
+<p>分块冗余存储：将大文件分成块，每个小块同时进行冗余备份。</p>
+<blockquote>
+<p>为什么这么做？备份的目的就是为了防止某个块损坏时，文件无法正常读取，使用冗余备份，可以在某个块坏掉时，使用备份块进行替换。</p>
+<p>有什么好处？解决了在某个块损坏导致文件无法读取的问题。</p>
+<p>有什么缺点？需要占用更多的存储空间。</p>
+</blockquote>
+</li>
+<li>
+<p>简化文件读写：一次写入后不再修改而是多次读取。</p>
+<blockquote>
+<p>为什么这么做？简化操作，HDFS中一旦文件写入完成之后就不能再被修改，只能执行添加操作。因为文件使用块的方式进行存储，要找到修改的位置在哪个块中的哪个块中是十分费时费力的。</p>
+<p>优点：操作简化，只有创建，添加，删除。</p>
+<p>缺点：要执行修改操作时需要重新写入新文件并删除旧文件，执行时间过长。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="体系架构">体系架构</h3>
+<p><img src="https://blog.zerorains.top/img/HDFS%E6%9E%B6%E6%9E%84.png" alt="HDFS架构"></p>
+<ol>
+<li>NameNode：负责HDFS的管理工作，文件目录结构，位置等元数据，维护DataNode状态，并不实际存储文件。</li>
+<li>Secondary NameNode：NameNode的备份，当NameNode发生故障时利用Secondary NameNode进行恢复。</li>
+<li>DataNode：负责存储文件，根据NameNode的控制信息存储和管理对应的文件块，并定期向NameNode汇报自身的状态。</li>
+</ol>
+<blockquote>
+<p>为什么使用这样的架构？</p>
+<p>首先客户端是用于启动任务的地方，这个肯定是需要的。文件系统中需要一个结构来存储各个文件的存储的路径(通常以树的形式)，因此NameNode就用于管理文件目录结构，和位置等元数据。然后各个文件的实际数据又需要存储，同时这些文件的总体积非常大，又考虑到分布式系统应该具备容错能力，要产生很多备份。于是根据主从结构的思想，文件目录做主，用于对文件系统整体控制，文件实体数据做从，实际存储文件数据。因此使用DataNode作为从节点。这样一个完整的主从结构就构成了。又由于主从节点中的主只有一个，宕机了就很恐怖，于是使用SecondaryNameNode，用于备份NameNode数据。</p>
+<p>当然如果NameNode和SecondaryNameNode都宕机了就比较麻烦了，得全部重启了，不过也可以使用ZooKeepper协助实现高可用性。</p>
+</blockquote>
+<p>NameNode主要维护FsImage和EditLog两个文件，FsImage中记录了HDFS的树形目录结构(树的非叶子节点是路径，叶子节点是对应的块存储位置，而不是存储文件)，EditLog中记录目录及文件修改操作。FsImage和EditLog都是写入到磁盘中的，只是在运行HDFS的过程中，FsImage会加载到内存中，方便使用。</p>
+<p><img src="https://blog.zerorains.top/img/01.2FsImage%E7%BB%93%E6%9E%84.png" alt="01.2FsImage结构"></p>
+<p>SecondaryNameNode通常在与NameNode不同的物理计算机上运行，定期备份FsImage和EditLog两个文件。具体工作流程如下：</p>
+<p><img src="https://blog.zerorains.top/img/01.3SecondaryNameNode%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.png" alt="01.3SecondaryNameNode工作流程"></p>
+<p>应用程序的启动流程：</p>
+<ol>
+<li>
+<p>客户端向NameNode发起文件操作请求，常见的发起请求的方式为编写Java程序或使用HDFS Shell等。</p>
+</li>
+<li>
+<p>如果是读写文件操作，则NameNode告知客户端文件块存储的位置信息。如果是创建，删除，重命名目标或文件等操作，NameNode成功修改文件目录结构即结束该操作(删除不会马上在DataNode上删除，而是等到特定的时间才会真正删除)。</p>
+<blockquote>
+<p>为什么不会马上删除呢？因为HDFS中的文件是以块为单位进行存储的，可能有多个块，同时每个块还有对应的冗余备份，在执行命令后让NameNode直接删除DataNode的内容会进行多线程的删除操作，这样会对NameNode产生较大的负担，同时影响其他多线程任务的进行。因此只是删除记录，而不是马上在DataNode中删除。</p>
+<p>那在什么时候删除呢？在执行删除的命令后，会在EditLog中进行记录，并且会在NameNode中移除对应的文件信息。DataNode会定期向NameNode发送心跳信息(DataNode中存储节点的情况)，这时候NameNode会反向索引这些块是否还存在文件树中，如果不存在则通过这次心跳反馈给DataNode，这时候DataNode的文件块才会执行真正的删除操作。</p>
+</blockquote>
+</li>
+<li>
+<p>对于读写文件操作，客户端获知具体位置信息后再与DataNode进行读写交互。</p>
+</li>
+</ol>
+<h3 id="工作原理">工作原理</h3>
+<h4 id="文件分块与备份">文件分块与备份</h4>
+<p>分块就是对一个大型文件按照块的大小进行划分成若干块，划分出来的块会作为HDFS的最小读取单位，在读取时，会完整地对块进行读取，不会因为只有块的一部分是目标而只读一部分。同时在分块时，如果默认分块的大小是128MB，有一个文件是129MB，那么多出来的这1MB，也要占用一个新的块。</p>
+<p>一般来说，HDFS中的每个文件块均设有3个副本：</p>
+<ol>
+<li>
+<p>第一个副本：如果客户端和某一DataNode位于同一物理节点，那么HDFS将第1个副本放置在该DataNode；如果客户端不与任何DataNode位于同一物理节点，那么HDFS随机挑选一台磁盘容量与CPU性能俱佳的节点。</p>
+<blockquote>
+<p>为什么这样设置第一个副本？目的是实现快速写入，如果要写入的目标和写入请求在同一个节点上，那么写入的过程就不会产生太大的数据传输延迟。</p>
+<p>那为什么要选容量与CPU性能俱佳的节点呢？因为如果无法写在同一个DataNode中，那肯定都会产生传输延迟，既然如此就要将这个延迟降低。如果写入时磁盘空间不够，那写入磁盘的时间被浪费掉，同时还要找新的节点。CPU计算得越快，写入的速度也越快，延迟就会下降地更低。</p>
+</blockquote>
+</li>
+<li>
+<p>第2个副本：NameNode将第2个副本防止于不同于第1个副本所在的机架的某一个节点中(磁盘容量与CPU性能也要俱佳)。</p>
+<blockquote>
+<p>为什么要这样做？有一种可能，就是现在要访问的文件块所在的DataNode，或者存放这个文件块的物理计算机宕机了，那么就需要找下一个副本了，如果第2个副本还在这个物理计算机上，那第2个副本也没有用了，所以，通常是放在与第1个副本不同的机架中。如果DataNode没宕机，那何必用第二个副本呢？直接用第1个副本不就行了么。此外，假设第一个副本放在机架1中，第二个副本放在机架2上，如果在机架2中的某个节点想访问这个数据块，那么直接从第二个副本中读取，就能减少机架间的数据传输延迟。</p>
+</blockquote>
+</li>
+<li>
+<p>第3个副本：NameNode将第3个副本放置在第一个副本所在机架的不同节点。</p>
+<blockquote>
+<p>为什么要这么做？如果第一个副本宕机了，而位于与第一个副本相同机架的某个节点发起了读取请求，无法直接访问第一个副本了，那就可以快速地直接访问第3个副本。同时如果这时候机架间通讯也坏掉了，这时候第三个副本的作用也更大了(因为机架间通讯坏掉的话，拿到第二个副本就不可能了)</p>
+</blockquote>
+</li>
+<li>
+<p>如果还有其他副本，就选一台磁盘容量与CPU性能俱佳的节点直接进行存储就行。</p>
+</li>
+</ol>
+<h4 id="文件写入">文件写入</h4>
+<ol>
+<li>首先是将文件进行分块，然后客户端与NameNode进行通信，请求写入一个文件块。</li>
+<li>NameNode根据启发式的策略决定文件块放置的DataNode，并将DataNode的位置告知客户端。</li>
+<li>客户端与DataNode1建立连接，DataNode2与DataNode2建立连接，DataNode2与DataNode3建立连接，客户端将文件块以流水线的方式写入这些DataNode(客户端不是一次性发送完整个文件，而是以更小的数据包为单位进行传输，数据包写入本地缓存后，立刻把这个数据包转发给下一个节点)。</li>
+<li>DataNode3写完毕后向DataNode2发送确认信息，随后DataNode2向DataNode1发送确认消息，最后，DataNode1向客户端发送确认消息，表示该文件块成功写入。但是并不意味着文件的写入已经完成了，如果文件还有其他的文件块，则会继续按照上面的步骤按顺序进行发送。</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20221009181703451.png" alt="image-20221009181703451"></p>
+<blockquote>
+<p>这样的写入方式有什么优点？能够写入到多个廉价的机器上，具备比较高的容错性。同时按照流水线的写入方式可以确保每个文件块及其副本都已经准确写入到对应的DataNode上。通过消息回馈也能让服务端知道什么时候文件传输完成。</p>
+<p>这样的写入有什么缺点？为了保证数据文件的一致性，牺牲了执行时间，按照这种流水线的写入方式，让整个写入过程都是串行进行的，写入比较缓慢。同时一个文件不同块的写入过程也是串行的，这就导致速度更慢了。因为是按块写入，如果小文件比较多的话，这个空间利用率有点低。</p>
+<p>question：一个文件块及其副本传输是串行的我能理解，但为啥一个文件的不同文件块不能并发写入呢？如果是为了避免两个块刚好写到一半，磁盘就满了这个情况，那不能提前在服务端预估一下要占用的空间，从而进行一个初步判断是否能写入就解决了么？</p>
+</blockquote>
+<h4 id="文件读取">文件读取</h4>
+<ol>
+<li>客户端与NameNode通信，请求读取一个文件</li>
+<li>NameNode根据文件的路径等信息判断读取请求是否合法，如果合法则向客户端返回文件中所有数据块的存放地址。</li>
+<li>对于第1个数据块，客户端从距离最近的存放该数据块的DataNode读取数据。</li>
+<li>当第1个数据块读取完毕后，客户端从距离最近的存放第2个数据块的DataNode读取数据</li>
+<li>以此类推客户端读取下一个数据块，直到读取完所有的数据块。</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20221009184546161.png" alt="image-20221009184546161"></p>
+<blockquote>
+<p>question：按照上面的读取描述，每一个块的读取过程都是串行的，还是老问题，为什么不能并发读取每一个块，然后异步整合成每一个文件呢？总不能说这样设计太难了，所以没有这么干吧。</p>
+</blockquote>
+<h4 id="文件读写一致性">文件读写一致性</h4>
+<p>HDFS中约定：同一时刻仅能发生一个写文件的请求，文件写入后即不可更改，并且文件写入后的读取操作可以并发执行。</p>
+<p>HDFS采用<strong>一次写入、多次读取</strong>的简化一致性模型</p>
+<ol>
+<li>一个文件经过创建、写入和关闭后即不得改变文件中的已有内容</li>
+<li>若已经写入HDFS文件，则仅允许在文件末尾追加数据</li>
+<li>当对一个文件执行写入操作或者追加操作时，NameNode将拒绝其他针对该文件的读、写请求</li>
+<li>当对一个文件执行读取操作时，NameNode允许其他针对该文件的读请求。</li>
+</ol>
+<blockquote>
+<p>为什么这么做？这样简化了文件的操作，追加好操作，直接从最后一个块的末尾进行写入或者写入一个新的块就好了。但是修改还得读取整个文件，需要拉取所有的文件块，修改里面内容后，还得移动每一个文件块中的存储细节，明显很复杂，也很费时。同时文件在写入时，其他用户也可以写入，则不好判断哪一个是正确的写入。同样的，如果文件在写入时，其他用户可以读取，那么他读取到内容可能不是最新写入了。这两种情况都导致了文件读写不一致。但如果都是读请求，都只需要拉取所有的文件块，而不需要修改其内容，因此读请求可以一起执行。</p>
+<p>那这样的方式有什么缺点吗？缺点肯定是有的，最大的缺点就是不能修改，要是想修改就必须先写入新的文件，然后将旧文件删除，这样无疑增大了修改时间。</p>
+</blockquote>
+<h3 id="容错机制">容错机制</h3>
+<h4 id="namenode故障">NameNode故障</h4>
+<p>NameNode故障之后通常由SecondaryNameNode进行恢复，在之间讲述了SecondaryNameNode的工作方式，所以NameNode在故障之后，SecondaryNameNode中存储了NameNode中的信息，所以就可以直接重启NameNode并通过SecondaryNameNode中的备份信息对NameNode的结果进行恢复。</p>
+<p>需要注意的是，如果在SecondaryNameNode备份过程中，有用户对文件进行了操作，EditLog.new就不再为空，在备份完成后，NameNode故障了，则EditLog.new中的内容是不会存在SecondaryNameNode中。因此这种容错机制是&quot;冷备份&quot;而非&quot;热备份&quot;。在Haddoop 2.x的版本中，增加了高可用性的支持，其中配置了活动-备用NameNode，其可以接管故障的NameNode任务。</p>
+<h4 id="datanode故障">DataNode故障</h4>
+<p>DataNode会定期向NameNode发送心跳以表示节点处于活跃状态。如果NameNode在一定时间范围内没有收到DataNode发送的心跳，那么NameNode就认为DataNode宕机了，标记DataNode为不可用状态。当客户端访问文件涉及到不可用的DataNode时，就不会使用这个宕机的DataNode中的数据，而是使用其他DataNode中的文件块。</p>
+<p>同时，DataNode宕机后会导致一部分的文件块冗余备份没有达到系统的要求，因此会使用之前提到的启发式策略对文件块进行冗余备份。</p>
+<blockquote>
+<p>question：因为NameNode和DataNode可能不在同一台物理设备上，因此心跳的传输可能会通过网络传输等方式进行，如果心跳在发往NameNode的途中出错了，导致心跳信号无法到达NameNode。那么，本来DataNode没有故障，但NameNode却认为其故障了，这时候应该怎么办呢？（回答，心跳基于RPC实现的，默认是可靠传输，除非真的DataNode挂了或者断网的，不然一般心跳信号都是可以传输过去的）</p>
+<p>我感觉，这个应该好解决，就是NameNode先标记为不可用，然后等到DataNode进行下一次心跳的时候，如果接收到了，就在NameNode中，将对应的DataNode的不可用状态标记为可用。</p>
+<p>但是这时候还会产生一个问题，就是不可用的时候会触发冗余备份，那么在等到好的DataNode第二次心跳带来前，冗余备份就完成了或者在进行中，这时候本来需要荣誉备份的变成不需要了，这时候会不会浪费掉存储空间或一部分计算资源呢？</p>
+<p>还有没有一种可能，NameNode标记为不可用之后，就给DataNode发送重启信号，重启之后他存储的东西就全部丢掉。</p>
+</blockquote>
+<h2 id="批处理系统mapreduce">批处理系统MapReduce</h2>
+<h3 id="设计思想">设计思想</h3>
+<p>MPI是在MapReduce之前更早产生的分布式计算系统，其为程序员提供了一个并行环境库(基于一种消息传递接口)，程序员可以通过调用MPI提供的程序接口达到并行处理的目的。其存在如下缺点：</p>
+<ol>
+<li>从用户编程来看，程序员需要考虑进程之间的并行问题，进程之间的通信需要用户在程序中进行显式表达。</li>
+<li>采用多进程的方式进行，当某一进程崩溃，如果之前没有添加故障恢复的功能，否则MPI并不提供容错功能。</li>
+</ol>
+<p>MPI不提供容错功能，将会导致计算资源的浪费，分布式计算系统应该具备容错能力，这就是MapReduce与MPI的重要区别。</p>
+<h4 id="数据模型">数据模型</h4>
+<p>数据在MapReduce流动的过程，通常是以键值对的形式，按照不同的键值，实现对一些列数值的处理。MapReduce是分布式计算系统的一个框架，其数据来源通常也是分布式存储系统(比如HDFS)。基本数据流动过程如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010095836173.png" alt="image-20221010095836173"></p>
+<h4 id="计算模型">计算模型</h4>
+<p>MapReduce将复杂的、运行大规模分布式集群中的并行计算过程高度抽象为Map和Reduce两个过程，采用分治的策略对数据进行并行处理。和上图一样，Map过程将输入键值对进行一次转化，产生若干新的键值对，Map转化后的键值对的内容是不同的。MapReduce框架将Map转化得到的键值对按照键值进行分组，即shuffle，从而狙击拥有不同键的键值对。之后，Reduce过程相对相同键的键值对进行计算，并根据需要将计算结果进行一次键值对转化后输出。</p>
+<p>MapReduce无须关系分布式系统中节点间的通信方式，可以像编写集中式程序那样编写MapReduce代码。此外，系统可以并行启动一系列进程以执行Map和Reduce操作，一旦出现故障，MapReduce框架可以自动进行容错处理，无须用户参与。</p>
+<h3 id="体系结构">体系结构</h3>
+<h4 id="架构图">架构图</h4>
+<p>MapReduce采用&quot;主从&quot;架构，如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/02.1MapReduce%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="02.1MapReduce架构图"></p>
+<ol>
+<li>JobTracker：主节点运行的后台进程，负责整个系统的资源管理和作业管理。监控TaskTracker管理系统拥有的计算资源，作业管理是指JubTracker负责将作业(Job)拆分成任务(Task)，并进行任务调度以及跟踪任务的运行进度。</li>
+<li>TaskTracker：从节点运行的后台进程，负责管理本节点的资源、执行JobTracker的命令并汇报情况。TaskTracker使用slot等量划分本节点中的计算资源，接收JobTracker发送的命令并执行，通过心跳将本节点的资源使用情况和任务运行进度汇报给JobTracker</li>
+<li>Task：从节点在应用程勋执行过程中启动的进程，负责任务执行。JobTracker根据TaskTracker汇报的信息进行调度，命令存在空闲slot的TaskTracker启动Task进程执行Map或Reduce任务，即MapTask或ReduceTask。在hadoop的MapReduce中，这些进程的名称为Child</li>
+<li>客户端：提交应用程序启动的进程，负责将用户编写的MapReduce程序提交给JobTracker。在hadoop的MapReduce中，这些进程的名称为RunJar</li>
+</ol>
+<p>为了避免通过网络读写输入输出数据的高额代价，MapReduce和HDFS通常部署于同一组物理节点，而TaskTracker和DataNode部署在同一个物理节点。JobTracker和NameNode部署在同一个物理节点，TaskTracker和DataNode部署在同一个物理节点。因此，MapReduce可以选择输入数据的DataNode所在的节点启动MapTask，从而节省了远程读取数据的网络开销。同理ReduceTask也可以用相同的方式，节省远程写入数据的网络开销。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010105203115.png" alt="image-20221010105203115"></p>
+<h4 id="应用程序执行流程">应用程序执行流程</h4>
+<p><img src="https://blog.zerorains.top/img/image-20221010114721970.png" alt="image-20221010114721970"></p>
+<ol>
+<li>客户端编写MapReduce作业的配置信息、jar包等信息上传到共享文件系统，通常为HDFS。</li>
+<li>客户端提交作业给JobTracker，并告知JobTracker作业信息的位置。</li>
+<li>JobTracker读取作业的信息，生成一系列Map和Reduce任务，并调度给拥有空闲slot的TaskTracker</li>
+<li>TaskTracker根据JobTracker的指令启动Child(即MapTask)进程执行Map任务，Map任务从共享文件系统读取输入数据</li>
+<li>JobTracker从TaskTracker处获得Map任务进度信息。</li>
+<li>Map任务完成后，JobTracker将Reduce任务分配给TaskTracker</li>
+<li>TaskTracker根据JobTracker的指令启动Child(即ReduceTask)进程执行Reduce任务，Reduce任务从Map任务所在节点的本地磁盘中拉取Map的输出结果。</li>
+<li>JobTracker从TaskTracker处获得Reduce任务进度信息</li>
+<li>当Reduce任务运行结束并将结果写入共享文件系统时，整个作业执行完毕。</li>
+</ol>
+<h3 id="工作原理">工作原理</h3>
+<p>MapReduce的工作原理就是从分布式文件系统中读取输入MapReduce任务的数据，经过Map解析成目标处理键值对，然后使用shuffle传输给Reduce任务，键相同的数据发送给相同的Reduce任务，然后Reduce通过这些键值对进行计算，并将结果以新的键值对形式写入分布式文件系统中。(与MPI的本质区别在于shuffle的过程(数据交换)不用显示定义)</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010142456446.png" alt="image-20221010142456446"></p>
+<p>同时Map和Map，Reduce和Reduce任务之间是不会进行通信的，只有map和reduce任务之间才有通信。</p>
+<h4 id="数据输入">数据输入</h4>
+<p>数据输入是指从存储系统中待读取的文件到Map任务可处理的键值对之间的映射。其与输入文件的格式有关，因此需要根据输入文件的格式定义到键值对映射。比如文本文件就可以将每一行在文件中的偏移量和行的内容作为一个键值对。同时HDFS系统是以块为单位进行存储的，所以直接就会想到，把每一块都作为一个Map任务的文件输入，从而完成快速读入的过程。但是这样存在一个问题，有可能有些键值对键的部分位于一个块的最末尾，值的部分位于另一个块的最开始，这就导致了文件读取不完整。</p>
+<p>为了解决这个文件读取不完整的问题，MapReduce在实际使用过程中是按照HDFS的方式读取文件，然后再对文件中的内容进行分片(split)，每一个分片中都包含着完整记录，这样就能在逻辑上将输入文件完整地划分给不同的Map任务。</p>
+<h4 id="map阶段">Map阶段</h4>
+<p>Map过程就是将其转化为一个或多个键值对，即将<code>[K1,V1]</code>键值对转化为<code>List([K2,V2])</code>。具体过程如下：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010145732149.png" alt="image-20221010145732149"></p>
+<p>在Map方法之中，就是用户自定义的代码处理原始文件，然后将其映射为<code>[K2,V2]</code>键值对，接着使用partition方式(不如HashPartitioner)确定<code>[K2,V2]</code>的分区，最终得到<code>[[K2,V2],partitionID]</code>，并将其写入到缓冲区中。当缓冲区内的数据达到一定的阈值，则先对这部分的缓冲区的数据进行固定(此时缓冲区还是剩余的部分可以继续支持Map写入，只是后面说到的操作，不包括这个部分，这部分用于下一次达到缓冲区阈值)，然后按照<code>partitionID</code>进行排序，再将同一个分区内的键值按照键值进行排序，然后将排序好的<strong>结果溢写到磁盘形成文件</strong>。当这些溢写的文件达到一定数量，就对这些文件进一步归并(merge)<strong>形成一个新的文件</strong>，使得属于同一个分区的所有键值对连续存储。最终Map任务输出一个以大文件形式存储于Map任务所在节点的本地磁盘中。</p>
+<blockquote>
+<p>优点：因为是并发运行多个Map任务，所以由多个进程执行，所以处理起来是相对快速的</p>
+<p>缺点：美中不足是要将其溢写成文件，可能涉及到不同节点的IO，会影响一点效率，但是其解决了对缓冲空间要求较大的一个问题。毕竟磁盘空间的获取肯定比缓冲空间好获取的。</p>
+</blockquote>
+<h4 id="shuffle阶段">shuffle阶段</h4>
+<p>shuffle过程将键相同的键值对发送给同一个Reduce任务，将<code>List([K2,V2])</code>转化成<code>[K2,List(V2)]</code>。本质上就是K2是map中的key，相同的key的value值组成一个list。</p>
+<p>Map任务完成后会通知所在节点的TaskTracker，并向其告知Map输出文件所在位置，之后TaskTracker进一步通知JobTracker。当Map任务完成率达到一定阈值时，系统将启动Reduce任务，启动后的Reduce任务会定期从JobTracker获取各个节点已经完成的Map任务的输出位置。Reduce任务拉取的数据一定是Map任务完成之后的数据(因此已经保存在磁盘中的文件，这一点是非常重要的)</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010160822005.png" alt="image-20221010160822005"></p>
+<blockquote>
+<p>优点：将key中的不同value组合在一起了，在进行Reduce操作的时候，就能分组进行处理，达到一个有序的效果。</p>
+<p>缺点：还是磁盘IO的问题，花费时间优点大，因为要用Map的文件中进行读取，然后还要对内容按照key进行组合。shuffle是阻塞式的数据传输方式，需要等待Map任务写入磁盘后才能开始。</p>
+<p>为什么要用shuffle？在map中得到的是很多个元组键值对，其缺点是相同的key有很多的值，如果直接运用到Reduce中，一个是key太多，每个key对应的结果可能又不一样，同时也达不到我们的需求。shuffle就可以将key相同的value值进行一个整合，key对应不同值的列表，这样在shuffle过程中就很方便地对这个value list进行处理，处理结果也是一个key对应一个结果。</p>
+</blockquote>
+<h4 id="reduce阶段">Reduce阶段</h4>
+<p>Reduce过程就是将其转化为一个或多个键值对。即将<code>[K2,List(V2)]</code>键值对转化为<code>[K3,V3]</code>。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010160808648.png" alt="image-20221010160808648"></p>
+<blockquote>
+<p>question：我感觉这一部分不太对劲，描述的时候如下</p>
+<p>map：<code>[K1,V1]-&gt;List([K2,V2])</code></p>
+<p>shuffle：<code>List([K2,V2])-&gt;[K2,List(V2)]</code></p>
+<p>reduce：<code>[K2,List(V2)]-&gt;[K3,V3]</code></p>
+<p>但是从流程图来看，map阶段确实是形成了<code>List([K2,V2])</code>的形式，但是在shuffle阶段我就觉得比较奇怪了，shuffle过程应该是对Map结果再进行一个整合，形成<code>[K2,List(V2)]</code>的形式，但是在流程图中shuffle只是将分区拆分成了两份(图中例子对应两个Reduce任务)，然后在Reduce的过程中，的输入形式并不直接是<code>[K2,List(V2)]</code>的形式，而是之前分区的结果，然后还要对分区后的内容进行排序溢写。我感觉这个部分和Map流程图中最后那部分非常像，但是Reduce任务中获得输入后没有直接执行reduce中的方法，而是再次执行和map相似的任务，这一点我不是很能理解。</p>
+<p>解答：</p>
+<p>我在问题中说的三个任务运行描述，指的<strong>是逻辑上的</strong>，但是<strong>图中的内容指的是物理运行情况</strong>。map操作过程和问题中描述的一样。在shuffle中，他的输入是多个Map结果溢写到磁盘上的文件，然后对文件中的内容进行读取，针对每一个分区进行归并(就是归并排序中的那个归并过程，因为分区的时候有过排序)，确保相同key的数据在同一个Reduce任务中执行。然后在Reduce中，得到的是shuffle的结果(数据可能有多个不同的key，但是每一个key必然包含这个key对应的全部数据)，因为是多个片段，所以仍然需要进行归并，由于内存空间不一定够大所以还是要写到磁盘上，当归并结束时，就可以从最后生成的文件中读取数据执行用户定影的Reduce任务了。</p>
+</blockquote>
+<h4 id="数据输出">数据输出</h4>
+<p>这部分就比较简单了，每个Reduce任务的输出结果将以一个文件的形式保存到指定的目录中，文件名称在之前输入部分的图中可以看到。也就是说MapReduce计算的结果并不是一个完整的文件，而是一组文件。</p>
+<h3 id="容错机制">容错机制</h3>
+<h4 id="jobtracker故障">JobTracker故障</h4>
+<p>影响：正在运行的所有作业的内部状态将会丢失</p>
+<p>恢复方式：重新启动JobTracker，所有动作全部重新执行</p>
+<p>改进方案：使用多个JobTracker，将其中一个作为主要的JobTracker其他作为备用，然和每一个JobTracker都被ZooKeeper中的ZNode的监听，如果主JobTracker发生故障，则ZooKeeper中对应的ZNode就会删除，这时候备用的JobTracker监听不到主ZNode的消息，就会自动担任JobTracker中的各项任务。</p>
+<h4 id="tasktracker故障">TaskTracker故障</h4>
+<p>检测方式：JobTracker无法接收到TaskTracker发送的心跳，则JobTracker会认为该TaskTracker失效。</p>
+<p>恢复方式：该TaskTracker所在节点运行过的任务均会被标记失败，JobTracker将这些任务调度到别的TaskTracker所在的节点重新执行。</p>
+<h4 id="task故障">Task故障</h4>
+<p>原因：代码错误，磁盘数据损坏，节点暂时性故障。</p>
+<p>恢复方式：TaskTracker检测到Task故障后，会在下一次心跳中报告给JobTracker，JobTracker在收到报告消息后重新调度执行该任务，该任务可能在集群中的任意一个节点重试，如果经过最大尝试次数之后仍然失败，则标记这个任务为失败。</p>
+<p>Map任务直接从HDFS中拉取数据重新执行即可，但是Reduce任务会碰到两种情况，如果能正常读取Map产生的文件，则只执行Reduce任务即可，如果无法读取，就需要连通Map任务一起重新执行。</p>
+<h2 id="批处理系统spark">批处理系统Spark</h2>
+<h3 id="设计思想">设计思想</h3>
+<h4 id="mapreduce的局限性">MapReduce的局限性</h4>
+<ol>
+<li>编程框架的表达能力有限，用户编程复杂。只提供了map和reduce两个编程算子</li>
+<li>单个作业中需要进行Shuffle的数据以阻塞方式传输，磁盘I/O开销大，延迟高</li>
+<li>多个作业之间的衔接设计I/O开销，应用程序的延迟高</li>
+</ol>
+<h4 id="数据模型">数据模型</h4>
+<p>Spark将数据抽象为弹性分布式数据(resilient distributed dataset, RDD)，其有下面3个特征：</p>
+<ol>
+<li>RDD是一个数据集(dataset)：与MapReduce不同，Spark的操作对象为抽象的数据而非数据集。</li>
+<li>RDD是分布式的：每个RDD可以划分成多个分区，每个分局即为一个数据集片段，一个RDD的不同分区可以存储于集群中的不同节点</li>
+<li>RDD具有弹性：具备可恢复的容错特性。</li>
+</ol>
+<blockquote>
+<p>RDD具备这些特征有什么优点？   对于第一个特征，这也就意味着RDD中的数据不必像MapReduce一样构造成键值对的样子，而是以输入数据实际的样子作为输入。对于第二个特征，RDD内部的数据可以有很多的分区，并且这些不同的分区可以存储在不同的节点中，这也就意味着，RDD是一个在逻辑上统一的整体，而物理上是由不同节点中的数据组成的，这会使得在应用执行时，不同节点的计算可以在不同的节点中使用Task线程完成计算。对于第3个特征，则保证了RDD计算的准确性，即使计算过程中进程故障，也能在一定时间内恢复成正常的计算过程。</p>
+</blockquote>
+<h4 id="计算模型">计算模型</h4>
+<p>Spark系统提供丰富的操作以对RDD进行变换。这些操作算子可以分为创建、转换和行动操作算子。</p>
+<ol>
+<li>创建操作算子从本地内存或外部数据源创建RDD，提供数据输入的功能</li>
+<li>转换操作算子描述RDD的转换逻辑，提供对RDD进行变换的功能</li>
+<li>行动操作算子标志转换结束，出发DAG生成。</li>
+</ol>
+<p>Spark逻辑计算模型通常有两种方式，一种是基于算子的Operator DAG，他会根据具体使用的算子形成有向无环图。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010201134357.png" alt="image-20221010201134357"></p>
+<p>另一种则是基于数据的RDD Lineage，他会构成一个有向无环图，其以变换的数据为节点，边是两个数据变化时使用的算子。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010201150060.png" alt="image-20221010201150060"></p>
+<p>值得注意的是，RDD在变换过程中是只读的，不可变的。RDD转换或行动操作会不断生成新的RDD，而非改变原有的RDD。</p>
+<p>在物理计算模型中，Spark利用分布式架构加速数据处理，DAG中的操作算子实际上是由若干实例任务(task)实现的。从算子的角度来看，Spark的物理计算模型可以表示为：</p>
+<blockquote>
+<p>其实和逻辑计算的结构相似，只是在物理计算过程中，算子的计算并不是只使用了一个，数据会分成不同的块，使用相同数量的算子进行操作，在逻辑计算结构中是将这个物理模型统合成一个个整体了。</p>
+</blockquote>
+<p><img src="https://blog.zerorains.top/img/image-20221010201400316.png" alt="image-20221010201400316"></p>
+<p>事实上每个任务通常负责处理RDD的一个分区，从RDD的角度描述物理计算模型如下图所示：(从RDD的角度来看，RDD内部也是由不同的分区组成，在Spark工作过程中，处理的是不同分区这也与RDD描述的逻辑结构相似，只是逻辑结构中将数据统合成一个整体了)</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010201532320.png" alt="image-20221010201532320"></p>
+<h3 id="体系架构">体系架构</h3>
+<h4 id="架构图">架构图</h4>
+<p><img src="https://blog.zerorains.top/img/03.1Spark%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="03.1Spark架构图"></p>
+<ol>
+<li>集群管理器(cluster manager)：管理整个系统的资源并监控工作节点(worker)。Spark可以分为Standalone和Yarn两种不同的部署模式。
+<ol>
+<li>Standalone的集群管理器包含Master和Worker</li>
+<li>Yarn模式将Spark与资源管理系统Yarn共同部署，集群管理器包括ResourceManager和NodeManager</li>
+</ol>
+</li>
+<li>执行器(executor)：执行任务。其本身是一个运行在工作节点上的进程，通过启动若干线程执行任务。Standalone部署方式下的进程名称为：CoarseGrainedExecutorBackend</li>
+<li>驱动器(driver)：启动应用程序的主方法并管理作业运行。其在逻辑上独立与主节点、从节点以及客户端，但根据应用程序的不同运行方式以不同的形式存在。</li>
+</ol>
+<p>在Spark中，集群管理器负责集群资源管理，驱动器负责作业管理，实现了资源管理和作业管理两大功能的分离，解决了MapReduce中资源管理和作业管理紧耦合的局限性。</p>
+<blockquote>
+<p>当然这个局限性在MapReduce二代中解决了，主要方案就是将资源管理的任务全部交给Yarn负责，而MapReduce的JobTracker和TaskTracker只负责作业管理。</p>
+</blockquote>
+<p>Standalone模式又可以进一步分为Standalone Client模式和Standalone Cluster模式。</p>
+<p>Standalone Client模式下驱动器位于客户端，并处于SparkSubmit进程中，客户端可以查看应用程序的执行过程，一般用于测试。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010214225243.png" alt="image-20221010214225243"></p>
+<p>Standalone Cluster模式下，Master将选择在某一Worker所在节点启动名为DriverWrapper的进程作为驱动器，客户端无法查看应用程序执行过程中的信息，一般用于生产环境。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010214400913.png" alt="image-20221010214400913"></p>
+<blockquote>
+<p>为什么Client用于测试居多，Cluster用于生产环境呢？举个实际的例子，假设在实际生产环境中，用户要向Spark提交1000个应用程序，如果选择Client模式进行部署，那1000个程序都会挤在客户端的节点中，导致客户端卡死，也不利于应用程序的执行。而Cluster模式，则会在不同的从节点中启动这1000个程序，同时不影响客户端的运行。同样的，在Yarn平台中运行Spark也有Client和Cluster两种模式，不论是在Yarn还是Standalone的条件下，Client和Cluster的优缺点都是基本一致的(前者多用于测试，后者多用于生产环境)。</p>
+</blockquote>
+<h4 id="应用程序的执行流程">应用程序的执行流程</h4>
+<p><img src="https://blog.zerorains.top/img/03.2Spark%E5%BA%94%E7%94%A8%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png" alt="03.2Spark应用执行流程"></p>
+<ol>
+<li>启动驱动器。Client部署方式将直接在客户端启动驱动器，并向Master注册。Cluster方式部署则客户端将应用程序提交给Master，由Master选择一个工作节点启动驱动器进程(DriverWrapper)。</li>
+<li>构建基本运行环境，即由驱动器创建SparkContext，向集群管理器进行资源申请，并由驱动器进行任务分配和监控。</li>
+<li>集群通知工作节点启动执行器进程，该进程内部以多线程方式运行任务。</li>
+<li>执行器进程向驱动器注册。</li>
+<li>SparkContext构建DAG并进行任务划分，从而将其交给执行器进程中的线程以执行任务。</li>
+</ol>
+<h3 id="工作原理">工作原理</h3>
+<p>Spark应用程序执行过程中，驱动器创建的SparkContext维护了应用程序的基本运行信息。SparkContext将RDD的依赖关系构造成DAG，使用DAG调度器(DAG scheduler)划分DAG Stage，将Stage作为一个TaskSet提交给任务调度器，由其将任务分发给各个工作节点上的执行器执行，整个过程按照Stage依次执行。驱动器具体工作如下图：</p>
+<p><img src="https://blog.zerorains.top/img/03.3%E9%A9%B1%E5%8A%A8%E5%99%A8%E5%86%85%E9%83%A8%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.png" alt="03.3驱动器内部工作原理"></p>
+<h4 id="stage划分">Stage划分</h4>
+<p>RDD之间存在依赖关系，通常分为窄依赖和宽依赖，窄依赖是指父RDD的每一个分区最多被一个子RDD的分区所用。宽依赖是指子RDD的分区依赖于父RDD的多个分区或所有分区。如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010224249134.png" alt="image-20221010224249134"></p>
+<p>在Stage划分过程中，DAG调度器针对DAG进行反向解析，遇到宽依赖则生成新的Stage，遇到窄依赖则将该Operator加入到当前Stage中，从而使窄依赖尽可能地划分在同一个Stage中。因此Stage内部生成的RDD之间为窄依赖关系，而Stage输出RDD和下一个Stage输入RDD之间为宽依赖关系。只有Stage之间的数据传输需要进行Shuffle。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221010230346256.png" alt="image-20221010230346256"></p>
+<blockquote>
+<p>为什么要按照这种方式进行Stage划分？从上面的描述中可以看出来，窄依赖的数据原都是单向变化的，即数据源是多对一的映射方式，比如map，filter，union操作并不需要数据交互，join也只需要将分散的数据源聚集起来即可。这样窄依赖的计算过程就不会有数据传输的需求。而宽依赖则是有需要传输的需求。因此，将窄依赖统合起来称为一个Stage可以将其抽象成一个完整的计算整体，尽可能地先做好较快的计算后再进行数据交互(比如shuffle)，减小不必要的数据传输耗费的时间。</p>
+</blockquote>
+<p>Stage分为ShuffleMapStage和ResultStage两种类型：</p>
+<ol>
+<li>ShuffleMapStage输出是另一个Stage，其特点是
+<ol>
+<li>不是最终的Stage，其后面还有其他的Stage</li>
+<li>输出必须经过Shuffle过程，并作为后续Stage的输入</li>
+<li>一个DAG中可能包含该类型Stage，也可能不包含该类型的Stage</li>
+</ol>
+</li>
+<li>ResultStage的特点是：
+<ol>
+<li>是最终的Stage，且其输出即为最终的结果</li>
+<li>一个DAG中必包含该类型Stage</li>
+</ol>
+</li>
+</ol>
+<h4 id="stage内部的数据传输">Stage内部的数据传输</h4>
+<p>Spark系统采用<strong>流水线的方式进行Stage内部的数据传输</strong>，流水线方式不要求物化前序算子的所有计算结果。简单来说就是在Stage内部中如果<strong>输入的数据源之间不存在依赖关系的计算，则可以并发进行，无须等待其他计算结束</strong>。<strong>如果有多个数据源的输入，并且这些数据源有不同的处理方式，就会需要等待</strong>。通常情况下，Spark根据每个Stage输出RDD中的分区个数决定启动的任务数量(即TaskSet的大小)以执行该Stage中的操作。</p>
+<h4 id="stage之间的数据传输">Stage之间的数据传输</h4>
+<p>Stage之间的数据传输需要进行Shuffle，Shuffle过程分为Shuffle Write和Shuffle Read两个阶段</p>
+<ol>
+<li>Shuffle Write阶段，ShuffleMapTask需要将输出RDD的记录按照分区函数划分到相应的bucket中并物化到本地磁盘形成ShuffleblockFile，之后才可以在Shuffle Read阶段被拉取</li>
+<li>Shuffle Read阶段，ShuffleMapTask或Result根据partition函数读取相应的ShuffleblcokFile，将其存入缓冲区并继续进行后续的计算。缓冲区并不一定要求对该Task负责的所有记录进行排序后才进行后续处理(与MapReduce先排序再执行Reduce任务不同)</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20221011111654129.png" alt="image-20221011111654129"></p>
+<blockquote>
+<p>为什么要这么做？Spark本质是一个内存计算系统，也就是说RDD的计算其实要加载到内存中，才进行计算的，如果不进行物化，直接在某一个节点上收集所有的输出结果并将其整合在一起，若整合后的结果不是很大，则影响不大，但是如果整合后的结果非常大，超过了节点的内存那么这样就算整合失败了。就会重新计算，但是会使用同样的方式进行整合，结果仍然是是失败的。物化计算结果到磁盘中，就是解决这个内存不足的问题，毕竟磁盘容量总是要比内存容量好拓展的。</p>
+<p>随之而来的问题也有，既然涉及到物化计算结果写入磁盘，写入磁盘的时间肯定是比内存旧的，但是相对而言，物化结果到磁盘能够更节省成本。</p>
+</blockquote>
+<h4 id="应用与作业">应用与作业</h4>
+<p>从逻辑执行上看：一个Application(应用)由一个或多个DAG构成，一个DAG由一个或多个Stage构成，一个Stage由若干个RDD Operator构成。</p>
+<p>从物理执行上看：一个Application等于一个或多个Job，一个Job由一个或多个TaskSet构成，一个TaskSet为多个不存在Shuffle关系的Task集合。</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>逻辑执行角度</th>
+<th>物理执行角度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Application</td>
+<td>DAG</td>
+<td>Job</td>
+</tr>
+<tr>
+<td>Application</td>
+<td>Stage</td>
+<td>TaskSet</td>
+</tr>
+<tr>
+<td>Application</td>
+<td>RDD Operator</td>
+<td>Task</td>
+</tr>
+</tbody>
+</table>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>
+<p>Client故障</p>
+<ol>
+<li>Standalone Client模式下，驱动器存在于该进程将导致系统无法正常工作，用户需要重新提交应用程序</li>
+<li>Standalone Cluster模式中，只要作业成功提交给系统，Client就不会影响系统中的作业运行，但如果Driver进程故障将导致系统无法正常工作，需要重新提交应用程序。</li>
+</ol>
+</li>
+<li>
+<p>Master故障</p>
+<ol>
+<li>故障后则无法正常工作，需要重新启动</li>
+<li>或者可以借助ZooKeeper实现高可用性</li>
+</ol>
+<blockquote>
+<p>ZooKeeper的实现方式就是使用多个Master，并形成对应的Znode，选出主Master，然后备选1监听主Master的Znode，备选2监听备选1的Znode，以此类推，当被监听的Master故障，则使用监听的Master顶替。</p>
+</blockquote>
+</li>
+<li>
+<p>Worker或Executor故障</p>
+<ol>
+<li>影响系统中局部计算的结果</li>
+<li>系统可以重启发生故障的进程或将其丢弃将原本由这些进程负责执行的任务交给新的Worker或Executor执行。</li>
+<li>可能会导致部分RDD或RDD中的某些分区丢失</li>
+</ol>
+</li>
+</ol>
+<h4 id="rdd持久化">RDD持久化</h4>
+<p>Worker进程可以<strong>管理一定大小的内存，用于存储RDD和计算中需要的其他辅助信息</strong>。一旦RDD占用空间达到相应存储空间的阈值，Spark会使用置换算法将部分RDD的内存空间腾出。如果不进行声明，这些RDD将会被直接丢弃。对于需要保留的RDD，则用户在编程时需标明该类RDD需要持久化(通过调用RDD的persist(Storagelevel)方法或cache()方法实现)</p>
+<h4 id="故障恢复">故障恢复</h4>
+<p>SparkContext中维护了RDD的血缘关系(RDD转换操作的DAG)。当某一RDD的部分分区丢失时，其可<strong>通过血缘关系获取足够的信息以重新运算和回复丢失的数据分区</strong>。窄依赖的RDD中只需要使用对应的数据源重新计算即可恢复，而宽依赖的RDD则需要等待依赖的所有父RDD计算完成后才能进行恢复。</p>
+<h4 id="检查点">检查点</h4>
+<p>RDD持久化在一定程度上提供了多个备份，但是这些备份的机器可能发生故障，在这种情况下需要依赖血缘关系进行恢复，但是如果正好依赖血缘关系进行RDD恢复所需的计算时间非常长，这时候就需要通过设置检查点来进行恢复了。</p>
+<p>检查点机制将RDD写入可靠的外部分布式文件系统中(本身就自带一定的容错能力)，用户需要指定某些计算时间较长的RDD设置检查点，系统在作业结束后启动一个独立的作业进行写检查点操作。通过这样的方式，直接从检查点中读取要恢复的RDD数据，以此加快恢复过程。</p>
+<blockquote>
+<p>优点：和上面说的一样，就是会加快系统的恢复过程</p>
+<p>缺点：这个检查点是写在HDFS上的，因此会产生一部分的写入计算开销，同时写入也会占用一定的磁盘空间。同时需要指定哪些RDD是要进行保存的，如果RDD很多，这可能会带来麻烦(但感觉影响又不大，因为在Spark编码的时候，RDD的转化也是一步一步手动定义的，即使使用for循环的方式进行定义，则也只需要记录对应位置然后加入检查点就可以了。除非是很复杂的DAG结构)</p>
+</blockquote>
+<h2 id="资源管理系统yarn">资源管理系统Yarn</h2>
+<p>Yarn是一个通用的资源管理系统，为上层应用提供统一的资源管理和制度。</p>
+<h3 id="设计思想">设计思想</h3>
+<p>一代MapReduce中，一个显著的缺陷就是资源管理和作业紧密耦合。Yarn的出现使得资源管理模块从第一代MapReduce中独立，称为一个通用的资源管理平台。</p>
+<h4 id="作业与资源管理">作业与资源管理</h4>
+<p>第一代MapReduce存在以下问题</p>
+<ol>
+<li>资源管理与作业紧密耦合：JobTracker既要负责作业调度和任务调度，又要负责集群中的资源。</li>
+<li>作业的控制管理高度集中：JobTracker负责所有作业的控制，JobTracker需要维护所有作业的元信息，内存开销较大。</li>
+</ol>
+<p>基于这些问题，Yarn通过将资源管理和作业管理分离形成通用的资源管理系统，并使作业之间相互独立地控制执行。</p>
+<blockquote>
+<p>为什么要将资源管理与作业分离？这个假设我们又要使用Spark系统又要使用MapReduce系统处理不同的数据，那么如果不将作业管理和资源管理分离的话，两个系统都要占有一定的资源，也就是说，Spark系统占用的资源使用结束后就无法让给MapReduce使用，反过来也是同理。因为两者资源分配的进程不同一，这也就导致了他们都无法统一使用集群中的资源。</p>
+</blockquote>
+<h4 id="平台与框架">平台与框架</h4>
+<p>如果将资源管理系统视为一个提供资源的平台(platform)，则可以在该平台上运行各种分布式系统。与平台相应，将运行在资源管理平台上的分布式计算系统称为框架(framework)。平台提供资源管理的功能，框架为运行在平台上的系统。</p>
+<p>Yarn进行资源管理的粒度是应用，称为Yarn平台的应用。框架可以将其应用或作业映射为Yarn平台的应用。</p>
+<h3 id="体系架构">体系架构</h3>
+<h4 id="架构图">架构图</h4>
+<p><img src="https://blog.zerorains.top/img/04.1Yarn%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="04.1Yarn架构图"></p>
+<p>Yarn也是采用主从架构，包括主节点运行的ResourceManager、从节点运行的NodeManager和提交应用程序的客户端(Client)。ResourceManager和NodeManager是Yarn的常驻进程，而从节点中的ApplicationMaster是用于某一应用管理的进程，Container表示可以用于执行该应用中具体任务的资源。</p>
+<ol>
+<li>ResourceManager(RM)：负责整个系统的资源管理和分配的资源管理器，主要由调度器和应用管理器两个组件构成。
+<ol>
+<li>调度器负责分配Container并进行资源调度</li>
+<li>应用管理器负责管理整个系统中运行的所有应用</li>
+</ol>
+</li>
+<li>NodeManager(NM)：负责每个节点资源和任务管理的节点管理器。
+<ol>
+<li>NM定时向RM汇报本节点的资源使用情况和Container运行状态</li>
+<li>NM接受并处理来自AM的Container启动/停止等各种请求</li>
+</ol>
+</li>
+<li>ApplicationMaster(AM)：用户基于Yarn平台提交一个框架应用，Yarn均启动一个AM以管理改应用
+<ol>
+<li>AM与RM调度器通过协商获取资源，将获取的资源进一步分配给作业内部的业务</li>
+<li>AM与NM通过通信启动/停止任务，监控所有任务运行状态，并在任务发生故障时重新申请资源以重启任务</li>
+</ol>
+</li>
+<li>Container：资源的抽象表示，包含CPU、内存等资源，是一个动态资源划分单位
+<ol>
+<li>当AM向RM申请资源时，RM向AM返回以Container表示的资源</li>
+</ol>
+</li>
+</ol>
+<h4 id="应用程序执行流程">应用程序执行流程</h4>
+<p><img src="https://blog.zerorains.top/img/image-20221011153951556.png" alt="image-20221011153951556"></p>
+<ol>
+<li>用户编写客户端应用程序，向Yarn提交应用程序</li>
+<li>ResourceManager负责接收和处理来自客户端的请求，尝试为该应用程序分配第一个Container，若分配成功则在该Container中启动应用程序的ApplicationMaster</li>
+<li>AppicationMaster向ResourceManager注册，以便客户端通过ResourceManager查看应用程序的资源使用情况。ApplicationMaster将应用解析为作业并进一步分解为若干任务，并向ResourceManager申请启动这些任务的资源。</li>
+<li>ResoueManager向提出请求的ApplicationMaster分配以Container形式表示的资源。一旦ApplicationMaster申请到资源，即可在多个任务间进行资源分配。</li>
+<li>ApplicationMaster确定资源分配方案后，与对应的NodeManager通信，在相应的Container中启动相应的工作进程以执行任务。</li>
+<li>各个工作进程向ApplicationMaster汇报自身的状态和进度，以便令ApplicationMaster随时掌握各个工作进程的任务运行状态。</li>
+<li>随着任务执行结束，ApplicationMaster逐步释放占用的资源，最终向ResourceManager注销并自行关闭。</li>
+</ol>
+<h3 id="工作原理">工作原理</h3>
+<h4 id="单平台多框架">单平台多框架</h4>
+<p>对于Yarn来说，其<strong>只负责向框架提供Container，并不关心在Container中运行何种服务</strong>。通过Yarn资源管理平台，多个框架可以部署在同一个物理集群中，并动态地共享资源。</p>
+<p>下图展示了在Yarn平台中提交了2个MapReduce应用和1个Spark应用，由此看出，每当提交一个应用时，Yarn均会启动一个对应的ApplicationMaster。</p>
+<p><img src="https://blog.zerorains.top/img/04.2Yarn%E5%8D%95%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2.png" alt="04.2Yarn单平台部署"></p>
+<h4 id="平台资源分配">平台资源分配</h4>
+<p>ResourceManager的调度器维护了一个或多个应用队列，每个队列拥有一定数量的资源，位于同一队列的应用共享该队列所有拥有的资源。<strong>资源调度实际上是决定如何将资源分配给队列，以及分配给队列中应用的过程</strong>。Yarn平台负责分配一定的资源，框架决定如何使用这些资源执行任务。</p>
+<p>Yarn中的调度器是一个可插拔的组件，可以通过配置文件选择不同的调度器：</p>
+<ol>
+<li>FIFO调度器：FIFO仅维护一个队列，该列拥有集群中的所有资源，调度器的资源分配方式为先提交的应用先得到资源。<strong>这种调度器的实现方式比较简单，但是会导致一个应用独占所有资源，而其他应用需要不断等待</strong></li>
+<li>Capacity调度器：维护层级式队列，集群中的资源划分给这些队列，队列内部的资源分配方式为FIFO，用户提交应用程序时可以指定将应用放入某一队列中。<strong>这种方式可以避免某个长时间运行的应用独占集群资源而其他应用得不到运行的情况。但也可能会出现一个队列的资源一直被使用，而另一个则一直没有使用的情况</strong>。</li>
+<li>Fair调度器：维护层级式队列，集群中的资源换分给这些队列，但是<strong>队列之间可以共享资源</strong>，因而这些队列在逻辑上可以看做一个共享队列。当只有一个应用运行时，该应用可以独占整个集群资源。但当其他应用提交到集群时，将空出部分资源给新的应用，最终所有的应用会根据所需使用内存的大小得到分配的资源。</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/image-20221011202304292.png" alt="image-20221011202304292"></p>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>
+<p>ResourceManager故障：进行故障恢复时需要用某一持久化存储系统中恢复信息。恢复完毕后，ResourceManager会清除当前集群中所有Container，包括运行ApplicationMaster的Container。RM重新启动ApplicationMaster，所有应用重新执行</p>
+<blockquote>
+<p>可以使用多个ResourceManager通过ZooKeeper进行协调，当主要的RM故障时，ZooKeeper对应的ZNode就监听不到了，这时候就使用其他ResourceManager进行替换。但是又要考虑一个问题，就是所有的RM应该和主RM保持相同的信息，这样才能在不重启的情况下完成替换。</p>
+</blockquote>
+</li>
+<li>
+<p>NodeManager故障：RM和NM之间保持心跳通信，因此RM可以通过超时机制判断NM是否发生故障。如果NM发生故障，则RM会认为NM所在节点中的所有容器运行的任务均执行失败，并将执行失败的信息告知ApplicationMaster。因此，AM将向RM重新申请运行资源去运行这些任务。故障NM恢复后，则向RM重新注册，重置本地信息</p>
+<blockquote>
+<p>一直想知道这个心跳通信的机制是什么情况？为什么没有考虑过这个心跳机制因为某种原因导致信号传递不到RM但实际上NM并没有问题，咋办？</p>
+<p>心跳通信的机制是基于RPC实现的，RPC是分布式的基石，其直接传输信息的二进制流，速度是比较快速的，在网络上可以认为是可靠传输。(实际上传输不到这个就涉及到计网相关的知识了，在网络传输协议中本身就包含一些确保数据正确传输的机制，除非断网，不然应该都是没有太大问题的)。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="典型示例">典型示例</h3>
+<h4 id="yarn平台运行mapreduce框架">Yarn平台运行MapReduce框架</h4>
+<p>第一代MapReduce与MapReduce+Yarn对比</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>第一代MapReduce</th>
+<th>MapReduce+Yarn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>资源管理</td>
+<td>JobTracker、TaskTracker</td>
+<td>ResourceManager</td>
+</tr>
+<tr>
+<td>资源管理</td>
+<td>JobTracker、TaskTracker</td>
+<td>NodeManager</td>
+</tr>
+<tr>
+<td>应用管理</td>
+<td>JobTracker、TaskTracker</td>
+<td>MRAppMaster</td>
+</tr>
+<tr>
+<td>任务执行</td>
+<td>Child</td>
+<td>YarnChild</td>
+</tr>
+</tbody>
+</table>
+<p>从对比表中可以看出，原本的JobTracker与TaskTracker对资源管理和应用管理过于耦合了，在Yarn的指导下，资源管理分别由ResourceManager和NodeManager负责，MRAppMaster完成应用管理，实现了资源管理与应用管理分离。Yarn平台运行MapReduce的架构图如下：</p>
+<p><img src="https://blog.zerorains.top/img/04.3MRYARN.png" alt="04.3MRYARN"></p>
+<h4 id="yarn平台运行spark架构">Yarn平台运行Spark架构</h4>
+<p>Spark的Standalone模式可以分为Client和Cluster两种部署方式，因此在Yarn中运行的Spark也可以分为Cluster和Client两种模式。四种模式的对比如下表</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>Standalone Client</th>
+<th>Standalone Cluster</th>
+<th>Yarn Client</th>
+<th>Yarn Cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>资源管理</td>
+<td>Master</td>
+<td>Master</td>
+<td>ResourceManager</td>
+<td>ResourceManager</td>
+</tr>
+<tr>
+<td>资源管理</td>
+<td>Worker</td>
+<td>Worker</td>
+<td>NodeManager</td>
+<td>NodeManager</td>
+</tr>
+<tr>
+<td>应用管理</td>
+<td>SparkSubmit</td>
+<td>DriverWrapper</td>
+<td>SparkSubmit</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>任务执行</td>
+<td>CoarseGrainedExecutorBackend</td>
+<td>同第一个</td>
+<td>同第一个</td>
+<td>同第一个</td>
+</tr>
+</tbody>
+</table>
+<p>Yarn Cluster模式下，除了使用ResourceManager和NodeManager分别替换Master和Worker之外，还创建了ApplicationMaster用于作业管理。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012101200463.png" alt="image-20221012101200463"></p>
+<p>Yarn Client模式下，驱动器仍然是在客户端中，同时使用ResourceManager和NodeManager分别替换了Master和Worker。只是这种情况不会再启动ApplicationMaster进行作业管理，而是在客户端提交一个Spark应用之后ResourceManager随机选取一个NodeManager所在节点启动Executor Laucher，这个进程只负责向ResourceManager申请资源启动CoarseGrainedExecutorBackend，不负责运行Driver。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012102028026.png" alt="image-20221012102028026"></p>
+<blockquote>
+<p>为什么Yarn Client模式下又不使用ApplicationMaster进行作业管理呢？我的理解是这样的，因为Client模式下需要在客户端监控作业的执行情况，因此作业的进度和状态应该直接向客户端反馈，而ApplicationMaster的任务也是监督作业的进度和状态，这就使得两个功能其实是相同的，这就没有必要在占用资源去启动ApplicationMaster，只是需要一个更轻量的进程去帮助作业启动即可，作业启动后的进度和状态直接由客户端监督。</p>
+</blockquote>
+<h4 id="yarn平台运行mapreduce和spark框架">Yarn平台运行MapReduce和Spark框架</h4>
+<p>从上面的两个示例来看，不论是MapReduce还是Spark，在Yarn平台上运行都由ResourceManager和NodeManager接管资源管理，因此两者的结合的重合部分就是资源管理部分，同时在作业管理上如果Spark使用的Yarn Cluster不是模式，则两者其实并没有太大区别。具体结合方式如下图所示：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012104049742.png" alt="image-20221012104049742"></p>
+<h2 id="协调服务系统zookeeper">协调服务系统ZooKeeper</h2>
+<h3 id="设计思想">设计思想</h3>
+<p>目标：将实现复杂的分布式一致性服务封装为一个高效可靠的原语集，并以一系列简单易用的接口提供给用户。</p>
+<p>ZooKeeper不用于存储大量数据，而是用于存储元数据和配置信息等，以便进行协调服务。</p>
+<h4 id="数据模型">数据模型</h4>
+<p>ZooKeeper维护的是类似于文件系统的层次数据结构，数据模型为一棵树。树中的每个数据节点称为Znode，每个Znode中均可保存信息。Znode可以分为持久Znode和临时Znode。</p>
+<ol>
+<li>持久Znode一旦被创建，除非主动进行Znode移除操作，否则将一直存在与ZooKeeper系统中。</li>
+<li>临时Znode的生命周期和客户端会话绑定，一旦客户端会话失效，则该客户端创建的所有临时Znode都会被移除。</li>
+</ol>
+<p><img src="https://blog.zerorains.top/img/05.1Znode.png" alt="05.1Znode"></p>
+<h4 id="操作原语">操作原语</h4>
+<ol>
+<li>create：在树中某个位置添加一个Znode</li>
+<li>delete：删除某个Znode</li>
+<li>exists：判断某个位置是否存在Znode</li>
+<li>get data：从某个Znode读取数据</li>
+<li>set data：向某个Znode写入数据</li>
+<li>get children：查找某个Znode的子节点</li>
+<li>sync：用于等待数据同步</li>
+</ol>
+<h3 id="体系架构">体系架构</h3>
+<p><img src="https://blog.zerorains.top/img/image-20221012113923387.png" alt="image-20221012113923387"></p>
+<p>ZooKeeper包含一组服务器，用于存储数据，每台服务器维护一份树形结构数据的备份。</p>
+<ol>
+<li>领导者：可以为客户端直接提供读、写服务</li>
+<li>追随者：只能直接提供读服务，客户端发给追随者的写操作需要转发给领导者。</li>
+<li>观察者：与追随者类似，但是观察者不参与选举领导的过程</li>
+</ol>
+<p>客户端与服务器之间建立的连接称为会话，客户端通过心跳与服务器保持有效连接，一旦连接断开即表示会话结束。客户端能够向ZooKeeper服务发送请求并接收响应，并且能够接收来自服务器的Watch事件通知。这个Watch事件是指客户端可以在某个Znode中设置一个Watcher，一旦该Znode发生变化(存储的数据改变，名称改变，子节点增加)则得到服务器的通知。</p>
+<blockquote>
+<p>为什么要使用这种架构呢？首先一个主，多个备用在分布式系统是很常见的，一个领导者主要用于管理整个ZooKeeper系统，多个备用(观察者，追随者)一方面可以在领导者宕机后进行顶替作用，另一方面是可以缓解领导者的压力，如果所有客户端都只和领导者进行交互，那么其带宽要求通常会很高，使用其他备用服务器读取操作就可以从对应的服务器进行读取了(因为这些主服务器和备用服务器的数据都是同步的)。而写操作还是要从主服务器中写入，再与其他备用服务器同步，这样做的目的是保证只有一个服务器进行写入，避免多个服务器写入后，同步时会产生记录冲突的情况。</p>
+</blockquote>
+<h3 id="工作原理">工作原理</h3>
+<p>ZooKeeper属于轻量级的数据存储系统，维护了数据的多个副本，由于写操作会改变数据的内容，因此必须保证所有节点执行系统的操作序列，从而实现副本之间的一致性。ZooKeeper需要由领导者节点保证各个节点执行相同的写操作序列，ZooKeeper工作过程的首要问题是如何在服务器之间确定领导者。</p>
+<h4 id="领导者选举">领导者选举</h4>
+<p>分布式一致性协议用于解决分布式系统如何就某个提议达成一致的问题，Paxos是实现该协议的经典算法之一：由某些节点发出提议，然后由其他节点进行投票表决，最终使所有节点达成一致。</p>
+<p>如果将竞选主节点作为一个提议，那么分布式一致性算法可以用于进行选主。初始状态下，所有节点均发出ID提议将自己作为领导者，系统中的节点按照分布式一致性算法进行投票表决，最终仅有一个节点成领导者。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/130332285">分布式一致性算法-Paxos、Raft、ZAB、Gossip - 知乎 (zhihu.com)</a></p>
+</blockquote>
+<h4 id="读写请求流程">读写请求流程</h4>
+<p>写请求的流程如下：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012152351492.png" alt="image-20221012152351492"></p>
+<ol>
+<li>客户端与服务器建立链接并发起写数据请求</li>
+<li>如果该服务器为追随者或观察者，则将接收的写请求转发给领导者，否则领导者可以直接处理</li>
+<li>理论上，领导者需要将写请求转发给所有的服务器节点，直到所有服务器节点均成功执行写操作，该写请求才算完成。(追随者，观察者，领导者之间的数据同步，需要使用一致性协议)</li>
+<li>服务器向客户端返回写成功的信息。</li>
+</ol>
+<blockquote>
+<p>优点：保证领导者服务器负责主要更新操作，确保了写入的一致性</p>
+<p>缺点：写请求需要转发给领导者，且在领导者写入后还需要与其他服务器节点进行数据同步，这无疑会增加写入时间。但是和写入不一致相比，增加的时间显然是可以接受的。</p>
+</blockquote>
+<p>在读请求中，如果发送给观察者或者追随者，读取到的内容可能不是最新的(领导者更新写入还没完成)，因此客户端可以调用sync()操作等待追随者与领导者进行数据同步，之后再获取最新的内容，具体流程如下：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012153024747.png" alt="image-20221012153024747"></p>
+<ol>
+<li>客户端与某一服务器建立连接并发起sync()请求</li>
+<li>如果该服务器是追随者或观察者，则与领导者进行数据同步。</li>
+<li>服务器向客户端返回同步成功的信息</li>
+<li>客户端从服务器读取数据</li>
+</ol>
+<blockquote>
+<p>优点：使用sync可以确保多个服务器中的数据始终处于同步状态，确保用户每次读取都能得到一致性的内容。</p>
+<p>缺点：一般涉及到同步问题的，都会涉及到的缺点就是等待时间的开销，数据实现同步得到的一致性通常都是会消耗时间的。</p>
+</blockquote>
+<h3 id="容错机制">容错机制</h3>
+<ol>
+<li>领导者故障：ZooKeeper重新进行领导者选举</li>
+<li>追随者或观察者发生故障，则该节点无法对外提供服务，但其他节点仍然可以正常提供服务</li>
+<li>追随者或观察者发生故障重启后，则能够从领导者节点或其他节点进行数据恢复</li>
+</ol>
+<h3 id="典型示例">典型示例</h3>
+<h4 id="集群管理">集群管理</h4>
+<p>分布式计算系统通常使用主从结构，通常情况下只有一个主节点和若干从节点。主节点需要监控集群中从节点的变化情况。为了支持分布式计算系统的高可用性，需要配置多个主节点并进行选主以保证系统的正常运行，ZooKeeper能够很好地完成这个任务。</p>
+<p>比如在MapReduce中，JobTracker要监控多个TaskTracker的变化情况，就可以在ZooKeeper中创建一个Znode(/cluster)并watch这个Znode节点。TaskTracker在启动之后会在/cluster节点下面创建临时Znode，当TaskTracker发生故障时，则会与ZooKeeper断开连接，这个TaskTracker对应的临时Znode就会被自动删除，这时候/cluster内的结果发生变化，watch他的JobTracker就会收到变化信息。由此实现了JobTracker对TaskTracker的状态监控。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012160514589.png" alt="image-20221012160514589"></p>
+<blockquote>
+<p>有什么优势呢？我们可以知道在之前JobTracker对TaskTracker的监控是通过心跳机制进行的，通常情况下这个时间定为3s左右，也就意味着每过3s就要使用一部分计算资源去确保TaskTracker的正常进行，如果TaskTracker的数量很大，那么计算资源就会产生很大的浪费。在引入ZooKeeper的方式之后，按照之前的描述，ZooKeeper只有在TaskTracker发生变化时，才会通知JobTracker，这时候就不需要3s的心跳机制了，节省了一部分的计算资源。</p>
+</blockquote>
+<p>还有在MapReduce之中提到的，使用多个JobTracker实现MapReduce的高可用性。这也需要引入ZooKeeper，创建多个JobTracker，这时候为了维持这些JobTracker的一致性就需要进行选主操作。初始化每个JobTracker均创建名为/epection/p的临时Znode并添加属性。ZooKeeper自动为这些顺序的Znode添加自增的编号，因而选主的方式为选取/election下编号最小的Znode。其余节点作为备用节点，并且监听前一位JobTracker的Znode，一旦监听的Znode告知节点的前一位故障，则当前备用节点直接代替其功能。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012161453692.png" alt="image-20221012161453692"></p>
+<blockquote>
+<p>这也是很多分布式计算系统的主节点借助ZooKeeper实现高可用性的通用方案。具体来说，Spark的Master，Storm的Nimbus，Flink的JobManager，都可以借助上面的描述方式实现高可用性。</p>
+</blockquote>
+<h4 id="配置更新">配置更新</h4>
+<p>分布式系统在运行过程中通常会动态修改配置，当修改配置后，相应的进程也要进行相应的变化。ZooKeeper的Watch机制为这种需求提供了便捷的解决方案。如下图：</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012164927164.png" alt="image-20221012164927164"></p>
+<p>首先使用进程A在ZooKeeper中创建一个/config的临时Znode，并让进程B和进程C去watch /config，然后在进程A对config进行修改后，B和C会收到/config修改的通知，重新拉取/config进行相应的变化。</p>
+<h4 id="同步控制">同步控制</h4>
+<p>分布式计算系统按照BSP模型执行一个迭代作业是，通常需要一组进程共同协助执行各自负责的任务，一方面，进程执行一轮迭代计算的前提通常是所有进程均已做好准备，另一方面，所有参与进程所负责的任务均执行结束后，本轮迭代计算才能视为已完成。因此分布式计算系统需要在每轮迭代计算开始和结束时同步所有参与的进程，称为“双屏障”机制。</p>
+<p>假设一项任务由A、B、C三个进程进行，在进入屏障阶段，A先在ZooKeeper中创建一个Znode(/bar)，并watch这个Znode。当B进入屏障后，在/bar下面创建P1 Znode。这时候A会收到/bar的通知，但是A在查询后，发现/bar下面只有一个Znode，所以还需要继续等待。当C进入品章后在/bar下面创建P2 Znode。值得一提的是，B和C除了创建Znode外还监听/ready是否存在，一旦其存在则迭代计算的具体内容即可开始。创建好P2之后，/bar给A发送信息，这时候所需的进程都准备完成，A创建/ready，然后开始迭代计算的具体内容。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012170521771.png" alt="image-20221012170521771"></p>
+<p>在离开屏障结束后，B率先计算完成，其主动删除P1的Znode，表示自己准备要离开屏障，这时候A收到来自/bar的通知，但是/bar中还有节点，并未完成本次计算，继续等待。C计算完成后，主动删除P2的Znode，这时候A收到来自/bar的通知，且/bar中没有子节点了，表示计算结束。A将主动删除/ready节点，让B和C离开屏障。</p>
+<p><img src="https://blog.zerorains.top/img/image-20221012171125159.png" alt="image-20221012171125159"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/">http://blog.zerorains.top/2022/10/09/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></div><div class="post-share"><div class="social-share" data-image="/img/3.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" title="「书籍阅读」数据密集型应用系统设计"><img class="cover" src="/img/14.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「书籍阅读」数据密集型应用系统设计</div></div><div class="info-2"><div class="info-item-1">可靠、可拓展与可维护的应用系统 应用系统的组成模块：  数据库：存储数据 高速缓存：缓存复杂或操作代价昂贵的结果 索引：用户可以按关键字搜索并支持各种过滤 流式处理：持续发送消息至另一进程(异步) 批处理：定期处理大量的累积数据  数据软件系统重视的三个问题：  可靠性(Reliability)：硬件、软件故障、人为失误等，系统仍然可以正常运转。 可拓展性(Scalability)：数据量和复杂度是可变的 可维护性(Maintainability)：新人员可以参与到系统开发和运维，维护现有功能或适配新的场景，系统都能够高效运作。  可靠性 可能出错的事情称为错误(faults)或故障，系统可应对错误称为容错(fault-tolerant)。与失效(failure)不完全一致，前者表示与预期目的偏离，后者表示整个系统完全停止工作。 硬件故障:...</div></div></div></a><a class="pagination-related" href="/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/" title="「书籍阅读」分布式计算系统（二）"><img class="cover" src="/img/26.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「书籍阅读」分布式计算系统（二）</div></div><div class="info-2"><div class="info-item-1"> 这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  流计算系统Storm 与批处理系统处理静态数据不同，这种大量、快速、时变并持续到达的数据称为流数据(stream...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2022/10/12/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%BA%8C%EF%BC%89/" title="「书籍阅读」分布式计算系统（二）"><img class="cover" src="/img/26.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-12</div><div class="info-item-2">「书籍阅读」分布式计算系统（二）</div></div><div class="info-2"><div class="info-item-1"> 这种框的部分一般是自己衍生出来的疑问与解答(当然有的问题可能暂时没有解答) (ps：本文只是粗略记录，想了解具体细节还是建议要看原书)  流计算系统Storm 与批处理系统处理静态数据不同，这种大量、快速、时变并持续到达的数据称为流数据(stream...</div></div></div></a><a class="pagination-related" href="/2023/02/10/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DAutoShard-Automated-Embedding-Table-Sharding-for-Recommender-Systems/" title="「论文笔记」AutoShard: Automated Embedding Table Sharding for Recommender Systems"><img class="cover" src="/img/20.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-10</div><div class="info-item-2">「论文笔记」AutoShard: Automated Embedding Table Sharding for Recommender Systems</div></div><div class="info-2"><div class="info-item-1">简要 problem：大规模的embedding表参数会影响到推荐系统embedding模型的训练过程，这些大规模的embedding表如果使用不平衡的分布式存储方式，会严重影响模型的执行效率。这就涉及到一个挑战：embedding表分片问题（embedding table sharding）  如上图所示，蓝色的框表示一个embedding表，然后框内的数字表示执行操作执行时间的成本。紫色的框表示一个分片（sharding）旁边的数字表示这个分片的执行时间成本。 如果在分片过程中没有考虑到分片的平衡（图左边），就可能会导致GPU之间的不平衡，其中所有的GPU必须强制等待最慢的GPU（图中的bottleneck）。相反，如果分片是平衡的（图右边），就可以通过减小等待时间来显著加速embedding的操作。  因为sharding内部是并行执行的，所以sharding内部的执行时间是显著小于所有embedding表的执行时间之和的，比如...</div></div></div></a><a class="pagination-related" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img class="cover" src="/img/25.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-27</div><div class="info-item-2">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2023/03/25/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DFleche-An-Efficient-GPU-Embedding-Cache-for-Personalized-Recommendations/" title="「论文笔记」Fleche: An Efficient GPU Embedding Cache for Personalized Recommendations"><img class="cover" src="/img/16.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-25</div><div class="info-item-2">「论文笔记」Fleche: An Efficient GPU Embedding Cache for Personalized Recommendations</div></div><div class="info-2"><div class="info-item-1">简要 问题：  CPU端的DRAM数据访问与GPU处理之间的差距成为深度embedding模型推理性能的阻碍，用GPU-resident cache缓存embedding表可以解决这个差距，但是这个方案并没有被完全探索。 现有的缓存方案为每个embedding表维护一个固定大小的cache表，防止在表重分区期间发生大量的数据移动。这样的设计有两个重要的影响因素：缓存利用率低（静态单表缓存的结构缺陷）和内核维护开销（过多的小缓存查询内核）  方案：FLECHE——用于有效GPU-resident embedding caching的新颖缓存机制  主要思想：联合设计缓存结构和工作流，从而促进缓存利用率并减少缓存查询时间。 结构：GPU-HBM层用于缓存hot embedding，CPU-DRAM层存储所有的embedding（这里只考虑了模型能完全放入内存中的情况，大型模型会另外讨论） 为了解决缓存利用率低的问题，提出了flat cache(FC)。其通过将所有的embedding表输入id重新编码为统一格式的flat key，让所有embedding...</div></div></div></a><a class="pagination-related" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img class="cover" src="/img/26.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-04</div><div class="info-item-2">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a><a class="pagination-related" href="/2023/03/15/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DHercules-Heterogeneity-Aware-Inference-Serving-for-At-Scale-Personalized-Recommendation/" title="「论文笔记」Hercules: Heterogeneity-Aware Inference Serving for At-Scale Personalized Recommendation"><img class="cover" src="/img/26.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-15</div><div class="info-item-2">「论文笔记」Hercules: Heterogeneity-Aware Inference Serving for At-Scale Personalized Recommendation</div></div><div class="info-2"><div class="info-item-1">简要 现象：数据中心的深度学习推荐系统具有许多独特的工作负载特征和系统需求——模型多样性、云规模的系统异构行和时变负载模式。这些都需要特定于应用程序的解决方案来提高执行效率。 问题：   模型多样性：推荐模型的迅速发展，以支持新的用例，并实现更高的预测精度。这种不同算法结构导致了不同的性能瓶颈。最先进的推荐模型的计算和内存强度可以变化1~2个数量级。    云规模的系统异构：各种各样的系统架构可以在数据中心中共存，其原因如下：  系统升级会周期性的发生，不同微架构的服务器一代又一代地出现 特定领域的加速器越来越多地部署在数据中心，以最大化执行效率    时变负载模式：查询到达服从泊松分布，查询大小呈明显的重尾分布。动态变化的条件要求调度程序在不同级别运行，以快速适应和响应负载变化。   最优调度鞠策高度依赖于模型和硬件，并且需要一个有效的搜索机制来充分探索所有SLA（服务级协议）目标在模型并行、操作员并行和数据并行维度上的大调度空间。但现有的任务调度器设计缺乏遍历整个并行空间的能力。   方案： Herules——heterogeneity-aware...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hadoop%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.</span> <span class="toc-text">Hadoop文件系统</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">1.1.</span> <span class="toc-text">体系架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E5%88%86%E5%9D%97%E4%B8%8E%E5%A4%87%E4%BB%BD"><span class="toc-number">1.2.1.</span> <span class="toc-text">文件分块与备份</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5"><span class="toc-number">1.2.2.</span> <span class="toc-text">文件写入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96"><span class="toc-number">1.2.3.</span> <span class="toc-text">文件读取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">1.2.4.</span> <span class="toc-text">文件读写一致性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">1.3.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#namenode%E6%95%85%E9%9A%9C"><span class="toc-number">1.3.1.</span> <span class="toc-text">NameNode故障</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#datanode%E6%95%85%E9%9A%9C"><span class="toc-number">1.3.2.</span> <span class="toc-text">DataNode故障</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86%E7%B3%BB%E7%BB%9Fmapreduce"><span class="toc-number">2.</span> <span class="toc-text">批处理系统MapReduce</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">2.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.1.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.2.</span> <span class="toc-text">计算模型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">体系结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">2.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">2.2.2.</span> <span class="toc-text">应用程序执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%BE%93%E5%85%A5"><span class="toc-number">2.3.1.</span> <span class="toc-text">数据输入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#map%E9%98%B6%E6%AE%B5"><span class="toc-number">2.3.2.</span> <span class="toc-text">Map阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#shuffle%E9%98%B6%E6%AE%B5"><span class="toc-number">2.3.3.</span> <span class="toc-text">shuffle阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#reduce%E9%98%B6%E6%AE%B5"><span class="toc-number">2.3.4.</span> <span class="toc-text">Reduce阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%BE%93%E5%87%BA"><span class="toc-number">2.3.5.</span> <span class="toc-text">数据输出</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">2.4.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jobtracker%E6%95%85%E9%9A%9C"><span class="toc-number">2.4.1.</span> <span class="toc-text">JobTracker故障</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tasktracker%E6%95%85%E9%9A%9C"><span class="toc-number">2.4.2.</span> <span class="toc-text">TaskTracker故障</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#task%E6%95%85%E9%9A%9C"><span class="toc-number">2.4.3.</span> <span class="toc-text">Task故障</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86%E7%B3%BB%E7%BB%9Fspark"><span class="toc-number">3.</span> <span class="toc-text">批处理系统Spark</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">3.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#mapreduce%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">3.1.1.</span> <span class="toc-text">MapReduce的局限性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.1.2.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.1.3.</span> <span class="toc-text">计算模型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">3.2.</span> <span class="toc-text">体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">3.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.2.2.</span> <span class="toc-text">应用程序的执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">3.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#stage%E5%88%92%E5%88%86"><span class="toc-number">3.3.1.</span> <span class="toc-text">Stage划分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stage%E5%86%85%E9%83%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">3.3.2.</span> <span class="toc-text">Stage内部的数据传输</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stage%E4%B9%8B%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">3.3.3.</span> <span class="toc-text">Stage之间的数据传输</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E4%B8%8E%E4%BD%9C%E4%B8%9A"><span class="toc-number">3.3.4.</span> <span class="toc-text">应用与作业</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">3.4.</span> <span class="toc-text">容错机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#rdd%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">3.4.1.</span> <span class="toc-text">RDD持久化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E6%81%A2%E5%A4%8D"><span class="toc-number">3.4.2.</span> <span class="toc-text">故障恢复</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9"><span class="toc-number">3.4.3.</span> <span class="toc-text">检查点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9Fyarn"><span class="toc-number">4.</span> <span class="toc-text">资源管理系统Yarn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">4.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%9C%E4%B8%9A%E4%B8%8E%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86"><span class="toc-number">4.1.1.</span> <span class="toc-text">作业与资源管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B3%E5%8F%B0%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-number">4.1.2.</span> <span class="toc-text">平台与框架</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">4.2.</span> <span class="toc-text">体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">4.2.1.</span> <span class="toc-text">架构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.2.2.</span> <span class="toc-text">应用程序执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">4.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E5%B9%B3%E5%8F%B0%E5%A4%9A%E6%A1%86%E6%9E%B6"><span class="toc-number">4.3.1.</span> <span class="toc-text">单平台多框架</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B3%E5%8F%B0%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D"><span class="toc-number">4.3.2.</span> <span class="toc-text">平台资源分配</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">4.4.</span> <span class="toc-text">容错机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.5.</span> <span class="toc-text">典型示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#yarn%E5%B9%B3%E5%8F%B0%E8%BF%90%E8%A1%8Cmapreduce%E6%A1%86%E6%9E%B6"><span class="toc-number">4.5.1.</span> <span class="toc-text">Yarn平台运行MapReduce框架</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#yarn%E5%B9%B3%E5%8F%B0%E8%BF%90%E8%A1%8Cspark%E6%9E%B6%E6%9E%84"><span class="toc-number">4.5.2.</span> <span class="toc-text">Yarn平台运行Spark架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#yarn%E5%B9%B3%E5%8F%B0%E8%BF%90%E8%A1%8Cmapreduce%E5%92%8Cspark%E6%A1%86%E6%9E%B6"><span class="toc-number">4.5.3.</span> <span class="toc-text">Yarn平台运行MapReduce和Spark框架</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E8%B0%83%E6%9C%8D%E5%8A%A1%E7%B3%BB%E7%BB%9Fzookeeper"><span class="toc-number">5.</span> <span class="toc-text">协调服务系统ZooKeeper</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">5.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">5.1.1.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E5%8E%9F%E8%AF%AD"><span class="toc-number">5.1.2.</span> <span class="toc-text">操作原语</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">5.2.</span> <span class="toc-text">体系架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">5.3.</span> <span class="toc-text">工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A2%86%E5%AF%BC%E8%80%85%E9%80%89%E4%B8%BE"><span class="toc-number">5.3.1.</span> <span class="toc-text">领导者选举</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B"><span class="toc-number">5.3.2.</span> <span class="toc-text">读写请求流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">5.4.</span> <span class="toc-text">容错机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E7%A4%BA%E4%BE%8B"><span class="toc-number">5.5.</span> <span class="toc-text">典型示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86"><span class="toc-number">5.5.1.</span> <span class="toc-text">集群管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%9B%B4%E6%96%B0"><span class="toc-number">5.5.2.</span> <span class="toc-text">配置更新</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E6%8E%A7%E5%88%B6"><span class="toc-number">5.5.3.</span> <span class="toc-text">同步控制</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

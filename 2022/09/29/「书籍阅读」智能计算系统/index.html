@@ -1,0 +1,352 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>「书籍阅读」智能计算系统 | ZeroRains Blog</title><meta name="author" content="zerorains,zerorainssakura@qq.com"><meta name="copyright" content="zerorains"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇博客用于记录《智能计算系统》一书中的一些关键内容，由于前4章都是深度学习相关知识，我已经基本了解，所以不需要记录太多内容  第5章 TF1的设计原则 {高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果易开发：提取出大量的共性运算，并将这些运算成TF1中的各种算子可移植性：定义不同设备的抽象，其要实现如下方法{1.设备上执">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「书籍阅读」智能计算系统">
+<meta property="og:url" content="http://blog.zerorains.top/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="ZeroRains Blog">
+<meta property="og:description" content="这篇博客用于记录《智能计算系统》一书中的一些关键内容，由于前4章都是深度学习相关知识，我已经基本了解，所以不需要记录太多内容  第5章 TF1的设计原则 {高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果易开发：提取出大量的共性运算，并将这些运算成TF1中的各种算子可移植性：定义不同设备的抽象，其要实现如下方法{1.设备上执">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.zerorains.top/img/28.jpg">
+<meta property="article:published_time" content="2022-09-29T09:10:17.000Z">
+<meta property="article:modified_time" content="2022-09-30T08:37:12.463Z">
+<meta property="article:author" content="zerorains">
+<meta property="article:tag" content="智能计算系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.zerorains.top/img/28.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "「书籍阅读」智能计算系统",
+  "url": "http://blog.zerorains.top/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/",
+  "image": "http://blog.zerorains.top/img/28.jpg",
+  "datePublished": "2022-09-29T09:10:17.000Z",
+  "dateModified": "2022-09-30T08:37:12.463Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "zerorains",
+      "url": "http://blog.zerorains.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="canonical" href="http://blog.zerorains.top/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '「书籍阅读」智能计算系统',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="web_bg" style="background-image: url(/img/body_background.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/28.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ZeroRains Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">「书籍阅读」智能计算系统</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/drink/"><i class="fa-fw fas fa-mug-hot"></i><span> 请我喝茶</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://ml.akasaki.space/"><i class="fa-fw fas fa-link"></i><span> DL笔记</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://notebook.therainisme.com/"><i class="fa-fw fas fa-link"></i><span> 急救箱</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">「书籍阅读」智能计算系统</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-09-29T09:10:17.000Z" title="发表于 2022-09-29 17:10:17">2022-09-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-09-30T08:37:12.463Z" title="更新于 2022-09-30 16:37:12">2022-09-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96/">系统优化</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>这篇博客用于记录《智能计算系统》一书中的一些关键内容，由于前4章都是深度学习相关知识，我已经基本了解，所以不需要记录太多内容</p>
+</blockquote>
+<h2 id="第5章">第5章</h2>
+<h3 id="tf1的设计原则">TF1的设计原则</h3>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>易开发：提取出大量的共性运算，并将这些运算成</mtext><mi>T</mi><mi>F</mi><mn>1</mn><mtext>中的各种算子</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>可移植性：定义不同设备的抽象，其要实现如下方法</mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1.</mn><mtext>设备上执行算的启动方法</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2.</mn><mtext>输入输出数据地址空间的分配方法</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3.</mn><mtext>主机端与设备端的数据传输方法</mtext></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{cases}
+高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果\\
+易开发：提取出大量的共性运算，并将这些运算成TF1中的各种算子\\
+可移植性：定义不同设备的抽象，其要实现如下方法\begin{cases}
+1. 设备上执行算的启动方法\\
+2. 输入输出数据地址空间的分配方法\\
+3. 主机端与设备端的数据传输方法\\
+\end{cases}
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:7.2em;vertical-align:-3.35em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.85em;"><span style="top:-1.366em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-1.358em;"><span class="pstrut" style="height:3.816em;"></span><span style="height:1.816em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="1.816em" style="width:0.8889em" viewBox="0 0 888.89 1816" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V1816 H384z M384 0 H504 V1816 H384z"/></svg></span></span><span style="top:-3.816em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.958em;"><span class="pstrut" style="height:3.816em;"></span><span style="height:1.816em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="1.816em" style="width:0.8889em" viewBox="0 0 888.89 1816" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V1816 H384z M384 0 H504 V1816 H384z"/></svg></span></span><span style="top:-6.766em;"><span class="pstrut" style="height:3.816em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.35em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.85em;"><span style="top:-7.252em;"><span class="pstrut" style="height:4.41em;"></span><span class="mord"><span class="mord cjk_fallback">高性能：调度器更具网络结构特点，并发运行没有数据依赖的节点，异步发射满足依赖关系的多个节点而不同步等待每个节点的中间结果</span></span></span><span style="top:-5.812em;"><span class="pstrut" style="height:4.41em;"></span><span class="mord"><span class="mord cjk_fallback">易开发：提取出大量的共性运算，并将这些运算成</span><span class="mord mathnormal" style="margin-right:0.13889em;">TF</span><span class="mord">1</span><span class="mord cjk_fallback">中的各种算子</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:4.41em;"></span><span class="mord"><span class="mord cjk_fallback">可移植性：定义不同设备的抽象，其要实现如下方法</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35em;"><span style="top:-2.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.192em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-4.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.85em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">1.</span><span class="mord cjk_fallback">设备上执行算的启动方法</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">2.</span><span class="mord cjk_fallback">输入输出数据地址空间的分配方法</span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">3.</span><span class="mord cjk_fallback">主机端与设备端的数据传输方法</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.35em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h3 id="tf1的计算图机制">TF1的计算图机制</h3>
+<h4 id="求导方式">求导方式</h4>
+<ol>
+<li>手动求导：用链式法则求解梯度公式
+<ol>
+<li>优点：直接带入数字就可以得到结果</li>
+<li>缺点：无法通用或复用</li>
+</ol>
+</li>
+<li>数值求导：利用导数的原始定义求解<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>h</mi><mo>→</mo><mn>0</mn></mrow></msub><mfrac><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>h</mi><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mi>h</mi></mfrac></mrow><annotation encoding="application/x-tex">f^{\prime}(x) = \lim_{h\rightarrow0}\frac{f(x+h)-f(x)}{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.355em;vertical-align:-0.345em;"></span><span class="mop"><span class="mop">lim</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">h</span><span class="mrel mtight">→</span><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">x</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight">h</span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">x</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>
+<ol>
+<li>优点：可以向用户隐藏求导细节</li>
+<li>缺点：计算量大，运行速度慢，引入舍入误差(roundoff error)和截断误差(truncation error)</li>
+</ol>
+</li>
+<li>符号求导：利用求导规则对表达式自动操作，可能产生“表达式膨胀的问题”。</li>
+</ol>
+<p>自动求导：在给定前向计算过程后，由编程框架自动推导方向计算图，完成导数计算是一种介于符号求导和数值求导之间的方法。其首先实现了一批常用基本算子的求导表达式(比如<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><msup><mi>n</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mi>o</mi><mi>s</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">sin^{\prime}(x)=cos(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">i</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">cos</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>，这个结果，就要在sin这个操作的类中，注册其求导方法为cos)，保留中间结果，最后求互整个函数的导数。</p>
+<h4 id="控制流">控制流</h4>
+<p>TF1使用不同的控制流算子的不同组合来实现各种复杂控制流场景。</p>
+<p><img src="https://blog.zerorains.top/img/image-20220929173114664.png" alt="image-20220929173114664"></p>
+<p>执行帧：TF1每个算子都会在一个执行帧中执行，其通过专门的控制流逻辑来创建和管理。在没有数据以来的前提下，不同的执行帧中的算子可以并行执行。</p>
+<p>控制流基本算子：</p>
+<ol>
+<li>Swtich算子：根据输入条件，选择将输入数据输出到T/F两个不同的端口上。当输入数据和输入条件同时有效时执行。</li>
+<li>Merge算子：同一个时刻最多有一个输入数据有效，一旦某个输入数据有效，算子就会执行，将有效数据进行传递，通常情况下不会同时有效。</li>
+<li>Enter算子：Enter(name)，将当前有效输入传入到名为name的执行帧中，主要用于主帧向子帧传递数据。一旦Enter的输入有效，就会自己执行。当第一个Enter算子执行时，执行帧就会建立起来。</li>
+<li>Exit算子：将输入传递给父帧，即子帧的计算结果传递给父帧。Exit算子可以类比为函数的返回值。每个执行帧可以由多个Exit算子，每个Exit算子异步执行。</li>
+<li>NextIteration算子：将输入传递给执行帧的迭代器，进入下一层迭代中。</li>
+</ol>
+<p>基于这些算子，TF1进一步封装了cond和循环操作while_loop两个控制流API。</p>
+<ol>
+<li>条件操作：<code>cond</code>
+<ol>
+<li>格式：<code>cond(pred, true_fn,false_fn)</code></li>
+<li>含义：如果<code>pred</code>为真，返回<code>true_fn</code>的结果，否则返回<code>false_fn</code>的结果</li>
+<li>举个例子：<code>tf.cond(x&gt;y,lambda:tf.substract(x,y),lambda:tf.add(x,x))</code>的实现</li>
+<li><img src="https://blog.zerorains.top/img/image-20220930113600996.png" alt="image-20220930113600996"></li>
+<li>x和y作为算子的输入，然后根据&gt;的条件，如果x&gt;y为T，则实现x与y相加的结果，如果x&gt;y为F，则左边的算子走F的通道(x+x)，右边的Swtich算子则不执行。最后根据Add和Sub算子中有效数据，作为Merge算子的输出。</li>
+</ol>
+</li>
+<li>循环操作：<code>while_loop</code>
+<ol>
+<li>格式：<code>while_loop(pred,body,loop_vars)</code></li>
+<li>含义：在满足<code>pred</code>的条件下，反复执行<code>body</code>，其中<code>loop_vars</code>是父执行帧传递给循环控制执行帧的输入张量列表</li>
+<li>举个例子：<code>tf.while_loop(lambda i:i&lt;16, lambda i:tf.multiply(i,2), [4])</code></li>
+<li><img src="https://blog.zerorains.top/img/image-20220930114110138.png" alt="image-20220930114110138"></li>
+<li>从下往上看，Enter算子注册了这个while_loop的执行帧，然后使用Merge算子进行输入流选择，由于初始化时只有Enter上来的输入，所以是Enter算子传递的数据会通过Merge算子传出，然后根据条件状态，在Switch算子中进行分支，如果是T，则执行x2的操作，进入NextIteration算子，然后输出值进入Merge算子中，此时因为Enter算子没有输入了，所以Merge算子会通过NextIteration算子的输出值，如果Switch算子为F，则进入Exit算子，结束执行帧输出最终的结果。</li>
+</ol>
+</li>
+</ol>
+<h4 id="执行模式">执行模式</h4>
+<p>TF1的计算图执行通常包括客户端(client)、主控(master)进程以及一个或多个工作进程(worker process)。TF1提供了本地执行和分布式执行两种执行方式。</p>
+<p>本地执行：客户端，主控进程以及工作进程都在只有一个操作系统的单一物理机上运行</p>
+<p>分布式执行：支持客户端、主控进程以及工作进程在不同机器上执行。</p>
+<p><img src="https://blog.zerorains.top/img/image-20220930145358282.png" alt="image-20220930145358282"></p>
+<p>基本流程：计算图中的节点按照图中的依赖关系顺序执行，TF调度器会持续见识未被执行的节点，一旦某个节点所依赖的前驱节点数量为0(即入度为0时，感觉有点像拓扑序列)，该节点处于就绪状态，就会被立即放入预执行队列中，执行器会从预执行队列中取出节点，并根据节点信息，选择合适的设备创建相应算子交给设备端来执行。当某个节点执行结束后，所欲依赖该节点的依赖信息将被更新。</p>
+<h3 id="计算图的本地执行">计算图的本地执行</h3>
+<h4 id="计算图剪枝-prune">计算图剪枝(prune)</h4>
+<p>目的：得到本地运行所需的最小子图。</p>
+<p>主要由两部分组成：</p>
+<ol>
+<li>取出计算图中与最终输出节点无关的边和节点</li>
+<li>给输入输出节点建立和外接的交互</li>
+</ol>
+<p>在本地执行模式下，TF通过<code>FunctionCallFrame</code>函数调用帧来解决输入输出值传递的问题。具体做法就是在每个输入节点前插入<code>Arg</code>节点，在每个输出节点后面加入<code>RetVal</code>节点，方便使用<code>FuncitonCallFrame</code>传递参数和抓取结果。最后，所有的输入节点连接到<code>Source</code>节点上，并通过控制依赖边相连。同样的，所有的输出节点连接到<code>Sink</code>节点上，也通过控制边相连，最终形成完整的计算图。</p>
+<p>去除无关节点和边的过程，则是从输出节点开始进行快读搜索遍历，对在遍历过程中没有接触到的节点和边进行删除。遍历完成之后可能会生成多个连通图，<strong>此时需要将每个连通图的入度为0的节点通过控制依赖边与Source节点相连</strong>，出度为0的点通过控制依赖边和Sink节点相连，从而形成完整的计算图。</p>
+<h4 id="计算图分配-placement">计算图分配(placement)</h4>
+<p>目的：解决在多设备运行环境中，计算图节点在哪个设备上执行的问题。</p>
+<p>用户可以执行指定某个操作的计算设备，也可以指定那些计算节点需要绑定(co-locate)在同一个设备上。对于为执行的计算节点，再利用特定算法自动将节点分配到不同设备上，提高计算效率。</p>
+<p>基础的设备划分算法<strong>采用贪心策略来对每个节点进行分配</strong>，从<code>Source</code>节点开始，算法<strong>模拟每个节点在支持该节点的所有不同设备上的执行情况</strong>，得到不同设备上该节点的执行开销。该算法不仅<strong>考虑代价模型中当前节点的计算开销</strong>，还包括<strong>输入数据拷贝到该节点的数据通信开销</strong>。显然，由于该设备分配算法每次都只关注当前节点，导致得到的结果仅仅是局部最优，无法保证全局最优。但TF提供了额外的接口，使得用户可以给设备分配算法提供额外帮助信息或限制信息，以达到高效的设备分配。</p>
+<h4 id="计算图优化-optimization">计算图优化(optimization)</h4>
+<p>TF图优化由<code>Grappler</code>模块来实现，用户可以利用此模块实现定制的优化方法。图优化可以根据不同的硬件结构调整计算调度策略，从而获得更快的计算调度策略。</p>
+<p>典型的优化方法：</p>
+<ol>
+<li>ConstFold(包括常量折叠等优化)
+<ol>
+<li>在分型静态计算图的过程中，检测到有的常量节点可以被提前计算，用得到的结果生成新的节点来代替原来的常量节点，从而减少运行时计算量的方法。</li>
+<li>主要由三个关键函数组成
+<ol>
+<li><code>MaterializeShapes</code>：处理Shape相关的节点，通过静态计算图已有的信息推算出形状结果后，用结果来代替原来的节点</li>
+<li><code>FoldGraph</code>：该函数会对每个节点的输入进行检测，如果检测到输入均为常量节点，则提前计算出值来完整替换当前的节点。</li>
+<li><code>SimplifyGraph</code>：该函数则聚焦于简化节点中的常量运算，比如<code>Mul(c1,Mul(tensor,c2))</code>简化为<code>Mul(tensor,c1*c2)</code></li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Arithmetic(包括算术简化等)：公共子表达式消除和算术简化
+<ol>
+<li>tensor+tensor+tensor转化为3*tensor</li>
+<li>(mat1+s1)+(mat2+s2)转化成(mat1+mat2)+(s1+s2)，其中s1和s2是标量</li>
+</ol>
+</li>
+<li>Layout(包括布局优化等)：主要针对GPU运算，TF默认使用NHWC的格式，而在GPU中NCHW更加高效，在布局优化中可以使用NHWC2NCHW和NCHW2NHWC这两个转化节点。</li>
+<li>Remapper(包括算子融合等)：一般指算子融合，即出现频率比较高的子图用一个单独算子来代替，提高计算效率。融合后的算子，该部分子图的调度开销就被完全消除了。
+<ul>
+<li>Conv2D+BiasAdd+Activation</li>
+<li>Conv2D+FusedBatchNorm+Activation</li>
+</ul>
+</li>
+</ol>
+<h4 id="计算图切分-partition">计算图切分(partition)</h4>
+<p>指在计算图的一系列优化完成之后，将计算图放到多个设备上计算，每个设备对应一个切分子图(partition graph)，需要解决通信问题。</p>
+<p>在新图中，所有的跨设备边被替换成一对由<code>Send</code>和<code>Recv</code>组成的节点，并限定所有使用目标张量的节点都使用同一个<code>Recv</code>节点。<code>Send/Recv</code>节点向不同的设备或工作机传递数据通讯需求。在<code>Recv</code>没有得到有效数据之前，图的运行会被阻塞主。主控机只需要向不同的工作传递运行请求，不需要负责不同工作机之间的同步问题。这使得TensorFlow系统有良好的可拓展性和更高的执行策略。</p>
+<p><img src="https://blog.zerorains.top/img/image-20220930152119087.png" alt="image-20220930152119087"></p>
+<h3 id="计算图的分布式执行">计算图的分布式执行</h3>
+<p>在图分配后为每个设备都创建了一个子图，在工作进程通信的<code>Send/Recv</code>节点通过远程通信机制(TCP,RDMA)进行数据传输。</p>
+<h4 id="分布式通信">分布式通信</h4>
+<p>可以分为两类：点到点通信(point-to-point communication)和集合通信(collective communication)。</p>
+<p>TF实行了集合通信的基本算子：</p>
+<ul>
+<li>all_sum：将所有输入张量相加得到一个张量，并将其输出到每个输入张量对应的设备上</li>
+<li>all_prod：将所有输入张量对应维度的元素相加得到一个张量，并将其输出到每个输入张量对应的设备上</li>
+<li>all_min：将所有输入张量对应维度的元素取最小值得到一个张量，并将其输出到每个输入张量对应的设备上</li>
+<li>all_max：将所有输入张量对应维度的元素取最大值得到一个张量，并将其输出到每个输入张量对应的设备上</li>
+<li>reduce_sum：将所有输入张量相加得到一个张量，并返回这个结果</li>
+<li>broadcast：将输入张量广播给所有的设备</li>
+</ul>
+<h4 id="容错机制">容错机制</h4>
+<p>TF会<strong>检查Send和Recv节点传输的正确性</strong>，同时<strong>主控机会定期检查每个工作机的状态</strong>。当检查到系统发生错误时，整个计算图的执行过程就会立即停止，然后可<strong>由用户重新启动执行</strong>。用户在训练过程中可以保存中间状态，用于立即回复到出错前的状态。</p>
+<h3 id="tf系统实现">TF系统实现</h3>
+<h4 id="整体架构">整体架构</h4>
+<p>第一部分是面向各种语言的语言包，第二部分是C/C++API，面向有较高性能需求的用户。第三部分是TF的后端代码。如下图：</p>
+<p><img src="https://blog.zerorains.top/img/image-20220930153403099.png" alt="image-20220930153403099"></p>
+<p>核心后端代码从结构上可以分为以下部分：</p>
+<ul>
+<li>core/common_runtime和core/distributed_runtime：运行时部分，有本地运行时core/common_runtime和分布式运行时distributed_runtime。本地运行时包括执行器逻辑和设备管理，分布式运行时包括主控进程、工作进程和远程通信等。</li>
+<li>core/framework：框架部分，包括TF基本数据结构定义，如Graph、Node、function、OpKernel(计算核函数)等定义</li>
+<li>core/graph：计算图部分，包括计算图的构建和切分</li>
+<li>core/grappler：图优化部分，计算图的优化以及计算图代价模型建立</li>
+<li>core/kernels：计算核函数部分，主要包括计算核函数(Conv,MatMul,ReLU)的具体实现</li>
+<li>core/ops：计算节点部分，包括计算节点注册逻辑</li>
+</ul>
+<h4 id="计算图执行模块">计算图执行模块</h4>
+<h5 id="session执行">Session执行</h5>
+<p>Session是用户和TF运行时的接口，在Session接受到输入数据时，便可开始运行。一般情况下，每个设备都会有一个执行器(Executor)，负责本设备上计算子图的执行。通过利用CPU上多线程或GPU上多Stream机制，执行器可以最大化地实现降低延迟和增加吞吐的目标。</p>
+<p>Run函数是Session执行的核心所里，在其中完成计算的执行，包括传参、运行和返回。函数调用帧(FunctionCallFrame)是Session和执行器进行交互的窗口，feed和fetch分别是输入和输出参数。执行器从feed中获取输入并执行结果写入fetch中。在准备好执行环境后，<strong>Session会调用RunInternal函数开始执行计算</strong>。在其中会启动多个并行执行器，同时会创建执行器的barrier，确保所有的执行器都执行完。RunInternal函数执行完毕后，返回到Run函数继续执行，处理计算图得到最终的运算结果。</p>
+<h5 id="执行器逻辑">执行器逻辑</h5>
+<p>执行流(stream)：一个能够存储计算任务的队列，队列中的计算任务按照进入队列的顺序执行。</p>
+<p>设备在执行计算任务时会存在不同的流，流与流之间的计算任务可以并行执行，流内的计算任务串行执行。执行器分配图中每个节点到对应的流的原则是：有数据依赖的节点分配到同一流中，无数据依赖的节点分配到不同流中。分配完流之后，执行器启动ScheduleReady函数开始异步执行计算图中的节点，执行器调用完RunAsync函数后，返回主逻辑，等待执行结束。</p>
+<p>ScheduleReady主要是对队列中每个节点都调用Process方法进行处理，其中主要处理两个队列：ready队列是预之心队列，inline_ready是当前现成要处理的队列。如果inline_ready为空(最开始为空)，则使用新的现成分别处理ready中的每个节点。当inline_ready不为空时，若节点都是低开销的，则逐一放到inline_ready队列中，如果节点是高开销的，当inline_ready队列为空则将首个高开销的节点放入inline_ready队列中，否则高开销的节点都会使用新的线程去执行。</p>
+<p>在Process中，会真正进行节点的运算，主要完成：为OpKernel设置运行参数，为OpKernel准备输入、设置计算参数，调用设备计算，处理计算输出，传播输出并更新节点间的依赖关系，完成后处理并可能启动新的ScheduleReady函数。TF的计算核函数又两种运行模式：同步和异步。绝大部分算子是同步计算模式，<code>Send/Recv</code>算子是异步计算模式。因为<code>Send</code>和<code>Recv</code>算子的运行时间是高开销且不确定的，Process如果等待<code>Send/Recv</code>至其执行完成会严重影响整体执行效率，实际上，类似GPU这种具有执行流概念的设备，核函数并不是真正同步运行，调用完Compute函数只表示计算任务已经下发到了执行流中。</p>
+<h4 id="设备抽象和管理">设备抽象和管理</h4>
+<p>设备是TF运行的实体，每个设备都负责一个子图的运算。TF使用注册机制来管理设备，开发者可以通过注册接口支持自定义设备，为了支持注册机制，TF定义了抽象的设备类。本地设备(CPU和GPU)都会基于LocalDevice再创建自己的设备类，深度学习处理器也可以基于LocalDevice创建自己的设备类。</p>
+<h4 id="网络和通信">网络和通信</h4>
+<p>TF中不同设备和机器间的同喜都有Send和Recv节点进行，而Send和Recv使用Rendezvous机制完成数据交互，其是一个基于生产者-消费之模型设计的抽象类。每个Rendezvous实例拥有一个通道表，其中记录了每对Send/Recv的广西和状态。不同的通道拥有唯一的键值，该键值是有生产者和消费者的消息产生的。生产者使用Send方法将数据传到特定通道，消费者使用Recv方法从特定通道中获取这组数据。生产者可以通过通道传输连续的多组数据，消费者可以按照发送顺序获得这组数据。消费者可以在任意时刻调用Recv方法来获取数据，也可以使用回调或阻塞的方法来获取数据。不论哪种方法，消费者都能在数据有效时尽快得到数据，生产者在任何时候对不会被阻塞。</p>
+<ul>
+<li>发送方法(Send)：Tensor生产者会在Send节点中调用Rendezvous的Send方法，将Tensor(val)和状态(is_dead)等信息发送到特定的键值通道上。</li>
+<li>接收方法(Recv)：由于Recv节点不知道何时数据才是有效的，因此采用异步回调模式。一旦读取的Tensor有效，回调函数便会被调用，完成Recv节点后续的操作。</li>
+</ul>
+<h5 id="本地通信：localrendezvouslmpl">本地通信：LocalRendezvouslmpl</h5>
+<p>主要是给本地运行时使用的，这个类中主要工鞥呢是实现了具体的Send和Recv函数。</p>
+<p>Send函数：如果键值通道队列为空或者队列中只有Send节点的信息，则继续把新的信息放入队列中；如果队列中有Recv节点的信息，则直接把这个Send节点信息通过Recv节点的回调函数传给Recv节点。</p>
+<p>Recv函数：主要逻辑是RecvAsync，如果队列中已经有Send节点信息，那么直接把该Send节点信息处理掉；如果队列为空或者只有Recv节点信息，则继续将本次Recv节点信息放入队列中。</p>
+<h5 id="远程通信：remoterendezvous">远程通信：RemoteRendezvous</h5>
+<p>主要用于远程数据的交互，在TF中使用RPC通信机制实现远程通信。</p>
+<p>BaseRemoteRendezvous类中定义，如果源和目的是同一个工作进程，则调用本地的RecvAsync，否则调用远程Recv方法。</p>
+<p>RpcRemoteRendezvous继承了BaseRemoteRendezvous类，使用PRC远程调用方法获得远端的数据。RecvFromRemoteAsync的核心是准备并启动RpcRecvTensorCall类型的过程调用，用于获取远程的Tensor。其中最终会调用worker的RecvTesnorAsyn发起相应请求。</p>
+<h4 id="算子实现">算子实现</h4>
+<p>每个算子都有自己的属性，可以由用户设置，也可以在建立Graph时由上下文推导而来，最常见的属性是设置算子的数据类型。OpKernel是算子的特定执行，依赖于底层硬件。基于不同设备、不同数据类型，算子可以由不同的OpKernel实现：既可以使用底层硬件提供的高性能库，也可以采用特定的编程语言。TF通过注册机制来支持不同算子和相应的OpKernel函数。</p>
+<p>OpKernel的家孙可以是同步的也可以是异步的，但所有的OpKernel的Compute方法都必须要保证线程安全。大部分的OpKernel是同步计算的模式，这些OpKernel应该集成OpKernel类并覆写Compute方法，在Compute方法中完成需要做的工作遍立即返回，表示该算子已经结束计算。和通信相关的Opkernel，如Send和Recv，则需要采用异步执行方式。需要继承AsyncOpKernel并覆盖ComputeAsync方法。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top">zerorains</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://blog.zerorains.top/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/">http://blog.zerorains.top/2022/09/29/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://blog.zerorains.top" target="_blank">ZeroRains Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%99%BA%E8%83%BD%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F/">智能计算系统</a></div><div class="post-share"><div class="social-share" data-image="/img/28.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2022/09/18/%E3%80%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8DNetRL-Task-aware-Network-Denoising-via-Deep-Reinforcement-Learning/" title="「论文阅读」NetRL: Task-aware Network Denoising via Deep Reinforcement Learning"><img class="cover" src="/img/10.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">「论文阅读」NetRL: Task-aware Network Denoising via Deep Reinforcement Learning</div></div><div class="info-2"><div class="info-item-1"> 论文：NetRL: Task-aware Network Denoising via Deep Reinforcement Learning  作者：Jiarong Xu; Yang Yang; Shiliang Pu; Yao Fu; Jun Feng; Weihao Jiang; Jiangang Lu; Chunping Wang 时间：2022-7 期刊：IEEE Transactions on Knowledge and Data Engineering 代码：https://github.com/galina0217/NetRL  原文摘要  Network data is mostly hard to obtain and error-prone. However, most existing works assume that the studied network represents a perfect and complete picture of topological structure; nevertheless, it is rarely the...</div></div></div></a><a class="pagination-related" href="/2022/10/01/%E3%80%8C%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E3%80%8D%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" title="「书籍阅读」数据密集型应用系统设计"><img class="cover" src="/img/14.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">「书籍阅读」数据密集型应用系统设计</div></div><div class="info-2"><div class="info-item-1">可靠、可拓展与可维护的应用系统 应用系统的组成模块：  数据库：存储数据 高速缓存：缓存复杂或操作代价昂贵的结果 索引：用户可以按关键字搜索并支持各种过滤 流式处理：持续发送消息至另一进程(异步) 批处理：定期处理大量的累积数据  数据软件系统重视的三个问题：  可靠性(Reliability)：硬件、软件故障、人为失误等，系统仍然可以正常运转。 可拓展性(Scalability)：数据量和复杂度是可变的 可维护性(Maintainability)：新人员可以参与到系统开发和运维，维护现有功能或适配新的场景，系统都能够高效运作。  可靠性 可能出错的事情称为错误(faults)或故障，系统可应对错误称为容错(fault-tolerant)。与失效(failure)不完全一致，前者表示与预期目的偏离，后者表示整个系统完全停止工作。 硬件故障:...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/assets/apple-touch-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">zerorains</div><div class="author-info-description">No matter what happens, I will do my best.</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">92</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">104</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zeroRains"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="tencent://message?uin=2274033547" target="_blank" title="qq"><i class="fab fa-qq"></i></a><a class="social-icon" href="https://github.com/zeroRains" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zerorainssakura@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://blog.csdn.net/kiminoamae?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="fab fa-cuttlefish"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">主业想做大模型推理，目前也正在努力学习中。副业做数据库中执行传统模型的推理优化。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC5%E7%AB%A0"><span class="toc-number">1.</span> <span class="toc-text">第5章</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#tf1%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="toc-number">1.1.</span> <span class="toc-text">TF1的设计原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tf1%E7%9A%84%E8%AE%A1%E7%AE%97%E5%9B%BE%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.</span> <span class="toc-text">TF1的计算图机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B1%82%E5%AF%BC%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.1.</span> <span class="toc-text">求导方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81"><span class="toc-number">1.2.2.</span> <span class="toc-text">控制流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.2.3.</span> <span class="toc-text">执行模式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E7%9A%84%E6%9C%AC%E5%9C%B0%E6%89%A7%E8%A1%8C"><span class="toc-number">1.3.</span> <span class="toc-text">计算图的本地执行</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E5%89%AA%E6%9E%9D-prune"><span class="toc-number">1.3.1.</span> <span class="toc-text">计算图剪枝(prune)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E5%88%86%E9%85%8D-placement"><span class="toc-number">1.3.2.</span> <span class="toc-text">计算图分配(placement)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%BC%98%E5%8C%96-optimization"><span class="toc-number">1.3.3.</span> <span class="toc-text">计算图优化(optimization)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E5%88%87%E5%88%86-partition"><span class="toc-number">1.3.4.</span> <span class="toc-text">计算图切分(partition)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E6%89%A7%E8%A1%8C"><span class="toc-number">1.4.</span> <span class="toc-text">计算图的分布式执行</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%80%9A%E4%BF%A1"><span class="toc-number">1.4.1.</span> <span class="toc-text">分布式通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="toc-number">1.4.2.</span> <span class="toc-text">容错机制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tf%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.5.</span> <span class="toc-text">TF系统实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">1.5.1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9B%BE%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9D%97"><span class="toc-number">1.5.2.</span> <span class="toc-text">计算图执行模块</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#session%E6%89%A7%E8%A1%8C"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">Session执行</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%99%A8%E9%80%BB%E8%BE%91"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">执行器逻辑</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E5%A4%87%E6%8A%BD%E8%B1%A1%E5%92%8C%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">设备抽象和管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E5%92%8C%E9%80%9A%E4%BF%A1"><span class="toc-number">1.5.4.</span> <span class="toc-text">网络和通信</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E9%80%9A%E4%BF%A1%EF%BC%9Alocalrendezvouslmpl"><span class="toc-number">1.5.4.1.</span> <span class="toc-text">本地通信：LocalRendezvouslmpl</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E9%80%9A%E4%BF%A1%EF%BC%9Aremoterendezvous"><span class="toc-number">1.5.4.2.</span> <span class="toc-text">远程通信：RemoteRendezvous</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%97%E5%AD%90%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.5.5.</span> <span class="toc-text">算子实现</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔"><img src="/img/27.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「随笔小记」大模型随笔"/></a><div class="content"><a class="title" href="/2025/03/02/%E3%80%8C%E9%9A%8F%E7%AC%94%E5%B0%8F%E8%AE%B0%E3%80%8D%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%8F%E7%AC%94/" title="「随笔小记」大模型随笔">「随笔小记」大模型随笔</a><time datetime="2025-03-02T04:54:32.000Z" title="发表于 2025-03-02 12:54:32">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发"><img src="/img/2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「实习笔记」Paddle组合机制设计与开发"/></a><div class="content"><a class="title" href="/2025/02/23/%E3%80%8C%E5%AE%9E%E4%B9%A0%E7%AC%94%E8%AE%B0%E3%80%8DPaddle%E7%BB%84%E5%90%88%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/" title="「实习笔记」Paddle组合机制设计与开发">「实习笔记」Paddle组合机制设计与开发</a><time datetime="2025-02-23T07:54:26.000Z" title="发表于 2025-02-23 15:54:26">2025-02-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"><img src="/img/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs"/></a><div class="content"><a class="title" href="/2023/04/26/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DPiPAD-Pipelined-and-Parallel-Dynamic-GNN-Training-on-GPUs/" title="「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs">「论文笔记」PiPAD: Pipelined and Parallel Dynamic GNN Training on GPUs</a><time datetime="2023-04-26T05:34:14.000Z" title="发表于 2023-04-26 13:34:14">2023-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"><img src="/img/26.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update"/></a><div class="content"><a class="title" href="/2023/04/04/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DEkko-A-Large-Scale-Deep-Learning-Recommender-System-with-Low-Latency-Model-Update/" title="「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update">「论文笔记」Ekko: A Large-Scale Deep Learning Recommender System with Low-Latency Model Update</a><time datetime="2023-04-04T03:24:12.000Z" title="发表于 2023-04-04 11:24:12">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"><img src="/img/25.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference"/></a><div class="content"><a class="title" href="/2023/03/27/%E3%80%8C%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0%E3%80%8DDeepRecSys-A-System-for-Optimizing-End-To-End-At-Scale-Neural-Recommendation-Inference/" title="「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference">「论文笔记」DeepRecSys: A System for Optimizing End-To-End At-Scale Neural Recommendation Inference</a><time datetime="2023-03-27T02:30:28.000Z" title="发表于 2023-03-27 10:30:28">2023-03-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By zerorains</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
